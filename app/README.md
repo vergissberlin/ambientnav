@@ -50,6 +50,24 @@ flutter gen-l10n
 flutter run --dart-define=USE_MOCK=true   # run against the in-memory mock
 ```
 
+### iOS device (physical iPhone)
+
+Device builds need an Apple Development certificate. One-time setup:
+
+1. Open the Xcode workspace: `open ios/Runner.xcworkspace`
+2. **Xcode → Settings → Accounts** — sign in with your Apple ID
+3. Select **Runner** → **Signing & Capabilities** → enable **Automatically manage signing**
+4. Choose your **Team** (Personal Team is fine for local testing)
+5. Connect/unlock the iPhone, trust the Mac, enable **Developer Mode** on the device
+6. Run again: `flutter run -d <device-id> --dart-define=USE_MOCK=true`
+7. On first install: **Settings → General → VPN & Device Management** → trust the developer app
+
+Alternatively, copy `ios/Flutter/Local.xcconfig.example` to `ios/Flutter/Local.xcconfig`
+and set `DEVELOPMENT_TEAM` to your Team ID (file is gitignored).
+
+Wireless debugging: pair once over USB, then enable **Connect via network** in
+**Window → Devices and Simulators**.
+
 ## Test & analyze
 
 ```bash
