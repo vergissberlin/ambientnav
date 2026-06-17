@@ -9,7 +9,7 @@ on:
     types: [published]
 
 permissions:
-  contents: write  # needed to upload release assets
+  contents: write  # needed to upload release assets and commit merged binaries
 
 jobs:
   build-front:
@@ -37,11 +37,29 @@ jobs:
       - name: Build front firmware
         run: cd firmware/front && pio run
 
-      - name: Upload artifact
+      - name: Create merged firmware (front)
+        run: |
+          BOOT_APP0=$(find ~/.platformio/packages -name "boot_app0.bin" 2>/dev/null | head -n 1)
+          echo "Using boot_app0: $BOOT_APP0"
+          python -m esptool --chip esp32 merge_bin \
+            -o firmware-front.bin \
+            0x1000 firmware/front/.pio/build/front/bootloader.bin \
+            0x8000 firmware/front/.pio/build/front/partitions.bin \
+            0xe000 "$BOOT_APP0" \
+            0x10000 firmware/front/.pio/build/front/firmware.bin
+
+      - name: Upload app artifact (front)
         uses: actions/upload-artifact@v4
         with:
           name: firmware-front
           path: firmware/front/.pio/build/front/firmware.bin
+          retention-days: 30
+
+      - name: Upload merged artifact (front)
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-front-merged
+          path: firmware-front.bin
           retention-days: 30
 
   build-rear:
@@ -69,11 +87,29 @@ jobs:
       - name: Build rear firmware
         run: cd firmware/rear && pio run
 
-      - name: Upload artifact
+      - name: Create merged firmware (rear)
+        run: |
+          BOOT_APP0=$(find ~/.platformio/packages -name "boot_app0.bin" 2>/dev/null | head -n 1)
+          echo "Using boot_app0: $BOOT_APP0"
+          python -m esptool --chip esp32 merge_bin \
+            -o firmware-rear.bin \
+            0x1000 firmware/rear/.pio/build/rear/bootloader.bin \
+            0x8000 firmware/rear/.pio/build/rear/partitions.bin \
+            0xe000 "$BOOT_APP0" \
+            0x10000 firmware/rear/.pio/build/rear/firmware.bin
+
+      - name: Upload app artifact (rear)
         uses: actions/upload-artifact@v4
         with:
           name: firmware-rear
           path: firmware/rear/.pio/build/rear/firmware.bin
+          retention-days: 30
+
+      - name: Upload merged artifact (rear)
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-rear-merged
+          path: firmware-rear.bin
           retention-days: 30
 
   attach-release-assets:
@@ -82,6 +118,11 @@ jobs:
     needs: [build-front, build-rear]
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Download front artifact
         uses: actions/download-artifact@v4
         with:
@@ -94,10 +135,32 @@ jobs:
           name: firmware-rear
           path: dist/rear/
 
-      - name: Rename binaries with version tag
+      - name: Download merged front artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: firmware-front-merged
+          path: dist/merged/
+
+      - name: Download merged rear artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: firmware-rear-merged
+          path: dist/merged/
+
+      - name: Rename versioned binaries
         run: |
           mv dist/front/firmware.bin dist/ambientnav-front-${{ github.ref_name }}.bin
           mv dist/rear/firmware.bin  dist/ambientnav-rear-${{ github.ref_name }}.bin
+
+      - name: Commit merged binaries to docs/public for GitHub Pages serving
+        run: |
+          cp dist/merged/firmware-front.bin docs/public/firmware-front.bin
+          cp dist/merged/firmware-rear.bin  docs/public/firmware-rear.bin
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/public/firmware-front.bin docs/public/firmware-rear.bin
+          git diff --cached --quiet || git commit -m "chore: update web flash binaries for ${{ github.ref_name }}"
+          git push origin main
 
       - name: Attach binaries to GitHub Release
         uses: softprops/action-gh-release@v2
@@ -105,3 +168,5 @@ jobs:
           files: |
             dist/ambientnav-front-${{ github.ref_name }}.bin
             dist/ambientnav-rear-${{ github.ref_name }}.bin
+            dist/merged/firmware-front.bin
+            dist/merged/firmware-rear.bin

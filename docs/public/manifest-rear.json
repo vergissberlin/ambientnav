@@ -1,0 +1,15 @@
+{
+  "name": "AmbientNav Rear (Slave)",
+  "version": "0.3.0",
+  "builds": [
+    {
+      "chipFamily": "ESP32",
+      "parts": [
+        {
+          "path": "https://vergissberlin.github.io/ambientnav/firmware-rear.bin",
+          "offset": 4096
+        }
+      ]
+    }
+  ]
+}

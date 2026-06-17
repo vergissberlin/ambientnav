@@ -44,6 +44,11 @@ export default defineConfig({
           link: '/getting-started/',
         },
         {
+          label: 'Flash Firmware',
+          translations: { de: 'Firmware flashen' },
+          link: '/flash/',
+        },
+        {
           label: 'Hardware',
           translations: { de: 'Hardware' },
           items: [

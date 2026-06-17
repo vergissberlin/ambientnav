@@ -1,0 +1,39 @@
+---
+interface Props {
+  manifest: string;
+  label?: string;
+}
+const { manifest, label = 'Flash Firmware' } = Astro.props;
+---
+
+<script is:inline type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js"></script>
+
+<div class="esp-flash">
+  <esp-web-install-button manifest={manifest}>
+    {label}
+    <span slot="unsupported">
+      <p class="esp-flash-warning">
+        <strong>Browser not supported.</strong>
+        Use Chrome or Edge on desktop to flash firmware.
+      </p>
+    </span>
+    <span slot="not-allowed">
+      <p class="esp-flash-warning">
+        <strong>HTTPS required</strong> — flashing only works over HTTPS.
+      </p>
+    </span>
+  </esp-web-install-button>
+</div>
+
+<style>
+  .esp-flash {
+    margin: 1.5rem 0;
+  }
+  .esp-flash-warning {
+    background: var(--sl-color-orange-low, #fff8e7);
+    border: 1px solid var(--sl-color-orange, #f0a500);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    margin: 0;
+  }
+</style>

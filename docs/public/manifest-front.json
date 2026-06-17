@@ -1,0 +1,15 @@
+{
+  "name": "AmbientNav Front (Master)",
+  "version": "0.3.0",
+  "builds": [
+    {
+      "chipFamily": "ESP32",
+      "parts": [
+        {
+          "path": "https://vergissberlin.github.io/ambientnav/firmware-front.bin",
+          "offset": 4096
+        }
+      ]
+    }
+  ]
+}
