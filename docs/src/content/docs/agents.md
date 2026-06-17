@@ -29,13 +29,13 @@ Reads live navigation data from the Valhalla routing engine via MapLibre Navigat
 | Source | Data |
 |---|---|
 | MapLibre / Valhalla SDK | Next maneuver type, distance to maneuver |
-| iOS turn-signal API | Blinker state (left / right / off) |
+| iOS turn-signal API | Indicator state (left / right / off) |
 
 ### Outputs
 
 | Destination | Protocol | Format |
 |---|---|---|
-| OrchestratorAgent | Bluetooth LE — GATT Write | `[direction, distance_m, blinker]` — 3 bytes |
+| OrchestratorAgent | Bluetooth LE — GATT Write | `[direction, distance_m, indicator]` — 3 bytes |
 
 ### States
 
@@ -101,7 +101,7 @@ The central decision-maker. Merges navigation commands from the iPhone and senso
 
 | Source | Protocol | Data |
 |---|---|---|
-| NavAgent | BLE GATT Write | `[direction, distance_m, blinker]` |
+| NavAgent | BLE GATT Write | `[direction, distance_m, indicator]` |
 | ProximityAgent | BT Classic SPP | `{ "type": "sensors", ... }` |
 
 ### Outputs
@@ -117,7 +117,7 @@ When multiple inputs arrive simultaneously:
 
 1. **Reverse active** — parking aid overrides all other rear strip effects
 2. **Active maneuver** (distance < 200 m) — navigation effect on front strip
-3. **Blinker active** — blinker animation on front strip
+3. **Indicator active** — indicator animation on front strip
 4. **Idle** — slow ambient breathing on both strips
 
 ### States
@@ -151,8 +151,8 @@ Translates abstract `EffectCommand` structs into WS2812B pixel data.
 | `NAV_LEFT` | Turn left < 200 m | Amber sweep center → left, 600 ms cycle |
 | `NAV_RIGHT` | Turn right < 200 m | Amber sweep center → right, 600 ms cycle |
 | `NAV_STRAIGHT` | Continue straight | White pulse forward, 800 ms |
-| `BLINKER_LEFT` | Left blinker | Fast amber blink on left half, 400 ms on/off |
-| `BLINKER_RIGHT` | Right blinker | Fast amber blink on right half, 400 ms on/off |
+| `INDICATOR_LEFT` | Left indicator | Fast amber blink on left half, 400 ms on/off |
+| `INDICATOR_RIGHT` | Right indicator | Fast amber blink on right half, 400 ms on/off |
 | `HAZARD` | Hazard lights | Full strip amber blink, 400 ms on/off |
 | `AMBIENT` | Idle | Slow breathing, configurable color (default: 20 % white) |
 

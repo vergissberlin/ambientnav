@@ -3,7 +3,7 @@ title: LED Effects
 description: Complete catalogue of navigation and parking-aid LED effects for the front and rear WS2812B strips.
 ---
 
-AmbientNav drives two independent WS2812B LED strips via FastLED. The front strip handles navigation and blinker feedback; the rear strip handles parking assistance.
+AmbientNav drives two independent WS2812B LED strips via FastLED. The front strip handles navigation and indicator feedback; the rear strip handles parking assistance.
 
 ---
 
@@ -16,14 +16,14 @@ The front strip is driven by the EffectAgent running on the front ESP32. Effects
 | `NAV_LEFT` | Turn left, distance < 200 m | Amber `#FFA500` | Sweep center → left edge, 600 ms cycle |
 | `NAV_RIGHT` | Turn right, distance < 200 m | Amber `#FFA500` | Sweep center → right edge, 600 ms cycle |
 | `NAV_STRAIGHT` | Continue straight | White `#FFFFFF` | Single pulse toward center, 800 ms |
-| `BLINKER_LEFT` | Left blinker active | Amber `#FFA500` | Fast blink, left half only, 400 ms on/off |
-| `BLINKER_RIGHT` | Right blinker active | Amber `#FFA500` | Fast blink, right half only, 400 ms on/off |
+| `INDICATOR_LEFT` | Left indicator active | Amber `#FFA500` | Fast blink, left half only, 400 ms on/off |
+| `INDICATOR_RIGHT` | Right indicator active | Amber `#FFA500` | Fast blink, right half only, 400 ms on/off |
 | `HAZARD` | Hazard lights | Amber `#FFA500` | Full strip blink, 400 ms on/off |
 | `AMBIENT` | Idle / no navigation | Configurable | Slow sine-wave breathing, 3 s period |
 
 ### Priority
 
-When the navigation app signals an upcoming turn **and** the blinker is active simultaneously, `NAV_LEFT` / `NAV_RIGHT` take priority over `BLINKER_LEFT` / `BLINKER_RIGHT` because they carry additional distance context.
+When the navigation app signals an upcoming turn **and** the indicator is active simultaneously, `NAV_LEFT` / `NAV_RIGHT` take priority over `INDICATOR_LEFT` / `INDICATOR_RIGHT` because they carry additional distance context.
 
 ### Sweep Animation
 
