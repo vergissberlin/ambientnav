@@ -1,0 +1,66 @@
+name: Translate Docs (EN → DE)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/src/content/docs/*.md'
+      - 'docs/src/content/docs/*.mdx'
+
+permissions:
+  contents: write
+  pull-requests: write
+  models: read
+
+jobs:
+  translate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect changed EN docs
+        id: changed
+        uses: tj-actions/changed-files@v44
+        with:
+          files: |
+            docs/src/content/docs/*.md
+            docs/src/content/docs/*.mdx
+          separator: "\n"
+
+      - uses: pnpm/action-setup@v4
+        if: steps.changed.outputs.any_changed == 'true'
+        with:
+          package_json_file: docs/package.json
+
+      - uses: actions/setup-node@v4
+        if: steps.changed.outputs.any_changed == 'true'
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: docs/pnpm-lock.yaml
+
+      - name: Install dependencies
+        if: steps.changed.outputs.any_changed == 'true'
+        run: pnpm install --frozen-lockfile
+        working-directory: docs
+
+      - name: Run translation script
+        if: steps.changed.outputs.any_changed == 'true'
+        run: node docs/scripts/translate.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CHANGED_FILES: ${{ steps.changed.outputs.all_changed_files }}
+
+      - uses: peter-evans/create-pull-request@v6
+        if: steps.changed.outputs.any_changed == 'true'
+        with:
+          commit-message: 'chore: update DE translations'
+          title: 'chore: update DE translations'
+          body: |
+            Automated EN → DE translation via GitHub Models (gpt-4o-mini).
+
+            Triggered by changes to:
+            ${{ steps.changed.outputs.all_changed_files }}
+          branch: translations/de-update
+          delete-branch: true
+          labels: translation

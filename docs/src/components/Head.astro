@@ -1,0 +1,46 @@
+---
+// Wraps Starlight's default Head and adds mermaid.js initialisation.
+import Default from '@astrojs/starlight/components/Head.astro';
+---
+
+<Default {...Astro.props} />
+
+<script>
+  import mermaid from 'mermaid';
+
+  function renderDiagrams() {
+    const diagrams = document.querySelectorAll<HTMLElement>('pre.mermaid');
+    if (!diagrams.length) return;
+
+    // Mirror Starlight's active theme ('light' | 'dark').
+    const isDark = document.documentElement.dataset['theme'] === 'dark';
+
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: isDark ? 'dark' : 'neutral',
+      securityLevel: 'strict',
+    });
+
+    mermaid.run({ nodes: diagrams });
+  }
+
+  // Fires on initial page load and every Starlight View Transition.
+  document.addEventListener('astro:page-load', renderDiagrams);
+</script>
+
+<style>
+  /* Centre diagrams and let them breathe. */
+  pre.mermaid {
+    display: flex;
+    justify-content: center;
+    overflow-x: auto;
+    background: transparent;
+    padding: 1.5rem 0;
+  }
+
+  /* The SVG mermaid injects gets max-width so it scales on narrow screens. */
+  pre.mermaid svg {
+    max-width: 100%;
+    height: auto;
+  }
+</style>

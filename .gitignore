@@ -1,0 +1,4 @@
+docs/dist/
+docs/.pnpm-store/
+docs/node_modules/
+.claude/
