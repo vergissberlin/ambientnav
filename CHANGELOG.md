@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.4.0](https://github.com/vergissberlin/ambientnav/compare/ambientnav-v0.3.0...ambientnav-v0.4.0) (2026-06-17)
+
+
+### Features
+
+* add merged firmware binaries to release assets and flash-firmware docs ([741a14f](https://github.com/vergissberlin/ambientnav/commit/741a14fb62eb69637e4aa57154cc2702738250d4))
+* **docs:** add ESP Web Tools in-browser firmware flasher ([e6b0c71](https://github.com/vergissberlin/ambientnav/commit/e6b0c715bf750facc10177972425d09b6e99778a))
+
+
+### Bug Fixes
+
+* resolve merge conflicts with main ([243e525](https://github.com/vergissberlin/ambientnav/commit/243e525c2aa2d3e2f3b435703055e6a0fc861a1d))
+
+
+### Documentation
+
+* add compatible microcontrollers section with Amazon affiliate links ([0b393ea](https://github.com/vergissberlin/ambientnav/commit/0b393eafab1984e9e422bd164fff71523d7a5c5a))
+
 ## [0.3.0](https://github.com/vergissberlin/ambientnav/compare/ambientnav-v0.2.0...ambientnav-v0.3.0) (2026-06-17)
 
 
