@@ -3,3 +3,6 @@ docs/.astro/
 docs/.pnpm-store/
 docs/node_modules/
 .claude/
+
+# PlatformIO build output
+firmware/**/.pio/

@@ -23,6 +23,16 @@ static uint16_t median3(uint16_t a, uint16_t b, uint16_t c) {
     return b;
 }
 
+// Apply calibration offset and the configured max range to a reading (cm).
+// 999 means "no obstacle" and is left untouched.
+static void applyConfig(uint16_t& cm, const SensorRuntimeConfig& cfg) {
+    if (cm == 999) return;
+    int32_t v = (int32_t)cm + cfg.calib_offset_cm;
+    if (v < 0) v = 0;
+    if (v > cfg.max_range_cm) { cm = 999; return; }
+    cm = (uint16_t)v;
+}
+
 void ultrasonicInit() {
     pinMode(TRIG_L, OUTPUT); pinMode(ECHO_L, INPUT);
     pinMode(TRIG_C, OUTPUT); pinMode(ECHO_C, INPUT);
@@ -63,6 +73,23 @@ void taskUltrasonic(void* param) {
         data.left_cm   = median3(rawL[0], rawL[1], rawL[2]);
         data.center_cm = median3(rawC[0], rawC[1], rawC[2]);
         data.right_cm  = median3(rawR[0], rawR[1], rawR[2]);
+
+        // Apply runtime calibration / range / active-sensor selection.
+        SensorRuntimeConfig cfg;
+        if (xSemaphoreTake(configMutex, pdMS_TO_TICKS(5)) == pdTRUE) {
+            cfg = g_sensorConfig;
+            xSemaphoreGive(configMutex);
+        } else {
+            cfg = {SENSOR_FUSED, 0, 400};
+        }
+        applyConfig(data.left_cm, cfg);
+        applyConfig(data.center_cm, cfg);
+        applyConfig(data.right_cm, cfg);
+        if (cfg.active_sensor != SENSOR_FUSED) {
+            if (cfg.active_sensor != SENSOR_LEFT)   data.left_cm   = 999;
+            if (cfg.active_sensor != SENSOR_CENTER) data.center_cm = 999;
+            if (cfg.active_sensor != SENSOR_RIGHT)  data.right_cm  = 999;
+        }
 
         xQueueOverwrite(sensorQueue, &data);
 
