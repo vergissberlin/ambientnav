@@ -1,6 +1,8 @@
 ---
 title: Erste Schritte
-description: Hardwareanforderungen, Software-Voraussetzungen und Schritt-für-Schritt-Einrichtungsanleitung für AmbientNav.
+description: Hardwareanforderungen, Software-Voraussetzungen und
+  Schritt-für-Schritt-Einrichtungsanleitung für AmbientNav.
+slug: de/0.1/getting-started
 ---
 
 ## Voraussetzungen
@@ -24,7 +26,7 @@ description: Hardwareanforderungen, Software-Voraussetzungen und Schritt-für-Sc
 | Xcode 15+ | iOS App (nur iPhone) | Mac App Store |
 | Node.js 20+ | Übersetzungs-Script (nur CI) | [nodejs.org](https://nodejs.org/) |
 
----
+***
 
 ## Firmware einrichten
 
@@ -46,7 +48,7 @@ pio run --target upload
 
 Den hinteren ESP32 **vor** dem vorderen flashen, damit der Master seine Bluetooth-Classic-Adresse beim ersten Start entdecken kann.
 
----
+***
 
 ## iOS App einrichten
 
@@ -59,7 +61,7 @@ Auf einem **echten iPhone** bauen und ausführen — Bluetooth LE erfordert echt
 
 Die App fragt beim ersten Start nach der Bluetooth-Berechtigung. Der vordere ESP32 muss eingeschaltet und werbend sein, bevor die App geöffnet wird.
 
----
+***
 
 ## Verkabelung
 
@@ -81,9 +83,9 @@ GND         ──────────────  LED-Streifen GND
 5 V         ──────────────  LED-Streifen 5 V (vom Spannungswandler)
 ```
 
-Detaillierte Pin-Belegungen sind in [Verkabelung](/de/wiring/).
+Detaillierte Pin-Belegungen sind in [Verkabelung](/0.1/de/wiring/).
 
----
+***
 
 ## Leistungsaufnahme
 
@@ -97,7 +99,7 @@ Detaillierte Pin-Belegungen sind in [Verkabelung](/de/wiring/).
 
 Den Spannungswandler für mindestens **3 A** auslegen, um Volllast-Spitzen abzufangen.
 
----
+***
 
 ## GitHub Pages einrichten
 
