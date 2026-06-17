@@ -1,11 +1,7 @@
 name: Translate Docs (EN → DE)
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'docs/src/content/docs/*.md'
-      - 'docs/src/content/docs/*.mdx'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -17,14 +13,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Detect changed EN docs
+      - name: Collect all EN docs
         id: changed
-        uses: tj-actions/changed-files@v44
-        with:
-          files: |
-            docs/src/content/docs/*.md
-            docs/src/content/docs/*.mdx
-          separator: "\n"
+        run: |
+          files=$(find docs/src/content/docs -maxdepth 1 \( -name "*.md" -o -name "*.mdx" \) | sort | tr '\n' '\n')
+          echo "all_changed_files=$files" >> $GITHUB_OUTPUT
+          echo "any_changed=$([ -n "$files" ] && echo true || echo false)" >> $GITHUB_OUTPUT
 
       - uses: pnpm/action-setup@v4
         if: steps.changed.outputs.any_changed == 'true'
