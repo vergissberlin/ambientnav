@@ -29,13 +29,13 @@ Liest Live-Navigationsdaten vom Valhalla-Routing-Engine über MapLibre Navigatio
 | Quelle | Daten |
 |---|---|
 | MapLibre / Valhalla SDK | Nächster Manövertyp, Abstand zum Manöver |
-| iOS Blinker-API | Blinkerstatus (links / rechts / aus) |
+| iOS indicator API | Indicator-Status (links / rechts / aus) |
 
 ### Ausgaben
 
 | Ziel | Protokoll | Format |
 |---|---|---|
-| OrchestratorAgent | Bluetooth LE — GATT Write | `[direction, distance_m, blinker]` — 3 Bytes |
+| OrchestratorAgent | Bluetooth LE — GATT Write | `[direction, distance_m, indicator]` — 3 Bytes |
 
 ### Zustände
 
@@ -101,7 +101,7 @@ Die zentrale Entscheidungsinstanz. Führt Navigationsbefehle vom iPhone und Sens
 
 | Quelle | Protokoll | Daten |
 |---|---|---|
-| NavAgent | BLE GATT Write | `[direction, distance_m, blinker]` |
+| NavAgent | BLE GATT Write | `[direction, distance_m, indicator]` |
 | ProximityAgent | BT Classic SPP | `{ "type": "sensors", ... }` |
 
 ### Ausgaben
@@ -134,8 +134,8 @@ Bei gleichzeitig eintreffenden Eingaben gilt folgende Priorität:
 | `NAV_LEFT` | Abbiegen links, Abstand < 200 m | Amber `#FFA500` | Sweep Mitte → linker Rand, 600 ms Zyklus |
 | `NAV_RIGHT` | Abbiegen rechts, Abstand < 200 m | Amber `#FFA500` | Sweep Mitte → rechter Rand, 600 ms Zyklus |
 | `NAV_STRAIGHT` | Geradeaus weiterfahren | Weiß `#FFFFFF` | Einzelner Puls vorwärts, 800 ms |
-| `BLINKER_LEFT` | Linker Blinker aktiv | Amber `#FFA500` | Schnelles Blinken, nur linke Hälfte, 400 ms ein/aus |
-| `BLINKER_RIGHT` | Rechter Blinker aktiv | Amber `#FFA500` | Schnelles Blinken, nur rechte Hälfte, 400 ms ein/aus |
+| `INDICATOR_LEFT` | Linker Blinker aktiv | Amber `#FFA500` | Schnelles Blinken, nur linke Hälfte, 400 ms ein/aus |
+| `INDICATOR_RIGHT` | Rechter Blinker aktiv | Amber `#FFA500` | Schnelles Blinken, nur rechte Hälfte, 400 ms ein/aus |
 | `HAZARD` | Warnblinker | Amber `#FFA500` | Gesamter Streifen blinkt, 400 ms ein/aus |
 | `AMBIENT` | Leerlauf / keine Navigation | Konfigurierbar | Langsames Sinus-Atmen, 3 s Periode |
 

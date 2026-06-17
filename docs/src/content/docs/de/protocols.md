@@ -32,7 +32,7 @@ Characteristic:    12345678-1234-5678-1234-56789ABCDEF1
 |---|---|---|
 | `[0]` | Richtung | `0x00` keine / Leerlauf · `0x01` links abbiegen · `0x02` rechts abbiegen · `0x03` geradeaus |
 | `[1]` | Abstand | Meter zum nächsten Manöver, begrenzt auf `0xFF` (255 m) |
-| `[2]` | Blinker | `0x00` aus · `0x01` links · `0x02` rechts · `0x03` Warnblinker |
+| `[2]` | Indicator | `0x00` aus · `0x01` links · `0x02` rechts · `0x03` Warnblinker |
 
 ### Beispielpakete
 

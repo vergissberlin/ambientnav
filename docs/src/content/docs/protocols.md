@@ -32,7 +32,7 @@ Characteristic:    12345678-1234-5678-1234-56789ABCDEF1
 |---|---|---|
 | `[0]` | Direction | `0x00` none / idle · `0x01` turn left · `0x02` turn right · `0x03` straight |
 | `[1]` | Distance | Metres to next maneuver, capped at `0xFF` (255 m) |
-| `[2]` | Blinker | `0x00` off · `0x01` left · `0x02` right · `0x03` hazard |
+| `[2]` | Indicator | `0x00` off · `0x01` left · `0x02` right · `0x03` hazard |
 
 ### Example Packets
 

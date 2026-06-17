@@ -22,8 +22,8 @@ graph TB
         US3["HC-SR04 Rechts"]
     end
 
-    iPhone -->|"Bluetooth LE\nDrehbefehle / Blinker"| ESP32_F
-    ESP32_F -->|"FastLED\nNavigations- & Blinker-Effekte"| LED_F
+    iPhone -->|"Bluetooth LE\nDrehbefehle / Indicator"| ESP32_F
+    ESP32_F -->|"FastLED\nNavigations- & Indicator-Effekte"| LED_F
     ESP32_F <-->|"Bluetooth Classic\nSynchronisation & Sensordaten"| ESP32_R
     ESP32_R -->|"FastLED\nParkhilfe-Effekte"| LED_R
     US1 & US2 & US3 -->|GPIO| ESP32_R
@@ -63,7 +63,7 @@ graph TB
 
 | Von | Nach | Protokoll | Nutzlast |
 |---|---|---|---|
-| iPhone | ESP32 Vorne | Bluetooth LE — GATT Write | 3 Bytes: Richtung, Abstand, Blinkerstatus |
+| iPhone | ESP32 Vorne | Bluetooth LE — GATT Write | 3 Bytes: Richtung, Abstand, Indicator-Status |
 | ESP32 Vorne | ESP32 Hinten | Bluetooth Classic SPP | JSON: Synchronisationsbefehle, Moduswechsel |
 | ESP32 Hinten | ESP32 Vorne | Bluetooth Classic SPP | JSON: Sensordistanzen (L/C/R in cm) |
 | HC-SR04 Sensoren | ESP32 Hinten | GPIO Trigger/Echo-Pulse | Rohzeitmessungen der Flugzeit |
@@ -74,11 +74,11 @@ graph TB
 
 ```
 ambientnav/
-├── ios/                    # Swift iOS-Anwendung
+├── ios/                    # Swift iOS application
 │   ├── AmbientNav/
-│   │   ├── Navigation/     # MapLibre + Valhalla-Integration
-│   │   ├── Bluetooth/      # CoreBluetooth BLE-Zentral
-│   │   └── Effects/        # LED-Befehlskodierung
+│   │   ├── Navigation/     # MapLibre + Valhalla integration
+│   │   ├── Bluetooth/      # CoreBluetooth BLE central
+│   │   └── Effects/        # LED command encoding
 │   └── AmbientNav.xcodeproj
 ├── firmware/
 │   ├── front/              # ESP32 Master (PlatformIO)
@@ -95,5 +95,5 @@ ambientnav/
 │       │   ├── bt_classic.cpp
 │       │   └── led_effects.cpp
 │       └── platformio.ini
-└── docs/                   # Diese Starlight-Dokumentationsseite
+└── docs/                   # This Starlight documentation site
 ```

@@ -22,8 +22,8 @@ graph TB
         US3["HC-SR04 Right"]
     end
 
-    iPhone -->|"Bluetooth LE\nTurn commands / blinker"| ESP32_F
-    ESP32_F -->|"FastLED\nNavigation & blinker effects"| LED_F
+    iPhone -->|"Bluetooth LE\nTurn commands / indicator"| ESP32_F
+    ESP32_F -->|"FastLED\nNavigation & indicator effects"| LED_F
     ESP32_F <-->|"Bluetooth Classic\nSync & sensor data"| ESP32_R
     ESP32_R -->|"FastLED\nParking-aid effects"| LED_R
     US1 & US2 & US3 -->|GPIO| ESP32_R
@@ -63,7 +63,7 @@ graph TB
 
 | From | To | Protocol | Payload |
 |---|---|---|---|
-| iPhone | ESP32 Front | Bluetooth LE — GATT Write | 3 bytes: direction, distance, blinker state |
+| iPhone | ESP32 Front | Bluetooth LE — GATT Write | 3 bytes: direction, distance, indicator state |
 | ESP32 Front | ESP32 Rear | Bluetooth Classic SPP | JSON: sync commands, mode changes |
 | ESP32 Rear | ESP32 Front | Bluetooth Classic SPP | JSON: sensor distances (L/C/R in cm) |
 | HC-SR04 sensors | ESP32 Rear | GPIO trigger/echo pulses | Raw time-of-flight measurements |

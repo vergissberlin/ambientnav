@@ -16,14 +16,14 @@ Der vordere Streifen wird vom EffectAgent auf dem vorderen ESP32 gesteuert. Effe
 | `NAV_LEFT` | Links abbiegen, Abstand < 200 m | Amber `#FFA500` | Sweep Mitte → linker Rand, 600 ms Zyklus |
 | `NAV_RIGHT` | Rechts abbiegen, Abstand < 200 m | Amber `#FFA500` | Sweep Mitte → rechter Rand, 600 ms Zyklus |
 | `NAV_STRAIGHT` | Geradeaus weiterfahren | Weiß `#FFFFFF` | Einzelner Puls zur Mitte, 800 ms |
-| `BLINKER_LEFT` | Linker Blinker aktiv | Amber `#FFA500` | Schnelles Blinken, nur linke Hälfte, 400 ms ein/aus |
-| `BLINKER_RIGHT` | Rechter Blinker aktiv | Amber `#FFA500` | Schnelles Blinken, nur rechte Hälfte, 400 ms ein/aus |
+| `INDICATOR_LEFT` | Linker Blinker aktiv | Amber `#FFA500` | Schnelles Blinken, nur linke Hälfte, 400 ms ein/aus |
+| `INDICATOR_RIGHT` | Rechter Blinker aktiv | Amber `#FFA500` | Schnelles Blinken, nur rechte Hälfte, 400 ms ein/aus |
 | `HAZARD` | Warnblinker | Amber `#FFA500` | Gesamter Streifen blinkt, 400 ms ein/aus |
 | `AMBIENT` | Leerlauf / keine Navigation | Konfigurierbar | Langsames Sinus-Atmen, 3 s Periode |
 
 ### Priorität
 
-Wenn die Navigations-App gleichzeitig eine bevorstehende Abbiegung signalisiert und der Blinker aktiv ist, haben `NAV_LEFT` / `NAV_RIGHT` Vorrang vor `BLINKER_LEFT` / `BLINKER_RIGHT`, da sie zusätzliche Abstandsinformationen liefern.
+Wenn die Navigations-App gleichzeitig eine bevorstehende Abbiegung signalisiert und der Blinker aktiv ist, haben `NAV_LEFT` / `NAV_RIGHT` Vorrang vor `INDICATOR_LEFT` / `INDICATOR_RIGHT`, da sie zusätzliche Abstandsinformationen liefern.
 
 ### Sweep-Animation
 
@@ -87,13 +87,13 @@ Der Einparkhilfe-Effekt des hinteren Streifens ist nur aktiv, wenn der vordere E
 Beide Streifen verwenden WS2812B LEDs mit 5 V und dem 800-kHz-Datenprotokoll.
 
 ```cpp
-// Vorderer Streifen
+// Front strip
 #define FRONT_LED_PIN   5
 #define FRONT_LED_COUNT 60
 CRGB frontLeds[FRONT_LED_COUNT];
 FastLED.addLeds<WS2812B, FRONT_LED_PIN, GRB>(frontLeds, FRONT_LED_COUNT).setCorrection(TypicalLEDStrip);
 
-// Hinterer Streifen
+// Rear strip
 #define REAR_LED_PIN    18
 #define REAR_LED_COUNT  60
 CRGB rearLeds[REAR_LED_COUNT];
