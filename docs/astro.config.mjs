@@ -36,6 +36,22 @@ export default defineConfig({
           link: '/getting-started/',
         },
         {
+          label: 'Hardware',
+          translations: { de: 'Hardware' },
+          items: [
+            {
+              label: 'Pinouts & Wiring',
+              translations: { de: 'Pinbelegung & Verdrahtung' },
+              link: '/pinouts/',
+            },
+            {
+              label: 'Bluetooth Setup',
+              translations: { de: 'Bluetooth-Konfiguration' },
+              link: '/bluetooth-setup/',
+            },
+          ],
+        },
+        {
           label: 'Reference',
           translations: { de: 'Referenz' },
           items: [
