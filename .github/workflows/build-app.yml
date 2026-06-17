@@ -75,9 +75,10 @@ jobs:
 
       # flutter_tts requires Android SDK platform 36 (compileSdk 36 in app/build.gradle).
       - name: Install Android SDK 36
-        run: sdkmanager "platforms;android-36"
+        run: yes | "${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36"
         env:
           ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+          ANDROID_HOME: /usr/local/lib/android/sdk
 
       - name: Build debug APK
         run: flutter build apk --debug
