@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.3.0](https://github.com/vergissberlin/ambientnav/compare/ambientnav-v0.2.0...ambientnav-v0.3.0) (2026-06-17)
+
+
+### Features
+
+* **docs:** upgrade Starlight 0.40 + Astro 6, add version selector and Hardware/Wiring section ([0236cb9](https://github.com/vergissberlin/ambientnav/commit/0236cb912525c3270931bf47558aba308ad13e1a))
+* **docs:** upgrade Starlight 0.40 + Astro 6, version selector, Hardware/Wiring section ([d1bdfaa](https://github.com/vergissberlin/ambientnav/commit/d1bdfaad3606bd176badf36a1e539c8459c64f69))
+
+
+### Bug Fixes
+
+* **ci:** sanitize changed file paths in translate script ([f17a397](https://github.com/vergissberlin/ambientnav/commit/f17a397d1c79875ce7600e5470fa4a171bf604fc))
+
 ## [0.2.0](https://github.com/vergissberlin/ambientnav/compare/ambientnav-v0.1.0...ambientnav-v0.2.0) (2026-06-17)
 
 
