@@ -1,88 +1,81 @@
 ---
 title: Firmware flashen
-description: AmbientNav-Firmware direkt aus dem Browser auf die ESP32-Boards flashen — keine Softwareinstallation erforderlich.
+description: Flashen Sie die AmbientNav-Firmware direkt auf Ihre ESP32-Boards über den Browser – keine Softwareinstallation erforderlich.
 ---
 
-import EspFlashButton from '../../../components/EspFlashButton.astro';
+import EspFlashButton from '../../components/EspFlashButton.astro';
 
-Flashe die AmbientNav-Firmware direkt aus dem Browser auf deine ESP32-Boards mit
+Flashen Sie die AmbientNav-Firmware direkt auf Ihre ESP32-Boards von dieser Seite aus mit
 [ESP Web Tools](https://esphome.github.io/esp-web-tools/).
 Keine Treiber oder Toolchain-Installation erforderlich.
 
-:::caution[Reihenfolge beim Flashen beachten]
-Flashe immer zuerst das **Rear-Board (hinten)**, danach das Front-Board. Das Front-Board sucht
-beim ersten Start per Bluetooth Classic nach dem Rear-Board. Falls die Reihenfolge falsch war,
-schalte das Rear-Board ein und flashe das Front-Board erneut.
+:::caution[Die Reihenfolge beim Flashen ist wichtig]
+Flashen Sie immer zuerst die **Hintere Platine**, dann die Vorderplatine. Die Vorderplatine sucht beim ersten Booten nach der Bluetooth Classic-Adresse der Hinterplatine. Wenn Sie in der falschen Reihenfolge flashen, schalten Sie die Hinterplatine ein und flashen Sie die Vorderplatine erneut.
 :::
 
 ---
 
-## Browser-Voraussetzungen
+## Browseranforderungen
 
-| Anforderung | Details |
+| Anforderung | Einzelheiten |
 |---|---|
-| Browser | Google Chrome oder Microsoft Edge — nur Desktop |
-| Verbindung | USB-Kabel zum ESP32 |
+| Browser | Google Chrome oder Microsoft Edge – nur Desktop |
+| Verbindung | USB-Kabel, das mit dem ESP32 verbunden ist |
 | Protokoll | HTTPS (diese Seite verwendet es bereits) |
 | Betriebssystem | Windows, macOS oder Linux |
 
-Safari und alle mobilen Browser unterstützen die Web Serial API nicht und können nicht zum
-Flashen verwendet werden.
+Safari und alle mobilen Browser unterstützen die Web Serial API nicht und können nicht zum Flashen verwendet werden.
 
 ---
 
-## Schritt 1 — Rear-Board flashen (Slave)
+## Schritt 1 – Hintere Platine flashen (Slave)
 
-Das Rear-Board steuert die drei Ultraschallsensoren und den hinteren LED-Streifen.
+Die hintere Platine verwaltet die drei Ultraschallsensoren und steuert den hinteren LED-Streifen.
 
-1. Verbinde den **hinteren ESP32** per USB mit dem Computer.
-2. Klicke den Button unten und wähle im Browser-Dialog den korrekten seriellen Port aus.
-3. Warte ca. 30 Sekunden bis der Flashvorgang abgeschlossen ist.
+1. Schließen Sie die **Hintere ESP32** über USB an Ihren Computer an.
+2. Klicken Sie auf die Schaltfläche unten und wählen Sie den richtigen seriellen Port im Browserdialog aus.
+3. Warten Sie etwa 30 Sekunden, bis das Flashen abgeschlossen ist.
 
 <EspFlashButton
   manifest="/ambientnav/manifest-rear.json"
-  label="⚡ Rear-Board flashen"
+  label="⚡ Hintere Platine flashen"
 />
 
-Nach dem Flash das Rear-Board trennen und über die 5-V-Versorgung betreiben. Ein langsames
-weißes Atmen auf dem hinteren LED-Streifen bestätigt, dass das Board bereit ist.
+Nachdem das Flashen abgeschlossen ist, trennen Sie die hintere Platine und versorgen Sie sie mit der 5 V Stromversorgung. Ein langsamer weißer Atemeffekt auf dem hinteren LED-Streifen bestätigt, dass die Platine bereit ist.
 
 ---
 
-## Schritt 2 — Front-Board flashen (Master)
+## Schritt 2 – Vorderplatine flashen (Master)
 
-Das Front-Board übernimmt die BLE-Kommunikation mit dem iPhone und steuert den vorderen LED-Streifen.
+Die Vorderplatine übernimmt die BLE-Kommunikation mit dem iPhone und steuert den vorderen LED-Streifen.
 
-1. Verbinde den **vorderen ESP32** per USB mit dem Computer.
-2. Klicke den Button unten und wähle den korrekten seriellen Port aus.
+1. Schließen Sie die **Vordere ESP32** über USB an Ihren Computer an.
+2. Klicken Sie auf die Schaltfläche unten und wählen Sie den richtigen seriellen Port aus.
 
 <EspFlashButton
   manifest="/ambientnav/manifest-front.json"
-  label="⚡ Front-Board flashen"
+  label="⚡ Vordere Platine flashen"
 />
 
-Nach dem Einschalten sucht das Front-Board per Bluetooth Classic nach dem Rear-Board. Sobald
-die Verbindung steht, starten beide LED-Streifen den Ambient-Breathing-Effekt.
+Nach dem Einschalten sucht die Vorderplatine über Bluetooth Classic nach der Hinterplatine. Sobald die Verbindung hergestellt ist, beginnt der atmosphärische Atemeffekt auf beiden LED-Streifen.
 
 ---
 
 ## Nach dem Flashen
 
-1. **iOS-App öffnen** — auf Verbinden tippen. Die App erkennt das Front-Board per Bluetooth LE automatisch.
-2. **Bluetooth-Classic-Link prüfen** — zeigen die Front-LEDs dauerhaftes Rot, beide Boards neu starten,
-   Rear zuerst.
-3. **Probleme beim Koppeln?** Siehe den [Bluetooth-Setup](/en/bluetooth-setup/)-Leitfaden.
+1. **Öffnen Sie die iOS-App** – tippen Sie auf Verbinden. Die App entdeckt die Vorderplatine automatisch über Bluetooth LE.
+2. **Überprüfen Sie die Bluetooth Classic-Verbindung** – wenn die vorderen LEDs einen festen roten Fehlerzustand anzeigen, schalten Sie beide Platinen aus und wieder ein, beginnend mit der Hinterplatine.
+3. **Brauchen Sie Hilfe beim Pairing?** Sehen Sie sich den [Bluetooth-Setup](/en/bluetooth-setup/) Leitfaden an.
 
 ---
 
-## Was wird geflasht?
+## Was geflasht wird
 
-Jeder Button flasht ein einzelnes zusammengeführtes Binary mit Bootloader, Partitionstabelle,
-Boot-Applikation und Firmware — identisch zu `pio run --target upload`.
+Jede Schaltfläche flashen eine einzelne zusammengeführte Binärdatei, die den Bootloader, die Partitionstabelle, die Bootanwendung und die Firmware enthält – identisch mit dem, was `pio run --target upload` hochladen würde.
 
 | Datei | Inhalt |
 |---|---|
-| `firmware-front.bin` | Bootloader + Partitionen + App (Front / Master) |
-| `firmware-rear.bin` | Bootloader + Partitionen + App (Rear / Slave) |
+| `firmware-front.bin` | Bootloader + Partitionen + App (Vorne / Master) |
+| `firmware-rear.bin` | Bootloader + Partitionen + App (Hinten / Slave) |
 
-Die installierte Version entspricht immer dem [neuesten GitHub-Release](https://github.com/vergissberlin/ambientnav/releases/latest).
+Die installierte Version entspricht immer der [neuesten GitHub-Version](https://github.com/vergissberlin/ambientnav/releases/latest).
