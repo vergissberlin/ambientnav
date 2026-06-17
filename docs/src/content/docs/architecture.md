@@ -5,33 +5,6 @@ description: System architecture, component overview, and data flow for the Ambi
 
 ## System Diagram
 
-```
-┌──────────────────────────────────────────────────────────────────────┐
-│                          AmbientNav System                           │
-│                                                                      │
-│  ┌──────────────────┐   Bluetooth LE    ┌──────────────────────────┐│
-│  │   📱 iPhone       │ ───────────────▶ │  ESP32 Front (Master)    ││
-│  │   iOS App        │   Turn / Blinker  │                          ││
-│  └──────────────────┘                   │  • BLE GATT Peripheral   ││
-│                                         │  • BT Classic SPP Client ││
-│                                         │  • FastLED (front strip) ││
-│                                         └──────────┬───────────────┘│
-│                                                    │                 │
-│                                         Bluetooth Classic            │
-│                                         (SPP — bidirectional)        │
-│                                                    │                 │
-│                                         ┌──────────▼───────────────┐│
-│  HC-SR04 Left   ──GPIO──▶              │  ESP32 Rear (Slave)      ││
-│  HC-SR04 Center ──GPIO──▶              │                          ││
-│  HC-SR04 Right  ──GPIO──▶              │  • HC-SR04 driver (×3)   ││
-│                                         │  • BT Classic SPP Server ││
-│                                         │  • FastLED (rear strip)  ││
-│                                         └──────────────────────────┘│
-└──────────────────────────────────────────────────────────────────────┘
-```
-
-### Mermaid Source
-
 ```mermaid
 graph TB
     iPhone["📱 iPhone\niOS Navigation App"]
