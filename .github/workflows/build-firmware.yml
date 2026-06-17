@@ -37,11 +37,21 @@ jobs:
       - name: Build front firmware
         run: cd firmware/front && pio run
 
+      - name: Build merged front firmware
+        run: cd firmware/front && pio run --target mergebin
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: firmware-front
           path: firmware/front/.pio/build/front/firmware.bin
+          retention-days: 30
+
+      - name: Upload merged front artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-front-merged
+          path: firmware/front/.pio/build/front/firmware-merged.bin
           retention-days: 30
 
   build-rear:
@@ -69,11 +79,21 @@ jobs:
       - name: Build rear firmware
         run: cd firmware/rear && pio run
 
+      - name: Build merged rear firmware
+        run: cd firmware/rear && pio run --target mergebin
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: firmware-rear
           path: firmware/rear/.pio/build/rear/firmware.bin
+          retention-days: 30
+
+      - name: Upload merged rear artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-rear-merged
+          path: firmware/rear/.pio/build/rear/firmware-merged.bin
           retention-days: 30
 
   attach-release-assets:
@@ -94,10 +114,24 @@ jobs:
           name: firmware-rear
           path: dist/rear/
 
+      - name: Download front merged artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: firmware-front-merged
+          path: dist/front-merged/
+
+      - name: Download rear merged artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: firmware-rear-merged
+          path: dist/rear-merged/
+
       - name: Rename binaries with version tag
         run: |
-          mv dist/front/firmware.bin dist/ambientnav-front-${{ github.ref_name }}.bin
-          mv dist/rear/firmware.bin  dist/ambientnav-rear-${{ github.ref_name }}.bin
+          mv dist/front/firmware.bin                   dist/ambientnav-front-${{ github.ref_name }}.bin
+          mv dist/rear/firmware.bin                    dist/ambientnav-rear-${{ github.ref_name }}.bin
+          mv dist/front-merged/firmware-merged.bin     dist/ambientnav-front-${{ github.ref_name }}-merged.bin
+          mv dist/rear-merged/firmware-merged.bin      dist/ambientnav-rear-${{ github.ref_name }}-merged.bin
 
       - name: Attach binaries to GitHub Release
         uses: softprops/action-gh-release@v2
@@ -105,3 +139,5 @@ jobs:
           files: |
             dist/ambientnav-front-${{ github.ref_name }}.bin
             dist/ambientnav-rear-${{ github.ref_name }}.bin
+            dist/ambientnav-front-${{ github.ref_name }}-merged.bin
+            dist/ambientnav-rear-${{ github.ref_name }}-merged.bin
