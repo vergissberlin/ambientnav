@@ -1,0 +1,107 @@
+name: Build Firmware
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'firmware/**'
+  release:
+    types: [published]
+
+permissions:
+  contents: write  # needed to upload release assets
+
+jobs:
+  build-front:
+    name: Build — ESP32 Front
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache PlatformIO
+        uses: actions/cache@v4
+        with:
+          path: ~/.platformio
+          key: ${{ runner.os }}-pio-front-${{ hashFiles('firmware/front/platformio.ini') }}
+          restore-keys: |
+            ${{ runner.os }}-pio-front-
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install PlatformIO
+        run: pip install platformio
+
+      - name: Build front firmware
+        run: cd firmware/front && pio run
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-front
+          path: firmware/front/.pio/build/front/firmware.bin
+          retention-days: 30
+
+  build-rear:
+    name: Build — ESP32 Rear
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache PlatformIO
+        uses: actions/cache@v4
+        with:
+          path: ~/.platformio
+          key: ${{ runner.os }}-pio-rear-${{ hashFiles('firmware/rear/platformio.ini') }}
+          restore-keys: |
+            ${{ runner.os }}-pio-rear-
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install PlatformIO
+        run: pip install platformio
+
+      - name: Build rear firmware
+        run: cd firmware/rear && pio run
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-rear
+          path: firmware/rear/.pio/build/rear/firmware.bin
+          retention-days: 30
+
+  attach-release-assets:
+    name: Attach binaries to GitHub Release
+    if: github.event_name == 'release'
+    needs: [build-front, build-rear]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download front artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: firmware-front
+          path: dist/front/
+
+      - name: Download rear artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: firmware-rear
+          path: dist/rear/
+
+      - name: Rename binaries with version tag
+        run: |
+          mv dist/front/firmware.bin dist/ambientnav-front-${{ github.ref_name }}.bin
+          mv dist/rear/firmware.bin  dist/ambientnav-rear-${{ github.ref_name }}.bin
+
+      - name: Attach binaries to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/ambientnav-front-${{ github.ref_name }}.bin
+            dist/ambientnav-rear-${{ github.ref_name }}.bin
