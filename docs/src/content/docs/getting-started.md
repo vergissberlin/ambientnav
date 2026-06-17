@@ -26,6 +26,21 @@ description: Hardware requirements, software prerequisites, and step-by-step set
 
 ---
 
+## Compatible Microcontrollers
+
+AmbientNav requires the **original ESP32** chip (Xtensa LX6 dual-core). The board must support **Bluetooth Classic (SPP)** and **Bluetooth Low Energy (BLE)** simultaneously — this rules out the ESP32-S2, S3, C3, C6, and H2 variants, which lack Bluetooth Classic.
+
+| Board | Pins | Notes | Buy |
+|---|---|---|---|
+| ESP32 DevKit V1 | 30 | **Recommended** — compact, widely available, tested | [Amazon](https://www.amazon.de/s?k=ESP32+DevKit+V1+30+Pin&tag=thebeatles-21) |
+| ESP32 DevKit V1 | 38 | More GPIOs, slightly larger footprint | [Amazon](https://www.amazon.de/s?k=ESP32+DevKit+V1+38+Pin&tag=thebeatles-21) |
+| AZDelivery ESP32 NodeMCU | 30 | Popular in DE/AT/CH, ships with headers | [Amazon](https://www.amazon.de/s?k=AZDelivery+ESP32+NodeMCU&tag=thebeatles-21) |
+| DOIT ESP32 DevKit V1 | 30 | Alternative brand, identical 30-pin pinout | [Amazon](https://www.amazon.de/s?k=DOIT+ESP32+DevKit+V1&tag=thebeatles-21) |
+
+> **Important:** All boards above must be based on the **ESP32-WROOM-32** or **ESP32-WROVER** module. Do **not** use ESP32-S2, S3, C3, C6, or H2 — they do not support Bluetooth Classic, which is required for the inter-board SPP link.
+
+---
+
 ## Firmware Setup
 
 Clone the repository and open the firmware projects in PlatformIO.

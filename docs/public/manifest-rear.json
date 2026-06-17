@@ -7,7 +7,7 @@
       "parts": [
         {
           "path": "https://vergissberlin.github.io/ambientnav/firmware-rear.bin",
-          "offset": 4096
+          "offset": 0
         }
       ]
     }

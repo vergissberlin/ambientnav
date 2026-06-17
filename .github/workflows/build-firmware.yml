@@ -37,16 +37,8 @@ jobs:
       - name: Build front firmware
         run: cd firmware/front && pio run
 
-      - name: Create merged firmware (front)
-        run: |
-          BOOT_APP0=$(find ~/.platformio/packages -name "boot_app0.bin" 2>/dev/null | head -n 1)
-          echo "Using boot_app0: $BOOT_APP0"
-          python -m esptool --chip esp32 merge_bin \
-            -o firmware-front.bin \
-            0x1000 firmware/front/.pio/build/front/bootloader.bin \
-            0x8000 firmware/front/.pio/build/front/partitions.bin \
-            0xe000 "$BOOT_APP0" \
-            0x10000 firmware/front/.pio/build/front/firmware.bin
+      - name: Build merged front firmware
+        run: cd firmware/front && pio run --target mergebin
 
       - name: Upload app artifact (front)
         uses: actions/upload-artifact@v4
@@ -55,11 +47,11 @@ jobs:
           path: firmware/front/.pio/build/front/firmware.bin
           retention-days: 30
 
-      - name: Upload merged artifact (front)
+      - name: Upload merged front artifact
         uses: actions/upload-artifact@v4
         with:
           name: firmware-front-merged
-          path: firmware-front.bin
+          path: firmware/front/.pio/build/front/firmware-merged.bin
           retention-days: 30
 
   build-rear:
@@ -87,16 +79,8 @@ jobs:
       - name: Build rear firmware
         run: cd firmware/rear && pio run
 
-      - name: Create merged firmware (rear)
-        run: |
-          BOOT_APP0=$(find ~/.platformio/packages -name "boot_app0.bin" 2>/dev/null | head -n 1)
-          echo "Using boot_app0: $BOOT_APP0"
-          python -m esptool --chip esp32 merge_bin \
-            -o firmware-rear.bin \
-            0x1000 firmware/rear/.pio/build/rear/bootloader.bin \
-            0x8000 firmware/rear/.pio/build/rear/partitions.bin \
-            0xe000 "$BOOT_APP0" \
-            0x10000 firmware/rear/.pio/build/rear/firmware.bin
+      - name: Build merged rear firmware
+        run: cd firmware/rear && pio run --target mergebin
 
       - name: Upload app artifact (rear)
         uses: actions/upload-artifact@v4
@@ -105,11 +89,11 @@ jobs:
           path: firmware/rear/.pio/build/rear/firmware.bin
           retention-days: 30
 
-      - name: Upload merged artifact (rear)
+      - name: Upload merged rear artifact
         uses: actions/upload-artifact@v4
         with:
           name: firmware-rear-merged
-          path: firmware-rear.bin
+          path: firmware/rear/.pio/build/rear/firmware-merged.bin
           retention-days: 30
 
   attach-release-assets:
@@ -135,27 +119,29 @@ jobs:
           name: firmware-rear
           path: dist/rear/
 
-      - name: Download merged front artifact
+      - name: Download front merged artifact
         uses: actions/download-artifact@v4
         with:
           name: firmware-front-merged
-          path: dist/merged/
+          path: dist/front-merged/
 
-      - name: Download merged rear artifact
+      - name: Download rear merged artifact
         uses: actions/download-artifact@v4
         with:
           name: firmware-rear-merged
-          path: dist/merged/
+          path: dist/rear-merged/
 
-      - name: Rename versioned binaries
+      - name: Rename binaries with version tag
         run: |
-          mv dist/front/firmware.bin dist/ambientnav-front-${{ github.ref_name }}.bin
-          mv dist/rear/firmware.bin  dist/ambientnav-rear-${{ github.ref_name }}.bin
+          mv dist/front/firmware.bin                   dist/ambientnav-front-${{ github.ref_name }}.bin
+          mv dist/rear/firmware.bin                    dist/ambientnav-rear-${{ github.ref_name }}.bin
+          mv dist/front-merged/firmware-merged.bin     dist/ambientnav-front-${{ github.ref_name }}-merged.bin
+          mv dist/rear-merged/firmware-merged.bin      dist/ambientnav-rear-${{ github.ref_name }}-merged.bin
 
       - name: Commit merged binaries to docs/public for GitHub Pages serving
         run: |
-          cp dist/merged/firmware-front.bin docs/public/firmware-front.bin
-          cp dist/merged/firmware-rear.bin  docs/public/firmware-rear.bin
+          cp dist/ambientnav-front-${{ github.ref_name }}-merged.bin docs/public/firmware-front.bin
+          cp dist/ambientnav-rear-${{ github.ref_name }}-merged.bin  docs/public/firmware-rear.bin
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add docs/public/firmware-front.bin docs/public/firmware-rear.bin
@@ -168,5 +154,5 @@ jobs:
           files: |
             dist/ambientnav-front-${{ github.ref_name }}.bin
             dist/ambientnav-rear-${{ github.ref_name }}.bin
-            dist/merged/firmware-front.bin
-            dist/merged/firmware-rear.bin
+            dist/ambientnav-front-${{ github.ref_name }}-merged.bin
+            dist/ambientnav-rear-${{ github.ref_name }}-merged.bin

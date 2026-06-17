@@ -70,6 +70,17 @@ graph TB
 | 330 Ω resistors           | 2        | Data line protection for each LED strip |
 | 1000 µF capacitor         | 2        | Across 5 V / GND of each LED strip      |
 
+### Compatible Microcontrollers
+
+The project requires the **original ESP32** chip — boards based on ESP32-WROOM-32 or ESP32-WROVER. The chip must support **both Bluetooth Classic (SPP) and BLE simultaneously**. ESP32-S2, S3, C3, C6, and H2 are **not compatible** (no Bluetooth Classic).
+
+| Board | Pins | Notes | Buy |
+|---|---|---|---|
+| ESP32 DevKit V1 | 30 | **Recommended** — tested, compact | [Amazon](https://www.amazon.de/s?k=ESP32+DevKit+V1+30+Pin&tag=thebeatles-21) |
+| ESP32 DevKit V1 | 38 | More GPIOs, slightly larger | [Amazon](https://www.amazon.de/s?k=ESP32+DevKit+V1+38+Pin&tag=thebeatles-21) |
+| AZDelivery ESP32 NodeMCU | 30 | Popular in Europe, ships with headers | [Amazon](https://www.amazon.de/s?k=AZDelivery+ESP32+NodeMCU&tag=thebeatles-21) |
+| DOIT ESP32 DevKit V1 | 30 | Alternative brand, identical 30-pin pinout | [Amazon](https://www.amazon.de/s?k=DOIT+ESP32+DevKit+V1&tag=thebeatles-21) |
+
 ### Software / Services
 
 | Layer                     | Technology                                                                          |

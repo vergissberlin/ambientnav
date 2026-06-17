@@ -49,6 +49,11 @@ export default defineConfig({
           link: '/flash/',
         },
         {
+          label: 'Flash Firmware (Manual)',
+          translations: { de: 'Firmware flashen (manuell)' },
+          link: '/flash-firmware/',
+        },
+        {
           label: 'Hardware',
           translations: { de: 'Hardware' },
           items: [
