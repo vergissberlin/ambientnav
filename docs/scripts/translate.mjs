@@ -31,7 +31,7 @@ Rules:
 
 const changedFiles = (process.env.CHANGED_FILES ?? '')
   .split('\n')
-  .map((f) => f.trim())
+  .map((f) => f.trim().replace(/\\+$/, ''))
   .filter((f) => f && !f.includes('/de/'));
 
 if (changedFiles.length === 0) {
