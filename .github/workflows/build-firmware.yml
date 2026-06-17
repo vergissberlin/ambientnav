@@ -9,7 +9,7 @@ on:
     types: [published]
 
 permissions:
-  contents: write  # needed to upload release assets
+  contents: write  # needed to upload release assets and commit merged binaries
 
 jobs:
   build-front:
@@ -40,7 +40,7 @@ jobs:
       - name: Build merged front firmware
         run: cd firmware/front && pio run --target mergebin
 
-      - name: Upload artifact
+      - name: Upload app artifact (front)
         uses: actions/upload-artifact@v4
         with:
           name: firmware-front
@@ -82,7 +82,7 @@ jobs:
       - name: Build merged rear firmware
         run: cd firmware/rear && pio run --target mergebin
 
-      - name: Upload artifact
+      - name: Upload app artifact (rear)
         uses: actions/upload-artifact@v4
         with:
           name: firmware-rear
@@ -102,6 +102,11 @@ jobs:
     needs: [build-front, build-rear]
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Download front artifact
         uses: actions/download-artifact@v4
         with:
@@ -132,6 +137,16 @@ jobs:
           mv dist/rear/firmware.bin                    dist/ambientnav-rear-${{ github.ref_name }}.bin
           mv dist/front-merged/firmware-merged.bin     dist/ambientnav-front-${{ github.ref_name }}-merged.bin
           mv dist/rear-merged/firmware-merged.bin      dist/ambientnav-rear-${{ github.ref_name }}-merged.bin
+
+      - name: Commit merged binaries to docs/public for GitHub Pages serving
+        run: |
+          cp dist/ambientnav-front-${{ github.ref_name }}-merged.bin docs/public/firmware-front.bin
+          cp dist/ambientnav-rear-${{ github.ref_name }}-merged.bin  docs/public/firmware-rear.bin
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/public/firmware-front.bin docs/public/firmware-rear.bin
+          git diff --cached --quiet || git commit -m "chore: update web flash binaries for ${{ github.ref_name }}"
+          git push origin main
 
       - name: Attach binaries to GitHub Release
         uses: softprops/action-gh-release@v2

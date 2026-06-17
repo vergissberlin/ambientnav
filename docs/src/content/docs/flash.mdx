@@ -1,0 +1,87 @@
+---
+title: Flash Firmware
+description: Flash AmbientNav firmware directly to your ESP32 boards from the browser — no software installation required.
+---
+
+import EspFlashButton from '../../components/EspFlashButton.astro';
+
+Flash the AmbientNav firmware directly to your ESP32 boards from this page using
+[ESP Web Tools](https://esphome.github.io/esp-web-tools/).
+No drivers or toolchain installation required.
+
+:::caution[Flash order matters]
+Always flash the **Rear board first**, then the Front board. The front board scans for the rear
+board's Bluetooth Classic address on first boot. If you flash in the wrong order, power on the
+rear board and re-flash the front board.
+:::
+
+---
+
+## Browser Requirements
+
+| Requirement | Details |
+|---|---|
+| Browser | Google Chrome or Microsoft Edge — desktop only |
+| Connection | USB cable connected to the ESP32 |
+| Protocol | HTTPS (this page already uses it) |
+| OS | Windows, macOS, or Linux |
+
+Safari and all mobile browsers do not support the Web Serial API and cannot be used for flashing.
+
+---
+
+## Step 1 — Flash the Rear Board (Slave)
+
+The rear board manages the three ultrasonic sensors and drives the rear LED strip.
+
+1. Connect the **Rear ESP32** to your computer via USB.
+2. Click the button below and select the correct serial port in the browser dialog.
+3. Wait approximately 30 seconds for the flash to complete.
+
+<EspFlashButton
+  manifest="/ambientnav/manifest-rear.json"
+  label="⚡ Flash Rear Board"
+/>
+
+Once flashed, disconnect the rear board and power it from the 5 V supply. A slow white breathing
+effect on the rear LED strip confirms the board is ready.
+
+---
+
+## Step 2 — Flash the Front Board (Master)
+
+The front board handles BLE communication with the iPhone and drives the front LED strip.
+
+1. Connect the **Front ESP32** to your computer via USB.
+2. Click the button below and select the correct serial port.
+
+<EspFlashButton
+  manifest="/ambientnav/manifest-front.json"
+  label="⚡ Flash Front Board"
+/>
+
+After powering on, the front board searches for the rear board over Bluetooth Classic. Once the
+link is established the ambient breathing effect starts on both LED strips.
+
+---
+
+## After Flashing
+
+1. **Open the iOS app** — tap Connect. The app discovers the front board over Bluetooth LE automatically.
+2. **Check the Bluetooth Classic link** — if the front LEDs show a solid red error state, power-cycle
+   both boards starting with the rear board.
+3. **Need help pairing?** See the [Bluetooth Setup](/en/bluetooth-setup/) guide.
+
+---
+
+## What Gets Flashed
+
+Each button flashes a single merged binary that includes the bootloader, partition table, boot
+application, and firmware — identical to what `pio run --target upload` would upload.
+
+| File | Contents |
+|---|---|
+| `firmware-front.bin` | Bootloader + Partitions + App (Front / Master) |
+| `firmware-rear.bin` | Bootloader + Partitions + App (Rear / Slave) |
+
+The installed version always matches the [latest GitHub Release](https://github.com/vergissberlin/ambientnav/releases/latest).
