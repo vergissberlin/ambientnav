@@ -41,12 +41,12 @@ This file describes the logical agents (autonomous processing units) within the 
 
 ### 1. NavAgent — iOS
 
-**Location:** `ios/AmbientNav/Navigation/`  
-**Runtime:** iPhone, foreground process  
-**Language:** Swift
+**Location:** `app/lib/features/navigation/` (Flutter, cross-platform iOS + Android)  
+**Runtime:** phone, foreground process  
+**Language:** Dart
 
 #### Responsibility
-Reads live navigation data from the routing engine (Valhalla) via MapLibre Navigation iOS, extracts the next maneuver instruction, and publishes compact BLE commands to the front ESP32.
+Reads live navigation data from the routing engine (Valhalla / OSRM) and renders it on a MapLibre map, extracts the next maneuver instruction, speaks guidance (multi-language TTS), and publishes compact BLE commands to the front ESP32. The same app also **manages the controllers** over an extended, passkey-secured BLE protocol: live telemetry (battery voltage) and signal strength (RSSI), LED-strip configuration (count / brightness / effect, read-back + edit), sensor selection & calibration, and firmware OTA. A planned route (geometry + maneuvers) plus its map region are cached for **offline** use. See `app/README.md` and the *Protocols* doc for the extended GATT services and the pairing/bonding security model.
 
 #### Inputs
 
@@ -303,4 +303,4 @@ This project uses **trunk-based development** on `main`.
 - Stay on `main` before making changes; never run `git checkout -b`, `git switch -c`, or equivalent branch-creation commands unless explicitly overridden.
 - When asked for a PR, prefer pushing commits to `main` and note that this repo uses trunk-based development — only create a PR if explicitly requested.
 
-**Exception:** Automated CI branches (e.g. bot-created translation branches) are allowed.
+**Exception:** Automated CI branches (e.g. bot-created translation branches) are allowed. Large, agent-driven feature work (such as the initial Flutter app) may also be developed on a `claude/*` branch and merged via PR; the maintainer should confirm whether to fold such work back into the trunk-based flow.
