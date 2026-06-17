@@ -27,7 +27,7 @@ Android Auto** scaffolds and a documented **watchOS** path for later.
 Feature-first layout; each feature is split into `data / domain / presentation`,
 on a shared `core/`. State management uses **Riverpod**.
 
-```
+```plaintext
 lib/
 ├── core/            # di, router, theme, l10n, persistence, security, utils
 └── features/
