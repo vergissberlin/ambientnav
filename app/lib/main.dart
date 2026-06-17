@@ -5,6 +5,7 @@ import 'app.dart';
 import 'core/persistence/hive_local_store.dart';
 import 'core/persistence/local_store.dart';
 import 'core/theme/theme_controller.dart';
+import 'features/car/car_bridge.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,11 +19,18 @@ Future<void> main() async {
     store = InMemoryLocalStore();
   }
 
+  // Own the container so the CarPlay / Android Auto bridge can share the same
+  // navigation state as the phone UI.
+  final container = ProviderContainer(
+    overrides: [
+      localStoreProvider.overrideWithValue(store),
+    ],
+  );
+  CarBridge(container).start();
+
   runApp(
-    ProviderScope(
-      overrides: [
-        localStoreProvider.overrideWithValue(store),
-      ],
+    UncontrolledProviderScope(
+      container: container,
       child: const AmbientNavApp(),
     ),
   );
