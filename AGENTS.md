@@ -288,3 +288,19 @@ All messages are UTF-8 JSON terminated by `\n`.
 - FastLED `show()` blocks for ~3 ms on a 60-LED strip at 800 kHz. Account for this in tick budgeting.
 - For BLE on ESP32, prefer **NimBLE** (via Arduino NimBLE-Arduino library) over the classic Bluedroid stack — lower memory footprint, simpler API.
 - For BT Classic SPP, use the ESP-IDF SPP API directly; the Arduino `BluetoothSerial` wrapper is sufficient for prototyping.
+
+---
+
+## Repository Workflow
+
+This project uses **trunk-based development** on `main`.
+
+- Work directly on `main`. Do not create feature, fix, or chore branches.
+- Do not suggest branch-based workflows (`git checkout -b …`, PRs from feature branches).
+- Keep changes small and commit often on `main`.
+- Pull or rebase onto the latest `main` before pushing.
+- Push to `origin/main` when asked to push.
+- Stay on `main` before making changes; never run `git checkout -b`, `git switch -c`, or equivalent branch-creation commands unless explicitly overridden.
+- When asked for a PR, prefer pushing commits to `main` and note that this repo uses trunk-based development — only create a PR if explicitly requested.
+
+**Exception:** Automated CI branches (e.g. bot-created translation branches) are allowed.
