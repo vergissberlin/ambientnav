@@ -4,6 +4,8 @@ import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { join, dirname } from 'path';
 import { remarkMermaid } from './src/plugins/remark-mermaid.mjs';
+import starlightVersions from 'starlight-versions';
+import { unified } from '@astrojs/markdown-remark';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const { version } = JSON.parse(readFileSync(join(__dirname, '../package.json'), 'utf-8'));
@@ -12,15 +14,21 @@ export default defineConfig({
   site: 'https://vergissberlin.github.io',
   base: '/ambientnav',
   markdown: {
-    remarkPlugins: [remarkMermaid],
+    processor: unified({ remarkPlugins: [remarkMermaid] }),
   },
   integrations: [
     starlight({
-      title: `AmbientNav v${version}`,
+      title: 'AmbientNav',
       description: 'Ambient LED navigation and parking assistance for vehicles',
-      social: {
-        github: 'https://github.com/vergissberlin/ambientnav',
-      },
+      plugins: [
+        starlightVersions({
+          versions: [{ slug: '0.1', label: 'v0.1.0' }],
+          current: { label: `v${version}` },
+        }),
+      ],
+      social: [
+        { icon: 'github', label: 'GitHub', href: 'https://github.com/vergissberlin/ambientnav' },
+      ],
       components: {
         Head: './src/components/Head.astro',
       },
@@ -40,14 +48,9 @@ export default defineConfig({
           translations: { de: 'Hardware' },
           items: [
             {
-              label: 'Pinouts & Wiring',
-              translations: { de: 'Pinbelegung & Verdrahtung' },
-              link: '/pinouts/',
-            },
-            {
-              label: 'Bluetooth Setup',
-              translations: { de: 'Bluetooth-Konfiguration' },
-              link: '/bluetooth-setup/',
+              label: 'Wiring',
+              translations: { de: 'Verkabelung' },
+              link: '/wiring/',
             },
           ],
         },

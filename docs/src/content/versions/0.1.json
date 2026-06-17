@@ -1,0 +1,62 @@
+{
+  "sidebar": [
+    {
+      "label": "Getting Started",
+      "translations": {
+        "de": "Erste Schritte"
+      },
+      "link": "/getting-started/"
+    },
+    {
+      "label": "Hardware",
+      "translations": {
+        "de": "Hardware"
+      },
+      "items": [
+        {
+          "label": "Wiring",
+          "translations": {
+            "de": "Verkabelung"
+          },
+          "link": "/wiring/"
+        }
+      ]
+    },
+    {
+      "label": "Reference",
+      "translations": {
+        "de": "Referenz"
+      },
+      "items": [
+        {
+          "label": "Architecture",
+          "translations": {
+            "de": "Architektur"
+          },
+          "link": "/architecture/"
+        },
+        {
+          "label": "Agents",
+          "translations": {
+            "de": "Agenten"
+          },
+          "link": "/agents/"
+        },
+        {
+          "label": "Protocols",
+          "translations": {
+            "de": "Protokolle"
+          },
+          "link": "/protocols/"
+        },
+        {
+          "label": "LED Effects",
+          "translations": {
+            "de": "LED-Effekte"
+          },
+          "link": "/led-effects/"
+        }
+      ]
+    }
+  ]
+}

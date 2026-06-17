@@ -1,6 +1,8 @@
 ---
 title: Getting Started
-description: Hardware requirements, software prerequisites, and step-by-step setup instructions for AmbientNav.
+description: Hardware requirements, software prerequisites, and step-by-step
+  setup instructions for AmbientNav.
+slug: 0.1/getting-started
 ---
 
 ## Prerequisites
@@ -24,7 +26,7 @@ description: Hardware requirements, software prerequisites, and step-by-step set
 | Xcode 15+ | iOS app (iPhone only) | Mac App Store |
 | Node.js 20+ | Translation script (CI only) | [nodejs.org](https://nodejs.org/) |
 
----
+***
 
 ## Firmware Setup
 
@@ -46,7 +48,7 @@ pio run --target upload
 
 Flash the rear ESP32 **before** the front so that the master can discover it by its Bluetooth Classic address on first boot.
 
----
+***
 
 ## iOS App Setup
 
@@ -59,7 +61,7 @@ Build and run on a **physical iPhone** — Bluetooth LE requires real hardware a
 
 The app requests Bluetooth permission on first launch. Make sure the front ESP32 is powered and advertising before opening the app.
 
----
+***
 
 ## Wiring
 
@@ -81,9 +83,9 @@ GND         ──────────────  LED strip GND
 5 V         ──────────────  LED strip 5 V (from step-down converter)
 ```
 
-Detailed pin assignments are in [Wiring](/wiring/).
+Detailed pin assignments are in [Wiring](/0.1/wiring/).
 
----
+***
 
 ## Power Budget
 
@@ -97,7 +99,7 @@ Detailed pin assignments are in [Wiring](/wiring/).
 
 Size your step-down converter for at least **3 A** to handle full-brightness peaks.
 
----
+***
 
 ## GitHub Pages Setup
 
