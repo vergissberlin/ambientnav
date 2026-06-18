@@ -60,6 +60,12 @@ void main() {
         lessThan(first.distanceToManeuverMeters));
   });
 
+  test('reports the travel heading (~east) along the east-bound route', () {
+    final sim = RouteSimulator(_route(), speedMps: 100);
+    final s = sim.step(1.0);
+    expect(s.bearingDeg, closeTo(90, 2));
+  });
+
   test('progress scales with the elapsed delta', () {
     final slow = RouteSimulator(_route(), speedMps: 10)..step(1.0);
     final fast = RouteSimulator(_route(), speedMps: 20)..step(1.0);

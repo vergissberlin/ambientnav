@@ -63,5 +63,32 @@ class Geo {
         a.longitude + (b.longitude - a.longitude) * t,
       );
 
+  /// Initial bearing from [a] to [b] in degrees, 0–360 clockwise from north.
+  static double initialBearing(GeoPoint a, GeoPoint b) {
+    final lat1 = _rad(a.latitude);
+    final lat2 = _rad(b.latitude);
+    final dLon = _rad(b.longitude - a.longitude);
+    final y = math.sin(dLon) * math.cos(lat2);
+    final x = math.cos(lat1) * math.sin(lat2) -
+        math.sin(lat1) * math.cos(lat2) * math.cos(dLon);
+    final deg = math.atan2(y, x) * 180.0 / math.pi;
+    return (deg + 360.0) % 360.0;
+  }
+
+  /// Heading (degrees) of the route at [meters] along the polyline — the
+  /// direction of the segment currently being traversed.
+  static double bearingAlong(List<GeoPoint> points, double meters) {
+    if (points.length < 2) return 0;
+    var remaining = meters <= 0 ? 0.0 : meters;
+    for (var i = 1; i < points.length; i++) {
+      final segLen = haversineMeters(points[i - 1], points[i]);
+      if (remaining <= segLen || i == points.length - 1) {
+        return initialBearing(points[i - 1], points[i]);
+      }
+      remaining -= segLen;
+    }
+    return initialBearing(points[points.length - 2], points.last);
+  }
+
   static double _rad(double deg) => deg * math.pi / 180.0;
 }

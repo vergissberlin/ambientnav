@@ -42,6 +42,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get noRouteFound => 'Keine Route gefunden';
 
   @override
+  String get routeOverview => 'Routenübersicht';
+
+  @override
+  String get followRoute => 'Route folgen';
+
+  @override
   String get developer => 'Entwickler';
 
   @override

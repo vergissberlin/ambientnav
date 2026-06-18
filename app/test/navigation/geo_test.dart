@@ -17,6 +17,20 @@ void main() {
     });
   });
 
+  group('Geo.initialBearing', () {
+    test('points north for a due-north step', () {
+      final b = Geo.initialBearing(
+          const GeoPoint(52.0, 13.0), const GeoPoint(52.01, 13.0));
+      expect(b, closeTo(0, 1));
+    });
+
+    test('points east for a due-east step', () {
+      final b = Geo.initialBearing(
+          const GeoPoint(52.0, 13.0), const GeoPoint(52.0, 13.01));
+      expect(b, closeTo(90, 1));
+    });
+  });
+
   group('Geo.interpolateAlong', () {
     final line = const [
       GeoPoint(0, 0),

@@ -11,6 +11,8 @@
   "downloadOffline": "Download for offline use",
   "offlineReady": "Offline route ready",
   "noRouteFound": "No route found",
+  "routeOverview": "Route overview",
+  "followRoute": "Follow route",
   "developer": "Developer",
   "developerDesc": "Tools for development and testing",
   "routeSimulation": "Route simulation",

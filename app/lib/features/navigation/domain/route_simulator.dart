@@ -5,12 +5,16 @@ import 'entities/route.dart';
 class SimStep {
   const SimStep({
     required this.position,
+    required this.bearingDeg,
     required this.nextManeuverIndex,
     required this.distanceToManeuverMeters,
     required this.arrived,
   });
 
   final GeoPoint position;
+
+  /// Travel heading at the current position (degrees, clockwise from north).
+  final double bearingDeg;
   final int nextManeuverIndex;
   final double distanceToManeuverMeters;
   final bool arrived;
@@ -58,6 +62,8 @@ class RouteSimulator {
     final position = _geometry.isEmpty
         ? const GeoPoint(0, 0)
         : Geo.interpolateAlong(_geometry, _traveled);
+    final bearing =
+        _geometry.length < 2 ? 0.0 : Geo.bearingAlong(_geometry, _traveled);
 
     // Next maneuver: the first whose cumulative distance is still ahead.
     var nextIndex = _cumManeuver.length;
@@ -77,6 +83,7 @@ class RouteSimulator {
 
     return SimStep(
       position: position,
+      bearingDeg: bearing,
       nextManeuverIndex: nextIndex >= _cumManeuver.length
           ? _cumManeuver.length - 1
           : nextIndex,

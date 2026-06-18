@@ -164,6 +164,18 @@ abstract class AppLocalizations {
   /// **'No route found'**
   String get noRouteFound;
 
+  /// No description provided for @routeOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'Route overview'**
+  String get routeOverview;
+
+  /// No description provided for @followRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow route'**
+  String get followRoute;
+
   /// No description provided for @developer.
   ///
   /// In en, this message translates to:

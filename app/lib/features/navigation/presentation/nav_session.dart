@@ -6,6 +6,7 @@ import '../data/geocoding_service.dart';
 import '../domain/entities/route.dart';
 import 'nav_controller.dart';
 import 'route_simulation_runner.dart';
+import 'simulated_position.dart';
 
 /// Orchestrates planning a trip: resolve the origin (device GPS, with a
 /// fallback), call the routing repository, and push the result into
@@ -35,6 +36,8 @@ class NavSession {
         return;
       }
       nav.setRoute(route);
+      // Start each trip in heading-up follow mode.
+      _ref.read(cameraModeProvider.notifier).state = CameraMode.follow;
 
       // Dev: drive a virtual vehicle along the route instead of real GPS.
       // Guarded so a simulation problem never aborts navigation.
@@ -50,6 +53,7 @@ class NavSession {
 
   void stop() {
     _ref.read(routeSimulationRunnerProvider).stop();
+    _ref.read(cameraModeProvider.notifier).state = CameraMode.follow;
     _ref.read(navControllerProvider.notifier).stop();
   }
 

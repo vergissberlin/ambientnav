@@ -7,7 +7,6 @@ import '../../../core/di/providers.dart';
 import '../../controllers/domain/entities/controller_role.dart';
 import '../../controllers/presentation/controllers_controller.dart';
 import '../domain/usecases/maneuver_to_ble_command.dart';
-import '../domain/entities/route.dart';
 import 'nav_controller.dart';
 import 'nav_session.dart';
 import 'search_screen.dart';
@@ -15,7 +14,8 @@ import 'simulated_position.dart';
 import 'turn_by_turn_panel.dart';
 
 /// The main navigation screen: a MapLibre street map with the next-maneuver
-/// banner and the planned route overlaid. A search button plans a trip.
+/// banner and the planned route overlaid. While navigating the camera follows
+/// the position heading-up; a button toggles a whole-route overview.
 class MapScreen extends ConsumerStatefulWidget {
   const MapScreen({super.key});
 
@@ -29,34 +29,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   Circle? _simCircle;
   static const _maneuverToCommand = ManeuverToBleCommand();
 
-  /// Move (or create) the virtual-vehicle marker and follow it.
-  Future<void> _updateSimPosition(GeoPoint? p) async {
-    final controller = _mapController;
-    if (controller == null) return;
-    if (p == null) {
-      if (_simCircle != null) {
-        await controller.removeCircle(_simCircle!);
-        _simCircle = null;
-      }
-      return;
-    }
-    final latLng = LatLng(p.latitude, p.longitude);
-    if (_simCircle == null) {
-      _simCircle = await controller.addCircle(CircleOptions(
-        geometry: latLng,
-        circleRadius: 8,
-        circleColor: '#1E88E5',
-        circleStrokeColor: '#FFFFFF',
-        circleStrokeWidth: 2,
-      ));
-    } else {
-      await controller.updateCircle(
-          _simCircle!, CircleOptions(geometry: latLng));
-    }
-    await controller.animateCamera(CameraUpdate.newLatLng(latLng));
-  }
+  /// Closer zoom as the next maneuver approaches, so the intersection is legible.
+  double _followZoom(double distanceToManeuver) =>
+      distanceToManeuver < 150 ? 17.5 : 16.5;
 
-  Future<void> _drawRoute() async {
+  /// Draw (or redraw) the route polyline — without moving the camera.
+  Future<void> _drawRouteLine() async {
     final controller = _mapController;
     final route = ref.read(navControllerProvider).route;
     if (controller == null) return;
@@ -74,7 +52,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         lineWidth: 5,
       ),
     );
-    // Frame the route.
+  }
+
+  /// Frame the whole route (overview).
+  Future<void> _fitRouteBounds() async {
+    final controller = _mapController;
+    final route = ref.read(navControllerProvider).route;
+    if (controller == null || route == null || route.geometry.isEmpty) return;
     final box = route.boundingBox;
     await controller.animateCamera(
       CameraUpdate.newLatLngBounds(
@@ -90,6 +74,44 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     );
   }
 
+  /// Move (or create) the virtual-vehicle marker and, in follow mode, keep the
+  /// camera centred + oriented in the travel direction.
+  Future<void> _updateSimPosition(SimPose? pose) async {
+    final controller = _mapController;
+    if (controller == null) return;
+    if (pose == null) {
+      if (_simCircle != null) {
+        await controller.removeCircle(_simCircle!);
+        _simCircle = null;
+      }
+      return;
+    }
+    final latLng = LatLng(pose.position.latitude, pose.position.longitude);
+    if (_simCircle == null) {
+      _simCircle = await controller.addCircle(CircleOptions(
+        geometry: latLng,
+        circleRadius: 8,
+        circleColor: '#1E88E5',
+        circleStrokeColor: '#FFFFFF',
+        circleStrokeWidth: 2,
+      ));
+    } else {
+      await controller.updateCircle(
+          _simCircle!, CircleOptions(geometry: latLng));
+    }
+    if (ref.read(cameraModeProvider) == CameraMode.follow) {
+      final dist = ref.read(navControllerProvider).distanceToManeuverMeters;
+      await controller.animateCamera(
+        CameraUpdate.newCameraPosition(CameraPosition(
+          target: latLng,
+          bearing: pose.bearingDeg,
+          tilt: 50,
+          zoom: _followZoom(dist),
+        )),
+      );
+    }
+  }
+
   Future<void> _openSearch() async {
     final result = await SearchScreen.show(context);
     if (result == null) return;
@@ -102,9 +124,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     }
   }
 
-  /// Speak the maneuver and push it to a connected front controller's LEDs.
+  /// Redraw the line + speak/forward each new maneuver.
   void _onManeuver(NavigationState? prev, NavigationState next) {
-    _drawRoute();
+    _drawRouteLine();
     final maneuver = next.nextManeuver;
     if (next.phase != NavPhase.navigating || maneuver == null) return;
     if (prev?.nextManeuver == maneuver) return;
@@ -124,15 +146,35 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     }
   }
 
+  void _toggleOverview() {
+    final notifier = ref.read(cameraModeProvider.notifier);
+    if (ref.read(cameraModeProvider) == CameraMode.overview) {
+      notifier.state = CameraMode.follow;
+      // Re-centre immediately on the latest simulated pose, if any.
+      _updateSimPosition(ref.read(simulatedPositionProvider));
+    } else {
+      notifier.state = CameraMode.overview;
+      _fitRouteBounds();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final navState = ref.watch(navControllerProvider);
     final isNavigating = navState.phase == NavPhase.navigating;
     final simulating = ref.watch(simulatedPositionProvider) != null;
+    final cameraMode = ref.watch(cameraModeProvider);
+    final following = cameraMode == CameraMode.follow;
 
     ref.listen(navControllerProvider, _onManeuver);
     ref.listen(simulatedPositionProvider, (_, p) => _updateSimPosition(p));
+
+    // Real-GPS heading-up follow is handled natively by MapLibre; the simulator
+    // drives the camera manually (its position isn't the OS location).
+    final trackingMode = (isNavigating && following && !simulating)
+        ? MyLocationTrackingMode.trackingGps
+        : MyLocationTrackingMode.none;
 
     return Scaffold(
       appBar: AppBar(
@@ -150,6 +192,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             const Padding(
               padding: EdgeInsets.only(right: 12),
               child: Icon(Icons.offline_pin),
+            ),
+          if (isNavigating)
+            IconButton(
+              tooltip: following ? l10n.routeOverview : l10n.followRoute,
+              icon: Icon(following ? Icons.alt_route : Icons.navigation),
+              onPressed: _toggleOverview,
             ),
           if (isNavigating)
             IconButton(
@@ -179,8 +227,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               zoom: 12,
             ),
             onMapCreated: (c) => _mapController = c,
-            onStyleLoadedCallback: _drawRoute,
+            onStyleLoadedCallback: _drawRouteLine,
             myLocationEnabled: true,
+            myLocationTrackingMode: trackingMode,
+            myLocationRenderMode: trackingMode == MyLocationTrackingMode.none
+                ? MyLocationRenderMode.normal
+                : MyLocationRenderMode.compass,
           ),
           Align(
             alignment: Alignment.topCenter,
