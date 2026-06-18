@@ -42,6 +42,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noRouteFound => 'No route found';
 
   @override
+  String get locationPermissionDenied =>
+      'Location permission is required for navigation';
+
+  @override
   String get routeOverview => 'Route overview';
 
   @override

@@ -1,0 +1,294 @@
+<!-- @dsCard group="iOS App" viewport="980x720" subtitle="AmbientNav iOS app — pair, live guide, proximity, settings" -->
+<!-- @startingPoint section="iOS App" subtitle="AmbientNav iOS app recreation" viewport="980x720" -->
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AmbientNav — iOS App</title>
+<link rel="stylesheet" href="../../styles.css">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#04060B;background-image:radial-gradient(900px 600px at 18% 6%,rgba(25,227,255,.10),transparent 60%),radial-gradient(900px 700px at 86% 96%,rgba(255,45,156,.10),transparent 60%);font-family:var(--font-body);min-height:100vh;display:flex;align-items:center;justify-content:center;gap:46px;padding:40px;flex-wrap:wrap}
+  /* device */
+  .device{width:390px;height:820px;border-radius:54px;background:#0A0D14;padding:13px;box-shadow:0 0 0 2px #1A1F2B,0 40px 90px rgba(0,0,0,.6);flex:none;position:relative}
+  .screen{width:100%;height:100%;border-radius:42px;overflow:hidden;background:var(--amb-cockpit);position:relative;display:flex;flex-direction:column}
+  .notch{position:absolute;top:13px;left:50%;transform:translateX(-50%);width:122px;height:30px;background:#0A0D14;border-radius:0 0 18px 18px;z-index:30}
+  /* status bar */
+  .status{display:flex;justify-content:space-between;align-items:center;padding:14px 26px 6px;font-family:var(--font-mono);font-size:13px;color:var(--amb-text);font-weight:500;z-index:20}
+  .status .r{display:flex;gap:6px;align-items:center}
+  /* view area */
+  .view{flex:1;overflow-y:auto;overflow-x:hidden}
+  .view::-webkit-scrollbar{width:0}
+  /* tab bar */
+  .tabs{display:flex;border-top:1px solid var(--amb-line);background:rgba(8,11,18,.9);backdrop-filter:blur(14px);padding:9px 8px 26px}
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-family:var(--font-mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--amb-text-4);background:none;border:0;cursor:pointer;padding:6px 0}
+  .tab.on{color:var(--amb-cyan)}
+  .tab svg{width:22px;height:22px}
+  .pad{padding:20px 22px}
+  .eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--amb-cyan)}
+  h1{font-family:var(--font-display);font-weight:600;letter-spacing:-.02em;margin:0}
+  .muted{color:var(--amb-text-3)}
+  .card{background:var(--amb-surface-2);border:1px solid var(--amb-line);border-radius:18px;padding:18px}
+  /* legend / labels under the phones */
+  .frameLabel{position:absolute;top:-30px;left:0;font-family:var(--font-mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--amb-text-4)}
+</style>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/plain" id="app-src">
+const { useState, useEffect, useRef } = React;
+
+/* ---------- icons (Lucide-style, 2px stroke) ---------- */
+const Ico = ({d, size=22, c="currentColor", fill="none"}) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill={fill} stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{d}</svg>
+);
+const iNav = <Ico d={<polygon points="3 11 22 2 13 21 11 13 3 11"/>}/>;
+const iRadar = <Ico d={<><path d="M12 12 7 8"/><path d="M4.93 19.07A10 10 0 1 1 19.07 4.93"/><path d="M7.76 16.24a6 6 0 1 1 8.48-8.48"/></>}/>;
+const iChip = <Ico d={<><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3"/></>}/>;
+const iCog = <Ico d={<><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></>}/>;
+const iTurn = <Ico d={<><polyline points="9 10 4 15 9 20"/><path d="M20 4v7a4 4 0 0 1-4 4H4"/></>} size={30} c="#19E3FF"/>;
+const iBolt = <Ico d={<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>} size={14}/>;
+
+/* ---------- LED strip ---------- */
+function Strip({mode="ambient", direction="right", intensity=0.6, leds=30, height=14, phase=0}){
+  const cells=[];
+  for(let i=0;i<leds;i++){
+    const t=i/(leds-1); let bg;
+    if(mode==="guide"){
+      const pos=direction==="right"?t:1-t;
+      const wave=Math.max(0,Math.sin((pos*4 - phase)*Math.PI)); // travelling pulse
+      const a=0.14+pos*0.5+wave*0.4;
+      bg=`rgba(25,227,255,${Math.min(1,a).toFixed(2)})`;
+    } else if(mode==="alert"){
+      const edge=Math.min(t,1-t)*2; const on=edge>=1-intensity;
+      bg=on?`rgba(255,45,156,${(0.5+intensity*0.5).toFixed(2)})`:"rgba(255,45,156,0.07)";
+    } else {
+      const stops=[[25,227,255],[124,92,255],[255,45,156]];
+      const seg=t*2, idx=Math.min(1,Math.floor(seg)), f=seg-idx;
+      const mix=(a,b)=>Math.round(a+(b-a)*f);
+      const c1=stops[idx],c2=stops[idx+1];
+      bg=`rgba(${mix(c1[0],c2[0])},${mix(c1[1],c2[1])},${mix(c1[2],c2[2])},0.5)`;
+    }
+    cells.push(<div key={i} style={{flex:1,height,borderRadius:999,background:bg,transition:"background .12s linear"}}/>);
+  }
+  const glow=mode==="alert"?"0 0 22px rgba(255,45,156,.55)":mode==="guide"?"0 0 22px rgba(25,227,255,.5)":"0 0 16px rgba(124,92,255,.3)";
+  return <div style={{display:"flex",gap:2,padding:4,borderRadius:999,background:"rgba(255,255,255,.03)",border:"1px solid var(--amb-line)",boxShadow:glow}}>{cells}</div>;
+}
+
+/* ---------- shared status bar ---------- */
+const StatusBar = () => (
+  <div className="status">
+    <span>9:41</span>
+    <span className="r" style={{fontFamily:"var(--font-mono)"}}>
+      <Ico size={15} d={<><path d="M2 20h.01M7 20v-4M12 20v-8M17 20V8M22 4v16"/></>}/>
+      <Ico size={15} d={<><path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></>}/>
+      <span style={{display:"inline-flex",alignItems:"center",gap:2}}>{iBolt}82%</span>
+    </span>
+  </div>
+);
+
+/* ============ SCREEN: GUIDE ============ */
+function Guide(){
+  const [phase,setPhase]=useState(0);
+  useEffect(()=>{const id=setInterval(()=>setPhase(p=>(p+0.12)%2),90);return()=>clearInterval(id);},[]);
+  return (
+    <div className="view">
+      <div className="pad" style={{paddingBottom:8}}>
+        <div className="eyebrow">Live guide</div>
+        <h1 style={{fontSize:24,marginTop:6}}>To Hauptbahnhof</h1>
+        <div className="muted" style={{fontSize:13,marginTop:2,fontFamily:"var(--font-mono)"}}>14 min · 6.2 km · ETA 9:55</div>
+      </div>
+
+      {/* next maneuver */}
+      <div className="pad" style={{paddingTop:8,paddingBottom:8}}>
+        <div className="card" style={{display:"flex",alignItems:"center",gap:16,boxShadow:"0 0 28px rgba(25,227,255,.16)"}}>
+          <div style={{width:54,height:54,borderRadius:14,background:"rgba(25,227,255,.1)",border:"1px solid rgba(25,227,255,.4)",display:"flex",alignItems:"center",justifyContent:"center"}}>{iTurn}</div>
+          <div style={{flex:1}}>
+            <div style={{fontFamily:"var(--font-display)",fontWeight:600,fontSize:19}}>Turn left</div>
+            <div className="muted" style={{fontSize:13}}>onto Lindenstraße</div>
+          </div>
+          <div style={{fontFamily:"var(--font-mono)",color:"var(--amb-cyan)",fontSize:22,fontWeight:500}}>200<span style={{fontSize:13,color:"var(--amb-text-3)"}}>&thinsp;m</span></div>
+        </div>
+      </div>
+
+      {/* dashboard preview */}
+      <div className="pad" style={{paddingTop:10}}>
+        <div className="muted" style={{fontFamily:"var(--font-mono)",fontSize:10,letterSpacing:".2em",textTransform:"uppercase",marginBottom:12}}>Dashboard strip · live</div>
+        <div style={{background:"linear-gradient(180deg,#0E121C,#080B12)",border:"1px solid var(--amb-line)",borderRadius:20,padding:"26px 18px"}}>
+          <div style={{perspective:600}}>
+            <div style={{transform:"rotateX(38deg)",transformOrigin:"center bottom"}}>
+              <Strip mode="guide" direction="left" leds={34} height={16} phase={phase}/>
+            </div>
+          </div>
+          <div style={{textAlign:"center",marginTop:22,fontFamily:"var(--font-mono)",fontSize:11,letterSpacing:".14em",color:"var(--amb-cyan)",textTransform:"uppercase"}}>Cyan flows left → turn ahead</div>
+        </div>
+      </div>
+
+      <div className="pad" style={{paddingTop:6}}>
+        <div style={{display:"flex",gap:10}}>
+          <div className="card" style={{flex:1,textAlign:"center"}}><div style={{fontFamily:"var(--font-mono)",color:"var(--amb-text)",fontSize:20}}>52<span style={{fontSize:12,color:"var(--amb-text-3)"}}> km/h</span></div><div className="muted" style={{fontSize:11,marginTop:4}}>Speed</div></div>
+          <div className="card" style={{flex:1,textAlign:"center"}}><div style={{fontFamily:"var(--font-mono)",color:"var(--amb-text)",fontSize:20}}>60<span style={{fontSize:12,color:"var(--amb-text-3)"}}> fps</span></div><div className="muted" style={{fontSize:11,marginTop:4}}>Strip refresh</div></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============ SCREEN: PROXIMITY ============ */
+function Proximity(){
+  const [d,setD]=useState(120); // cm
+  const intensity=Math.max(0,Math.min(1,(160-d)/150));
+  const zone = d>120?{t:"Clear",c:"var(--amb-cyan)"}:d>50?{t:"Close",c:"var(--amb-violet-soft)"}:{t:"Stop",c:"var(--amb-magenta)"};
+  return (
+    <div className="view">
+      <div className="pad" style={{paddingBottom:8}}>
+        <div className="eyebrow" style={{color:"var(--amb-magenta)"}}>Proximity</div>
+        <h1 style={{fontSize:24,marginTop:6}}>Parking assist</h1>
+        <div className="muted" style={{fontSize:13,marginTop:2}}>Rear sensor · live distance</div>
+      </div>
+
+      <div className="pad" style={{paddingTop:8}}>
+        <div className="card" style={{textAlign:"center",padding:"30px 20px",boxShadow:intensity>0.6?"0 0 34px rgba(255,45,156,.22)":"none"}}>
+          <div style={{fontFamily:"var(--font-display)",fontWeight:600,fontSize:64,lineHeight:1,color:zone.c}}>{d}<span style={{fontSize:22,color:"var(--amb-text-3)"}}> cm</span></div>
+          <div style={{fontFamily:"var(--font-mono)",fontSize:13,letterSpacing:".2em",textTransform:"uppercase",color:zone.c,marginTop:10}}>{zone.t}</div>
+          <div style={{marginTop:24}}><Strip mode="alert" intensity={intensity} leds={30} height={16}/></div>
+        </div>
+      </div>
+
+      <div className="pad" style={{paddingTop:6}}>
+        <div className="muted" style={{fontFamily:"var(--font-mono)",fontSize:10,letterSpacing:".2em",textTransform:"uppercase",marginBottom:12}}>Simulate distance</div>
+        <input type="range" min="10" max="160" value={d} onChange={e=>setD(+e.target.value)} style={{width:"100%",accentColor:"#FF2D9C"}}/>
+        <div style={{display:"flex",justifyContent:"space-between",fontFamily:"var(--font-mono)",fontSize:10,color:"var(--amb-text-4)",marginTop:4}}><span>10 cm</span><span>160 cm</span></div>
+      </div>
+
+      <div className="pad" style={{paddingTop:8}}>
+        <div className="card" style={{display:"flex",alignItems:"center",gap:14}}>
+          <div style={{color:"var(--amb-magenta)"}}>{iRadar}</div>
+          <div style={{flex:1}}><div style={{fontWeight:600,fontFamily:"var(--font-display)"}}>Magenta fills inward</div><div className="muted" style={{fontSize:12.5}}>The closer the obstacle, the more the strip fills and the faster it pulses.</div></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============ SCREEN: DEVICES ============ */
+function Devices(){
+  const [paired,setPaired]=useState({nav:true,sensor:true});
+  const Row=({k,name,role,icon})=>(
+    <div className="card" style={{display:"flex",alignItems:"center",gap:14,marginBottom:12}}>
+      <div style={{width:46,height:46,borderRadius:12,background:"var(--amb-surface-3)",display:"flex",alignItems:"center",justifyContent:"center",color:paired[k]?"var(--amb-cyan)":"var(--amb-text-4)"}}>{icon}</div>
+      <div style={{flex:1}}>
+        <div style={{fontWeight:600,fontFamily:"var(--font-display)"}}>{name}</div>
+        <div className="muted" style={{fontSize:12,fontFamily:"var(--font-mono)"}}>{role}</div>
+      </div>
+      <button onClick={()=>setPaired(p=>({...p,[k]:!p[k]}))} style={{cursor:"pointer",fontFamily:"var(--font-mono)",fontSize:10.5,letterSpacing:".1em",textTransform:"uppercase",padding:"6px 11px",borderRadius:4,border:"1px solid "+(paired[k]?"rgba(25,227,255,.4)":"var(--amb-line-strong)"),background:paired[k]?"rgba(25,227,255,.08)":"transparent",color:paired[k]?"var(--amb-cyan)":"var(--amb-text-3)",boxShadow:paired[k]?"var(--amb-glow-cyan)":"none"}}>{paired[k]?"Connected":"Connect"}</button>
+    </div>
+  );
+  const both = paired.nav && paired.sensor;
+  return (
+    <div className="view">
+      <div className="pad" style={{paddingBottom:8}}>
+        <div className="eyebrow">Devices</div>
+        <h1 style={{fontSize:24,marginTop:6}}>BLE pairing</h1>
+        <div className="muted" style={{fontSize:13,marginTop:2}}>Two ESP32 controllers</div>
+      </div>
+      <div className="pad" style={{paddingTop:8}}>
+        <Row k="nav" name="AmbientNav · Front" role="ESP32 · navigation light" icon={iNav}/>
+        <Row k="sensor" name="AmbientNav · Rear" role="ESP32 · proximity sensor" icon={iRadar}/>
+        <div className="card" style={{marginTop:6,display:"flex",alignItems:"center",gap:12,borderColor:both?"rgba(25,227,255,.25)":"var(--amb-line)"}}>
+          <div style={{width:9,height:9,borderRadius:99,background:both?"#19E3FF":"#6B7488",boxShadow:both?"var(--amb-glow-cyan)":"none"}}/>
+          <div style={{fontFamily:"var(--font-mono)",fontSize:12,color:both?"var(--amb-cyan)":"var(--amb-text-3)"}}>{both?"Link active · 60 fps":"Waiting for both controllers"}</div>
+        </div>
+      </div>
+      <div className="pad" style={{paddingTop:8}}>
+        <div className="card"><div className="muted" style={{fontSize:10,fontFamily:"var(--font-mono)",letterSpacing:".18em",textTransform:"uppercase",marginBottom:10}}>Hardware</div>
+          <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+            {["2× ESP32","WS2812B","BLE 5.0","HC-SR04"].map(t=>(<span key={t} style={{fontFamily:"var(--font-mono)",fontSize:11,letterSpacing:".06em",color:"var(--amb-text-3)",border:"1px solid var(--amb-line-strong)",borderRadius:4,padding:"6px 10px"}}>{t}</span>))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============ SCREEN: SETTINGS ============ */
+function Toggle({on,set}){return <button onClick={()=>set(!on)} style={{width:46,height:28,borderRadius:999,border:"none",cursor:"pointer",background:on?"var(--amb-cyan)":"var(--amb-surface-3)",boxShadow:on?"var(--amb-glow-cyan)":"none",position:"relative",transition:"background .2s"}}><span style={{position:"absolute",top:3,left:on?21:3,width:22,height:22,borderRadius:99,background:"#06080E",transition:"left .2s"}}/></button>;}
+function Settings(){
+  const [bright,setBright]=useState(70);
+  const [autoDim,setAutoDim]=useState(true);
+  const [warn,setWarn]=useState(true);
+  const swatches=["#19E3FF","#7C5CFF","#FF2D9C","#5CEFFF"];
+  const [guideC,setGuideC]=useState("#19E3FF");
+  const Item=({label,sub,children})=>(
+    <div className="card" style={{display:"flex",alignItems:"center",gap:14,marginBottom:12}}>
+      <div style={{flex:1}}><div style={{fontWeight:600,fontFamily:"var(--font-display)"}}>{label}</div>{sub&&<div className="muted" style={{fontSize:12}}>{sub}</div>}</div>{children}
+    </div>
+  );
+  return (
+    <div className="view">
+      <div className="pad" style={{paddingBottom:8}}>
+        <div className="eyebrow">Settings</div>
+        <h1 style={{fontSize:24,marginTop:6}}>Light &amp; behavior</h1>
+      </div>
+      <div className="pad" style={{paddingTop:8}}>
+        <div className="card" style={{marginBottom:12}}>
+          <div style={{display:"flex",justifyContent:"space-between",marginBottom:14}}><span style={{fontWeight:600,fontFamily:"var(--font-display)"}}>Brightness</span><span style={{fontFamily:"var(--font-mono)",color:"var(--amb-cyan)"}}>{bright}%</span></div>
+          <input type="range" min="0" max="100" value={bright} onChange={e=>setBright(+e.target.value)} style={{width:"100%",accentColor:"#19E3FF"}}/>
+        </div>
+        <Item label="Auto-dim at night" sub="Lower glow after sunset"><Toggle on={autoDim} set={setAutoDim}/></Item>
+        <Item label="Proximity warnings" sub="Magenta alert on approach"><Toggle on={warn} set={setWarn}/></Item>
+        <div className="card">
+          <div style={{fontWeight:600,fontFamily:"var(--font-display)",marginBottom:4}}>Guide color</div>
+          <div className="muted" style={{fontSize:12,marginBottom:14}}>Direction signal hue</div>
+          <div style={{display:"flex",gap:12}}>
+            {swatches.map(s=>(<button key={s} onClick={()=>setGuideC(s)} style={{width:38,height:38,borderRadius:10,background:s,border:guideC===s?"2px solid #EEF2FA":"2px solid transparent",cursor:"pointer",boxShadow:guideC===s?`0 0 16px ${s}`:"none"}}/>))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- shell ---------- */
+const TABS=[
+  {k:"guide",label:"Guide",icon:iNav,C:Guide},
+  {k:"prox",label:"Parking",icon:iRadar,C:Proximity},
+  {k:"dev",label:"Devices",icon:iChip,C:Devices},
+  {k:"set",label:"Settings",icon:iCog,C:Settings},
+];
+function Phone({start="guide", label}){
+  const [tab,setTab]=useState(start);
+  const Active=(TABS.find(t=>t.k===tab)||TABS[0]).C;
+  return (
+    <div className="device">
+      {label && <div className="frameLabel">{label}</div>}
+      <div className="screen">
+        <div className="notch"></div>
+        <StatusBar/>
+        <Active/>
+        <div className="tabs">
+          {TABS.map(t=>(
+            <button key={t.k} className={"tab"+(tab===t.k?" on":"")} onClick={()=>setTab(t.k)}>
+              {t.icon}<span>{t.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+function App(){
+  return (<><Phone start="guide" label="Live Guide"/><Phone start="prox" label="Parking Assist"/></>);
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+<script>
+  (function(){
+    var src = document.getElementById("app-src").textContent;
+    var code = Babel.transform(src, {presets:[["react",{runtime:"classic"}]]}).code;
+    (0, eval)(code);
+  })();
+</script>
+</body></html>

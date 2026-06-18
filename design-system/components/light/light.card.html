@@ -1,0 +1,51 @@
+<!-- @dsCard group="Components" viewport="700x230" subtitle="LightStrip — the signature LED element, three modes" name="Light" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../../styles.css">
+<style>
+  body{margin:0;background:var(--amb-cockpit);font-family:var(--font-body);padding:30px;color:var(--amb-text)}
+  .grid{display:flex;flex-direction:column;gap:26px;max-width:760px}
+  .lab{font-family:var(--font-mono);font-size:10px;letter-spacing:.16em;color:var(--amb-text-4);text-transform:uppercase;margin-bottom:12px}
+</style>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="../../_ds_bundle.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/plain" id="app-src">
+  function findNS(names){
+    for (const k of Object.keys(window)) {
+      let v; try { v = window[k]; } catch(e) { continue; }
+      if (v && typeof v === "object" && names.every(n => { try { return typeof v[n] === "function"; } catch(e){ return false; } })) return v;
+    }
+    return {};
+  }
+  const NS = findNS(["LightStrip"]);
+  const LightStrip = NS.LightStrip || function({mode="ambient",direction="right",intensity=0.6,leds=28,height=16,style={},...r}){
+    const colorFor=(i)=>{const t=i/(leds-1);
+      if(mode==="guide"){const pos=direction==="right"?t:1-t;return `rgba(25,227,255,${(0.12+pos*0.88).toFixed(2)})`;}
+      if(mode==="alert"){const edge=Math.min(t,1-t)*2;return edge>=1-intensity?`rgba(255,45,156,${(0.5+intensity*0.5).toFixed(2)})`:"rgba(255,45,156,0.08)";}
+      const s=[[25,227,255],[124,92,255],[255,45,156]];const seg=t*2,idx=Math.min(1,Math.floor(seg)),f=seg-idx,m=(a,b)=>Math.round(a+(b-a)*f);return `rgba(${m(s[idx][0],s[idx+1][0])},${m(s[idx][1],s[idx+1][1])},${m(s[idx][2],s[idx+1][2])},0.55)`;};
+    const glow=mode==="alert"?"0 0 22px rgba(255,45,156,.55)":mode==="guide"?"0 0 22px rgba(25,227,255,.5)":"0 0 18px rgba(124,92,255,.3)";
+    return <div style={{display:"flex",gap:2,padding:4,borderRadius:"var(--radius-strip)",background:"rgba(255,255,255,.03)",border:"1px solid var(--amb-line)",boxShadow:glow,...style}} {...r}>{Array.from({length:leds}).map((_,i)=><div key={i} style={{flex:1,height,borderRadius:999,background:colorFor(i),transition:"background .24s"}}/>)}</div>;
+  };
+  function Demo(){
+    return (
+      <div className="grid">
+        <div><div className="lab">Ambient · idle</div><LightStrip mode="ambient"/></div>
+        <div><div className="lab">Guide · flow right</div><LightStrip mode="guide" direction="right"/></div>
+        <div><div className="lab">Guide · flow left</div><LightStrip mode="guide" direction="left"/></div>
+        <div><div className="lab">Alert · proximity 0.85</div><LightStrip mode="alert" intensity={0.85}/></div>
+      </div>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById("root")).render(<Demo/>);
+</script>
+<script>
+  (function(){
+    var src = document.getElementById("app-src").textContent;
+    var code = Babel.transform(src, {presets:[["react",{runtime:"classic"}]]}).code;
+    (0, eval)(code);
+  })();
+</script>
+</body></html>

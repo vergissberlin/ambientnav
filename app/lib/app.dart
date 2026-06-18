@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_controller.dart';
+import 'features/navigation/presentation/navigation_effects_listener.dart';
 
 /// Root widget. Wires the persisted [ThemeMode], localizations and the home
 /// shell.
@@ -22,7 +23,7 @@ class AmbientNavApp extends ConsumerWidget {
       themeMode: themeMode,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      home: const HomeShell(),
+      home: const NavigationEffectsListener(child: HomeShell()),
     );
   }
 }

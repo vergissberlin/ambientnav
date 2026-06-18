@@ -8,6 +8,13 @@
 	<string>AmbientNav uses Bluetooth to connect to and configure your LED controllers.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>AmbientNav uses your location for turn-by-turn navigation.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>AmbientNav continues turn-by-turn navigation when you switch to another app, including voice guidance and LED strip updates.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+		<string>audio</string>
+	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

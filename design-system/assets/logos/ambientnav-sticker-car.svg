@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+  <defs>
+    <linearGradient id="stGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#19E3FF"></stop>
+      <stop offset="50%" stop-color="#7C5CFF"></stop>
+      <stop offset="100%" stop-color="#FF2D9C"></stop>
+    </linearGradient>
+    <radialGradient id="stGlow" cx="50%" cy="42%" r="60%">
+      <stop offset="0%" stop-color="#1A2233"></stop>
+      <stop offset="100%" stop-color="#06080E"></stop>
+    </radialGradient>
+    <filter id="stBlur" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="9"></feGaussianBlur>
+    </filter>
+  </defs>
+
+  
+  <circle cx="300" cy="300" r="286" fill="#FFFFFF"></circle>
+  
+  <circle cx="300" cy="300" r="276" fill="url(#stGlow)"></circle>
+  
+  <circle cx="300" cy="300" r="276" fill="none" stroke="url(#stGrad)" stroke-width="6"></circle>
+  <circle cx="300" cy="300" r="255" fill="none" stroke="#FFFFFF" stroke-opacity="0.08" stroke-width="1.5"></circle>
+
+  
+  <g transform="translate(300 232)" filter="url(#stBlur)" opacity="0.85">
+    <g transform="translate(-94 -94) scale(1.88)" fill="none" stroke="url(#stGrad)" stroke-width="8.5" stroke-linecap="round" stroke-dasharray="0.1 11.5">
+      <path d="M23 83 L50 17 L77 83"></path>
+      <path d="M35 59 L65 59"></path>
+    </g>
+  </g>
+  
+  <g transform="translate(300 232)">
+    <g transform="translate(-94 -94) scale(1.88)" fill="none" stroke="url(#stGrad)" stroke-width="8.5" stroke-linecap="round" stroke-dasharray="0.1 11.5">
+      <path d="M23 83 L50 17 L77 83"></path>
+      <path d="M35 59 L65 59"></path>
+    </g>
+  </g>
+
+  
+  <text x="300" y="430" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="56" letter-spacing="-1.5" fill="#FFFFFF">Ambient<tspan fill="#19E3FF">Nav</tspan></text>
+
+  
+  <text x="300" y="478" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="18" letter-spacing="6" fill="#7C8195">FOLLOW THE LIGHT</text>
+
+  
+  <g transform="translate(300 512)">
+    <circle cx="-44" cy="0" r="5" fill="#19E3FF"></circle>
+    <circle cx="-22" cy="0" r="5" fill="#5FBEF0"></circle>
+    <circle cx="0" cy="0" r="5" fill="#7C5CFF"></circle>
+    <circle cx="22" cy="0" r="5" fill="#C254CB"></circle>
+    <circle cx="44" cy="0" r="5" fill="#FF2D9C"></circle>
+  </g>
+</svg>

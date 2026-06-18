@@ -75,6 +75,23 @@ and set `DEVELOPMENT_TEAM` to your Team ID (file is gitignored).
 Wireless debugging: pair once over USB, then enable **Connect via network** in
 **Window → Devices and Simulators**.
 
+### iOS background navigation
+
+Active turn-by-turn navigation uses continuous GPS in the background so iOS
+shows the blue status-bar indicator (tap to return to the app). This requires:
+
+- `UIBackgroundModes`: `location` and `audio` (voice guidance while backgrounded)
+  in `ios/Runner/Info.plist`
+- `NSLocationAlwaysAndWhenInUseUsageDescription` alongside the when-in-use string
+- **Signing & Capabilities → Background Modes**: Location updates and Audio
+
+Location permission is requested when navigation starts, not at app launch. For
+App Store review, explain that background location is only active during an
+ongoing navigation session and stops when the user taps **Stop**.
+
+On Android, background navigation uses a foreground-service notification via
+`geolocator` (no blue status bar — that pattern is iOS-specific).
+
 ## Navigation backends
 
 The Navigate tab uses free, key-less services by default:

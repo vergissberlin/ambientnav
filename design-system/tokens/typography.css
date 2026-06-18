@@ -1,0 +1,39 @@
+/* AmbientNav — Typography
+   Space Grotesk (geometric display) · IBM Plex Sans (body/UI) · IBM Plex Mono (data/eyebrows). */
+
+:root {
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* Type scale (px) */
+  --fs-display: 90px;   /* hero            */
+  --fs-h1: 46px;
+  --fs-h2: 30px;
+  --fs-h3: 22px;
+  --fs-lg: 18px;
+  --fs-body: 16px;
+  --fs-sm: 14px;
+  --fs-xs: 12px;
+  --fs-eyebrow: 12px;
+
+  /* Weights */
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  /* Letter spacing */
+  --ls-display: -0.035em;   /* tight, geometric          */
+  --ls-heading: -0.02em;
+  --ls-body: 0em;
+  --ls-eyebrow: 0.26em;     /* wide tracked mono labels  */
+
+  /* Line heights */
+  --lh-display: 0.98;
+  --lh-heading: 1.12;
+  --lh-body: 1.6;
+
+  /* Semantic */
+  --text-eyebrow-transform: uppercase;
+}

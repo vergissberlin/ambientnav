@@ -56,7 +56,7 @@ final geocodingServiceProvider = Provider<GeocodingService>((ref) {
 });
 
 final locationServiceProvider = Provider<LocationService>((ref) {
-  return const LocationService();
+  return LocationService();
 });
 
 /// MapLibre style URL — OpenFreeMap Liberty (free, no API key, street detail).

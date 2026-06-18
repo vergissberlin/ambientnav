@@ -1,0 +1,15 @@
+<!-- @dsCard group="Brand" viewport="700x180" subtitle="Cyan guides direction · magenta warns of proximity" name="The light system" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css">
+<style>body{margin:0;background:var(--amb-cockpit);padding:22px 24px;font-family:var(--font-body);display:flex;flex-direction:column;gap:18px}
+.row{display:flex;align-items:center;gap:18px}
+.strip{flex:1;height:16px;border-radius:999px}
+.guide{background:linear-gradient(90deg,rgba(25,227,255,.12),#19E3FF 70%,#5CEFFF);box-shadow:0 0 22px rgba(25,227,255,.6)}
+.alert{background:linear-gradient(90deg,rgba(255,45,156,.12),#FF2D9C 60%,#FF6FC2);box-shadow:0 0 22px rgba(255,45,156,.6)}
+.lab{width:150px;flex:none}
+.t{font-family:var(--font-display);font-weight:600;font-size:15px}
+.s{font-size:12px;color:var(--amb-text-3)}
+.cy{color:var(--amb-cyan)}.mg{color:var(--amb-magenta)}</style></head>
+<body>
+  <div class="row"><div class="lab"><div class="t cy">Guide</div><div class="s">flows toward the turn</div></div><div class="strip guide"></div></div>
+  <div class="row"><div class="lab"><div class="t mg">Alert</div><div class="s">fills inward on approach</div></div><div class="strip alert"></div></div>
+</body></html>
