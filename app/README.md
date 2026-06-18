@@ -68,6 +68,20 @@ and set `DEVELOPMENT_TEAM` to your Team ID (file is gitignored).
 Wireless debugging: pair once over USB, then enable **Connect via network** in
 **Window → Devices and Simulators**.
 
+## Navigation backends
+
+The Navigate tab uses free, key-less services by default:
+
+- **Map tiles/style:** OpenFreeMap Liberty (`tiles.openfreemap.org`)
+- **Routing:** public OSRM demo (`router.project-osrm.org`)
+- **Geocoding:** OpenStreetMap Nominatim (`nominatim.openstreetmap.org`)
+
+These are shared, rate-limited community services — fine for development. For
+production, host your own (Nominatim, OSRM/Valhalla, a tile/style server) and
+override `kMapStyleUrl` + `routingApiProvider` + `geocodingServiceProvider` in
+`lib/core/di/providers.dart`. A planned route is cached and its map region can be
+downloaded for offline use.
+
 ## Test & analyze
 
 ```bash

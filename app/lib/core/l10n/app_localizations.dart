@@ -158,6 +158,12 @@ abstract class AppLocalizations {
   /// **'Offline route ready'**
   String get offlineReady;
 
+  /// No description provided for @noRouteFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No route found'**
+  String get noRouteFound;
+
   /// No description provided for @voiceGuidance.
   ///
   /// In en, this message translates to:

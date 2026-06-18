@@ -1,5 +1,3 @@
-// ignore: unused_import
-import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -37,6 +35,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get offlineReady => 'Offline-Route bereit';
+
+  @override
+  String get noRouteFound => 'Keine Route gefunden';
 
   @override
   String get voiceGuidance => 'Sprachausgabe';

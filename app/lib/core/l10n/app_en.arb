@@ -10,6 +10,7 @@
   "stopNavigation": "Stop",
   "downloadOffline": "Download for offline use",
   "offlineReady": "Offline route ready",
+  "noRouteFound": "No route found",
   "voiceGuidance": "Voice guidance",
   "theme": "Theme",
   "themeSystem": "System",
