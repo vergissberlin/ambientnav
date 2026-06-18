@@ -45,6 +45,13 @@ used in development and **every test**, so the whole app runs without hardware.
 ## Develop
 
 ```bash
+just run          # iOS simulator + mock BLE (from repo root)
+just phone        # physical iPhone + mock BLE
+```
+
+Or manually:
+
+```bash
 flutter pub get
 flutter gen-l10n
 flutter run --dart-define=USE_MOCK=true   # run against the in-memory mock
