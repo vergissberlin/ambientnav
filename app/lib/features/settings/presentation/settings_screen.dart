@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:ambientnav/core/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/dev/dev_settings.dart';
 import '../../../core/theme/theme_controller.dart';
 
 /// App settings: theme mode (dark/light/system) and voice guidance toggle.
@@ -48,6 +50,22 @@ class SettingsScreen extends ConsumerWidget {
             selected: {mode},
             onSelectionChanged: (s) => controller.setMode(s.first),
           ),
+          if (kDebugMode) ...[
+            const Divider(),
+            ListTile(
+              title: Text(l10n.developer),
+              subtitle: Text(l10n.developerDesc),
+            ),
+            SwitchListTile(
+              key: const Key('routeSimulationSwitch'),
+              secondary: const Icon(Icons.route),
+              title: Text(l10n.routeSimulation),
+              subtitle: Text(l10n.routeSimulationDesc),
+              value: ref.watch(simulationEnabledProvider),
+              onChanged: (v) =>
+                  ref.read(simulationEnabledProvider.notifier).setEnabled(v),
+            ),
+          ],
         ],
       ),
     );

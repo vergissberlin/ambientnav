@@ -1,9 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/dev/dev_settings.dart';
 import '../../../core/di/providers.dart';
 import '../data/geocoding_service.dart';
 import '../domain/entities/route.dart';
 import 'nav_controller.dart';
+import 'route_simulation_runner.dart';
 
 /// Orchestrates planning a trip: resolve the origin (device GPS, with a
 /// fallback), call the routing repository, and push the result into
@@ -33,12 +35,23 @@ class NavSession {
         return;
       }
       nav.setRoute(route);
+
+      // Dev: drive a virtual vehicle along the route instead of real GPS.
+      // Guarded so a simulation problem never aborts navigation.
+      try {
+        if (_ref.read(simulationEnabledProvider)) {
+          _ref.read(routeSimulationRunnerProvider).start(route);
+        }
+      } catch (_) {}
     } catch (e) {
       nav.fail(e.toString());
     }
   }
 
-  void stop() => _ref.read(navControllerProvider.notifier).stop();
+  void stop() {
+    _ref.read(routeSimulationRunnerProvider).stop();
+    _ref.read(navControllerProvider.notifier).stop();
+  }
 
   /// Download the planned route's map region for offline use.
   Future<void> downloadOffline({void Function(double)? onProgress}) async {

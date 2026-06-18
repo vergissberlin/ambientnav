@@ -164,6 +164,30 @@ abstract class AppLocalizations {
   /// **'No route found'**
   String get noRouteFound;
 
+  /// No description provided for @developer.
+  ///
+  /// In en, this message translates to:
+  /// **'Developer'**
+  String get developer;
+
+  /// No description provided for @developerDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tools for development and testing'**
+  String get developerDesc;
+
+  /// No description provided for @routeSimulation.
+  ///
+  /// In en, this message translates to:
+  /// **'Route simulation'**
+  String get routeSimulation;
+
+  /// No description provided for @routeSimulationDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Drive a virtual vehicle along the planned route'**
+  String get routeSimulationDesc;
+
   /// No description provided for @voiceGuidance.
   ///
   /// In en, this message translates to:

@@ -42,6 +42,19 @@ class AppLocalizationsDe extends AppLocalizations {
   String get noRouteFound => 'Keine Route gefunden';
 
   @override
+  String get developer => 'Entwickler';
+
+  @override
+  String get developerDesc => 'Werkzeuge für Entwicklung und Tests';
+
+  @override
+  String get routeSimulation => 'Routensimulation';
+
+  @override
+  String get routeSimulationDesc =>
+      'Ein virtuelles Fahrzeug entlang der geplanten Route fahren';
+
+  @override
   String get voiceGuidance => 'Sprachausgabe';
 
   @override

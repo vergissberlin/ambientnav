@@ -1,4 +1,6 @@
 import 'package:ambientnav/core/di/providers.dart';
+import 'package:ambientnav/core/persistence/local_store.dart';
+import 'package:ambientnav/core/theme/theme_controller.dart';
 import 'package:ambientnav/features/navigation/data/geocoding_service.dart';
 import 'package:ambientnav/features/navigation/domain/entities/maneuver.dart';
 import 'package:ambientnav/features/navigation/domain/entities/route.dart';
@@ -44,6 +46,7 @@ const _dest = GeoResult(label: 'Dest', point: GeoPoint(52.50, 13.45));
 void main() {
   test('planTo sets the route and enters navigating', () async {
     final container = ProviderContainer(overrides: [
+      localStoreProvider.overrideWithValue(InMemoryLocalStore()),
       routingRepositoryProvider.overrideWithValue(_FakeRouting(_route)),
     ]);
     addTearDown(container.dispose);
@@ -61,6 +64,7 @@ void main() {
 
   test('planTo reports an error when routing fails', () async {
     final container = ProviderContainer(overrides: [
+      localStoreProvider.overrideWithValue(InMemoryLocalStore()),
       routingRepositoryProvider
           .overrideWithValue(_FakeRouting(_route, fail: true)),
     ]);
@@ -78,6 +82,7 @@ void main() {
 
   test('stop clears the navigation state', () async {
     final container = ProviderContainer(overrides: [
+      localStoreProvider.overrideWithValue(InMemoryLocalStore()),
       routingRepositoryProvider.overrideWithValue(_FakeRouting(_route)),
     ]);
     addTearDown(container.dispose);

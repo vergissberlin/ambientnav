@@ -7,9 +7,11 @@ import '../../../core/di/providers.dart';
 import '../../controllers/domain/entities/controller_role.dart';
 import '../../controllers/presentation/controllers_controller.dart';
 import '../domain/usecases/maneuver_to_ble_command.dart';
+import '../domain/entities/route.dart';
 import 'nav_controller.dart';
 import 'nav_session.dart';
 import 'search_screen.dart';
+import 'simulated_position.dart';
 import 'turn_by_turn_panel.dart';
 
 /// The main navigation screen: a MapLibre street map with the next-maneuver
@@ -24,7 +26,35 @@ class MapScreen extends ConsumerStatefulWidget {
 class _MapScreenState extends ConsumerState<MapScreen> {
   MapLibreMapController? _mapController;
   Line? _routeLine;
+  Circle? _simCircle;
   static const _maneuverToCommand = ManeuverToBleCommand();
+
+  /// Move (or create) the virtual-vehicle marker and follow it.
+  Future<void> _updateSimPosition(GeoPoint? p) async {
+    final controller = _mapController;
+    if (controller == null) return;
+    if (p == null) {
+      if (_simCircle != null) {
+        await controller.removeCircle(_simCircle!);
+        _simCircle = null;
+      }
+      return;
+    }
+    final latLng = LatLng(p.latitude, p.longitude);
+    if (_simCircle == null) {
+      _simCircle = await controller.addCircle(CircleOptions(
+        geometry: latLng,
+        circleRadius: 8,
+        circleColor: '#1E88E5',
+        circleStrokeColor: '#FFFFFF',
+        circleStrokeWidth: 2,
+      ));
+    } else {
+      await controller.updateCircle(
+          _simCircle!, CircleOptions(geometry: latLng));
+    }
+    await controller.animateCamera(CameraUpdate.newLatLng(latLng));
+  }
 
   Future<void> _drawRoute() async {
     final controller = _mapController;
@@ -99,13 +129,23 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final l10n = AppLocalizations.of(context);
     final navState = ref.watch(navControllerProvider);
     final isNavigating = navState.phase == NavPhase.navigating;
+    final simulating = ref.watch(simulatedPositionProvider) != null;
 
     ref.listen(navControllerProvider, _onManeuver);
+    ref.listen(simulatedPositionProvider, (_, p) => _updateSimPosition(p));
 
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.navTab),
         actions: [
+          if (simulating)
+            const Padding(
+              padding: EdgeInsets.only(right: 8),
+              child: Chip(
+                label: Text('SIM'),
+                visualDensity: VisualDensity.compact,
+              ),
+            ),
           if (navState.offlineReady)
             const Padding(
               padding: EdgeInsets.only(right: 12),

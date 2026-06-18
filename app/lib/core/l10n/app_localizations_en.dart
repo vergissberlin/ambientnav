@@ -42,6 +42,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noRouteFound => 'No route found';
 
   @override
+  String get developer => 'Developer';
+
+  @override
+  String get developerDesc => 'Tools for development and testing';
+
+  @override
+  String get routeSimulation => 'Route simulation';
+
+  @override
+  String get routeSimulationDesc =>
+      'Drive a virtual vehicle along the planned route';
+
+  @override
   String get voiceGuidance => 'Voice guidance';
 
   @override
