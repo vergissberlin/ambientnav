@@ -27,7 +27,19 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   MapLibreMapController? _mapController;
   Line? _routeLine;
   Circle? _simCircle;
+  Brightness? _lastBrightness;
   static const _maneuverToCommand = ManeuverToBleCommand();
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final brightness = Theme.of(context).brightness;
+    if (_lastBrightness != null && _lastBrightness != brightness) {
+      final url = brightness == Brightness.dark ? kMapStyleUrlDark : kMapStyleUrl;
+      _mapController?.setStyleString(url);
+    }
+    _lastBrightness = brightness;
+  }
 
   /// Closer zoom as the next maneuver approaches, so the intersection is legible.
   double _followZoom(double distanceToManeuver) =>
@@ -161,6 +173,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final styleUrl = isDark ? kMapStyleUrlDark : kMapStyleUrl;
     final navState = ref.watch(navControllerProvider);
     final isNavigating = navState.phase == NavPhase.navigating;
     final simulating = ref.watch(simulatedPositionProvider) != null;
@@ -221,7 +235,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       body: Stack(
         children: [
           MapLibreMap(
-            styleString: kMapStyleUrl,
+            styleString: styleUrl,
             initialCameraPosition: const CameraPosition(
               target: LatLng(52.52, 13.405), // Berlin
               zoom: 12,
