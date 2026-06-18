@@ -161,6 +161,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final styleUrl = isDark ? kMapStyleUrlDark : kMapStyleUrl;
     final navState = ref.watch(navControllerProvider);
     final isNavigating = navState.phase == NavPhase.navigating;
     final simulating = ref.watch(simulatedPositionProvider) != null;
@@ -221,7 +223,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       body: Stack(
         children: [
           MapLibreMap(
-            styleString: kMapStyleUrl,
+            key: ValueKey(styleUrl),
+            styleString: styleUrl,
             initialCameraPosition: const CameraPosition(
               target: LatLng(52.52, 13.405), // Berlin
               zoom: 12,
