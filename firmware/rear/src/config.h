@@ -35,7 +35,30 @@ struct SensorData {
     uint16_t right_cm;
 };
 
+// Runtime sensor configuration, set from the phone app (forwarded by the front
+// controller over SPP) and persisted to NVS.
+enum ActiveSensor : uint8_t {
+    SENSOR_LEFT   = 0,
+    SENSOR_CENTER = 1,
+    SENSOR_RIGHT  = 2,
+    SENSOR_FUSED  = 3
+};
+
+struct SensorRuntimeConfig {
+    uint8_t  active_sensor;     // ActiveSensor
+    int16_t  calib_offset_cm;   // signed offset applied to raw readings
+    uint16_t max_range_cm;      // beyond this → 999 (no obstacle)
+};
+
 // ── FreeRTOS handles (defined in main.cpp) ────────────────────────────────────
 extern QueueHandle_t   cmdQueue;    // bool reverseActive, depth 4
 extern QueueHandle_t   sensorQueue; // SensorData, depth 4
 extern SemaphoreHandle_t sppMutex;
+
+// Shared sensor config (guarded by configMutex; defined in main.cpp)
+extern SensorRuntimeConfig g_sensorConfig;
+extern SemaphoreHandle_t   configMutex;
+
+// Persistence (defined in sensor_store.cpp)
+void sensorConfigLoad();
+void sensorConfigSave();

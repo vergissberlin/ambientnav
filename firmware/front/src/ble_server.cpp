@@ -1,5 +1,6 @@
 #include "ble_server.h"
 #include "config.h"
+#include "gatt_ext.h"
 #include <NimBLEDevice.h>
 
 static NimBLEServer*         pServer         = nullptr;
@@ -51,6 +52,13 @@ void bleServerInit() {
     NimBLEDevice::init(BLE_DEVICE_NAME);
     NimBLEDevice::setPower(ESP_PWR_LVL_P9);
 
+    // LE Secure Connections + bonding with a fixed passkey. Config/OTA
+    // characteristics require an encrypted, authenticated link; the open nav
+    // characteristic is unaffected.
+    NimBLEDevice::setSecurityAuth(true /*bond*/, true /*mitm*/, true /*sc*/);
+    NimBLEDevice::setSecurityIOCap(BLE_HS_IO_DISPLAY_ONLY);
+    NimBLEDevice::setSecurityPasskey(BLE_PASSKEY);
+
     pServer = NimBLEDevice::createServer();
     pServer->setCallbacks(new ServerCallbacks());
 
@@ -63,6 +71,9 @@ void bleServerInit() {
     pNavChar->setCallbacks(new NavCharCallbacks());
 
     pService->start();
+
+    // Register the extended (secured) services: telemetry, LED/sensor config, OTA.
+    gattExtInit(pServer);
 
     NimBLEAdvertising* pAdv = NimBLEDevice::getAdvertising();
     pAdv->addServiceUUID(BLE_SERVICE_UUID);

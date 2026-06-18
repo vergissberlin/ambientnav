@@ -1,13 +1,17 @@
 # AmbientNav
 
-Ambient LED navigation and parking assistance system for vehicles, inspired by the VW ID.3 ambient lighting. AmbientNav turns addressable LED strips into a real-time navigation guide and proximity warning system using two ESP32 microcontrollers and a custom iOS app.
+[![Build App](https://github.com/vergissberlin/ambientnav/actions/workflows/build-app.yml/badge.svg)](https://github.com/vergissberlin/ambientnav/actions/workflows/build-app.yml)
+[![Build Firmware](https://github.com/vergissberlin/ambientnav/actions/workflows/build-firmware.yml/badge.svg)](https://github.com/vergissberlin/ambientnav/actions/workflows/build-firmware.yml)
+
+Ambient LED navigation and parking assistance system for vehicles, inspired by the VW ID.3 ambient lighting. AmbientNav turns addressable LED strips into a real-time navigation guide and proximity warning system using two ESP32 microcontrollers and a cross-platform (Flutter) companion app for iOS and Android.
 
 ---
 
 ## Overview
 
 ```plaintext
-📱 iPhone App  ──BLE──▶  ESP32 Front (Master)  ──BT Classic──▶  ESP32 Rear (Slave)
+📱 Flutter App  ──BLE──▶  ESP32 Front (Master)  ──BT Classic──▶  ESP32 Rear (Slave)
+   (iOS/Android)
                               │                                        │
                           LED Strip                               LED Strip
                           (front)                                  (rear)
@@ -31,7 +35,7 @@ Ambient LED navigation and parking assistance system for vehicles, inspired by t
 
 ```mermaid
 graph TB
-    iPhone["📱 iPhone\niOS Navigations-App"]
+    iPhone["📱 Flutter App\niOS + Android"]
     
     subgraph FRONT["🚗 Fahrzeug Vorne"]
         ESP32_F["ESP32 Master\nVorne"]
@@ -85,13 +89,17 @@ The project requires the **original ESP32** chip — boards based on ESP32-WROOM
 
 | Layer                     | Technology                                                                          |
 |---------------------------|-------------------------------------------------------------------------------------|
-| iOS app — maps & UI       | [MapLibre Navigation iOS](https://github.com/maplibre/maplibre-navigation-ios)      |
-| iOS app — routing         | [Valhalla](https://valhalla.github.io/valhalla/) via self-hosted or public instance |
-| iOS app — map tiles       | [OpenStreetMap](https://www.openstreetmap.org/) (free)                              |
-| iOS app — BLE             | CoreBluetooth (native iOS framework)                                                |
+| App — framework           | [Flutter](https://flutter.dev/) (one Dart codebase: iOS + Android; CarPlay / Android Auto scaffolds) |
+| App — maps & UI           | [maplibre_gl](https://pub.dev/packages/maplibre_gl) ([OpenStreetMap](https://www.openstreetmap.org/) tiles, offline regions) |
+| App — routing             | [Valhalla](https://valhalla.github.io/valhalla/) / OSRM (online) + offline route cache |
+| App — voice guidance      | [flutter_tts](https://pub.dev/packages/flutter_tts) (multi-language)                |
+| App — BLE                 | [flutter_blue_plus](https://pub.dev/packages/flutter_blue_plus) (central, RSSI, bonding) |
+| App — state management    | [Riverpod](https://riverpod.dev/)                                                   |
 | ESP32 — LED control       | [FastLED](https://fastled.io/)                                                      |
 | ESP32 — front BLE stack   | ESP-IDF NimBLE / Arduino BLE library                                                |
 | ESP32 — inter-board comms | ESP-IDF Bluetooth Classic SPP                                                       |
+
+See [`app/README.md`](app/README.md) for the app architecture and features (dark/light mode, voice guidance, offline routes, controller configuration, sensor calibration, LED config, battery voltage, signal strength, secure passkey pairing, firmware OTA).
 
 ---
 
@@ -99,7 +107,7 @@ The project requires the **original ESP32** chip — boards based on ESP32-WROOM
 
 | From            | To          | Protocol                | Payload                                             |
 |-----------------|-------------|-------------------------|-----------------------------------------------------|
-| iPhone          | ESP32 Front | Bluetooth LE (GATT)     | Turn direction, distance to maneuver, blinker state |
+| App (phone)     | ESP32 Front | Bluetooth LE (GATT)     | Turn direction, distance to maneuver, blinker state |
 | ESP32 Front     | ESP32 Rear  | Bluetooth Classic (SPP) | Sync commands (e.g. "start reverse mode")           |
 | ESP32 Rear      | ESP32 Front | Bluetooth Classic (SPP) | Sensor distances (left / center / right, cm)        |
 | HC-SR04 sensors | ESP32 Rear  | GPIO (trigger/echo)     | Raw distance measurements                           |
@@ -110,12 +118,16 @@ The project requires the **original ESP32** chip — boards based on ESP32-WROOM
 
 ```plaintext
 ambientnav/
-├── ios/                    # Swift iOS application
-│   ├── AmbientNav/
-│   │   ├── Navigation/     # MapLibre + Valhalla integration
-│   │   ├── Bluetooth/      # CoreBluetooth BLE central
-│   │   └── Effects/        # LED command encoding
-│   └── AmbientNav.xcodeproj
+├── app/                    # Flutter app (iOS + Android, CarPlay/Android Auto scaffolds)
+│   ├── lib/
+│   │   ├── core/           # di, router, theme, l10n, persistence, security
+│   │   └── features/
+│   │       ├── navigation/ # MapLibre + Valhalla/OSRM routing + voice
+│   │       ├── offline/    # offline map region download
+│   │       ├── controllers/# BLE: telemetry, LED/sensor config, OTA, pairing
+│   │       ├── car/        # CarPlay / Android Auto scaffolds
+│   │       └── settings/   # theme & preferences
+│   └── test/               # unit + widget tests (run against a mock BLE layer)
 ├── firmware/
 │   ├── front/              # ESP32 Master (Arduino / ESP-IDF)
 │   │   ├── src/
@@ -141,9 +153,9 @@ ambientnav/
 
 ## Communication Protocols
 
-### BLE — iPhone ↔ ESP32 Front
+### BLE — App ↔ ESP32 Front
 
-The iOS app acts as a **BLE Central**; the front ESP32 exposes a **GATT Peripheral**.
+The phone app acts as a **BLE Central**; the front ESP32 exposes a **GATT Peripheral**. Beyond the navigation packet below, the app uses an **extended GATT protocol** (telemetry/voltage, LED config, sensor config, OTA) protected by **passkey pairing + bonding** — see [`docs`](docs/) → *Protocols*.
 
 ```plaintext
 Service UUID:     AMBIENT-NAV-0001 (custom 128-bit)
@@ -198,7 +210,8 @@ Rear strip is divided into three zones (left / center / right), each driven by t
 
 ### Prerequisites
 
-- Xcode 15+ with iOS 16+ SDK
+- [Flutter](https://docs.flutter.dev/get-started/install) 3.27+ (Dart 3.6+)
+- Xcode 15+ (iOS builds) and/or Android SDK (Android builds)
 - [PlatformIO](https://platformio.org/) (VS Code extension or CLI)
 - Two ESP32 DevKit boards
 - WS2812B LED strips + wiring
@@ -214,13 +227,17 @@ cd ../../firmware/rear
 pio run --target upload
 ```
 
-### iOS App
+### App
 
 ```bash
-cd ios
-open AmbientNav.xcodeproj
-# Build and run on a physical iPhone (BLE requires real hardware)
+cd app
+flutter pub get
+flutter gen-l10n
+flutter run --dart-define=USE_MOCK=true   # run against the in-memory mock (no hardware)
+# Drop USE_MOCK to use real BLE on a physical device
 ```
+
+See [`app/README.md`](app/README.md) for full app docs.
 
 ---
 

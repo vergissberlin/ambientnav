@@ -81,6 +81,12 @@ void taskLEDFront(void* param) {
             }
         }
 
+        // Apply the runtime brightness set over BLE (LED-config characteristic).
+        if (xSemaphoreTake(configMutex, 0) == pdTRUE) {
+            FastLED.setBrightness(g_ledConfig.brightness);
+            xSemaphoreGive(configMutex);
+        }
+
         uint32_t elapsed = millis() - effectStart;
 
         switch (cmd.type) {

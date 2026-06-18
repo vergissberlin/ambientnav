@@ -41,12 +41,12 @@ This file describes the logical agents (autonomous processing units) within the 
 
 ### 1. NavAgent — iOS
 
-**Location:** `ios/AmbientNav/Navigation/`  
-**Runtime:** iPhone, foreground process  
-**Language:** Swift
+**Location:** `app/lib/features/navigation/` (Flutter, cross-platform iOS + Android)  
+**Runtime:** phone, foreground process  
+**Language:** Dart
 
 #### Responsibility
-Reads live navigation data from the routing engine (Valhalla) via MapLibre Navigation iOS, extracts the next maneuver instruction, and publishes compact BLE commands to the front ESP32.
+Reads live navigation data from the routing engine (Valhalla / OSRM) and renders it on a MapLibre map, extracts the next maneuver instruction, speaks guidance (multi-language TTS), and publishes compact BLE commands to the front ESP32. The same app also **manages the controllers** over an extended, passkey-secured BLE protocol: live telemetry (battery voltage) and signal strength (RSSI), LED-strip configuration (count / brightness / effect, read-back + edit), sensor selection & calibration, and firmware OTA. A planned route (geometry + maneuvers) plus its map region are cached for **offline** use. See `app/README.md` and the *Protocols* doc for the extended GATT services and the pairing/bonding security model.
 
 #### Inputs
 
@@ -291,6 +291,63 @@ All messages are UTF-8 JSON terminated by `\n`.
 
 ---
 
+## UI Component Architecture (Atomic Design)
+
+Custom UI in the Flutter app (`app/lib/`) follows **Atomic Design** when slicing widgets. Use this hierarchy to decide **where** a new component lives and **what** it may import.
+
+### Levels and locations
+
+| Level | Purpose | Location | Examples in AmbientNav |
+|---|---|---|---|
+| **Quarks** | Design tokens — colors, spacing, typography, radii | `app/lib/core/theme/` | `AppTheme`, `ThemeData`, `ColorScheme` |
+| **Atoms** | Smallest reusable UI units; no business logic | `app/lib/core/widgets/` or `features/<feature>/presentation/widgets/` | `RssiIndicator`, `BatteryGauge` |
+| **Molecules** | Small compositions of atoms with one job | `features/<feature>/presentation/widgets/` | Form field (label + input + error), nav list tile |
+| **Organisms** | Distinct screen sections; may wire state | `features/<feature>/presentation/` | `LedConfigForm`, `TurnByTurnPanel` |
+| **Templates / Pages** | Full routes and screens | `features/<feature>/presentation/*_screen.dart`, `app/lib/core/router/` | `MapScreen`, `ControllerDetailScreen` |
+
+Promote a widget from a feature folder to `core/widgets/` only when **two or more features** need it unchanged.
+
+### Composition rules (strict)
+
+Imports must flow **down** the hierarchy only:
+
+```
+Quarks → Atoms → Molecules → Organisms → Screens
+```
+
+- **Atoms** consume theme/quarks (`Theme.of(context)`, `AppTheme`); they must not import molecules, organisms, screens, Riverpod providers, or repositories.
+- **Molecules** compose atoms (and quarks); they must not import organisms or screens.
+- **Organisms** compose molecules and atoms; domain/state wiring (Riverpod, repositories) is allowed here and in screens.
+- **Screens** compose organisms, molecules, and atoms; they own navigation and page-level orchestration.
+
+### When to extract a new component
+
+Extract when **any** of these apply:
+
+1. The same UI block appears in **two or more** places.
+2. A `build()` method exceeds ~**80 lines** or mixes layout with non-trivial logic.
+3. A unit can be described with a **single responsibility** (e.g. “show RSSI bars”, not “manage controller + show RSSI”).
+4. A widget would be useful in a **widget test** in isolation.
+
+Do **not** extract when the markup is a one-off, fewer than ~15 lines, or splitting would obscure the screen’s flow.
+
+### Naming and files
+
+- One public widget per file; **PascalCase** filename matching the class (`rssi_indicator.dart` → `RssiIndicator`).
+- Prefer `StatelessWidget` for atoms and molecules; use `ConsumerWidget` / `StatefulWidget` only when state is required.
+- Colocate feature-specific widgets under `features/<feature>/presentation/widgets/`.
+- Pass data **down** via constructor parameters; avoid reaching into global state from atoms.
+
+### Anti-patterns
+
+- Atom importing a screen, controller, or repository.
+- Molecule importing another feature’s presentation layer.
+- “God widget” screens that inline atoms which already exist (`RssiIndicator`, `BatteryGauge`, etc.).
+- Hard-coded colors in atoms when `Theme.of(context).colorScheme` or `AppTheme` should be used.
+- Over-atomization (e.g. separate widgets for every `Padding` or `Text` span).
+
+---
+
 ## Repository Workflow
 
 This project uses **trunk-based development** on `main`.
@@ -303,4 +360,4 @@ This project uses **trunk-based development** on `main`.
 - Stay on `main` before making changes; never run `git checkout -b`, `git switch -c`, or equivalent branch-creation commands unless explicitly overridden.
 - When asked for a PR, prefer pushing commits to `main` and note that this repo uses trunk-based development — only create a PR if explicitly requested.
 
-**Exception:** Automated CI branches (e.g. bot-created translation branches) are allowed.
+**Exception:** Automated CI branches (e.g. bot-created translation branches) are allowed. Large, agent-driven feature work (such as the initial Flutter app) may also be developed on a `claude/*` branch and merged via PR; the maintainer should confirm whether to fold such work back into the trunk-based flow.

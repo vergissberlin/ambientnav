@@ -22,6 +22,10 @@
           "type": "generic",
           "path": "firmware/rear/src/config.h",
           "search-version-string": "#define FIRMWARE_VERSION \""
+        },
+        {
+          "type": "generic",
+          "path": "app/pubspec.yaml"
         }
       ]
     }

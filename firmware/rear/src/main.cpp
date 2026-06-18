@@ -8,6 +8,9 @@ QueueHandle_t    cmdQueue;
 QueueHandle_t    sensorQueue;
 SemaphoreHandle_t sppMutex;
 
+SensorRuntimeConfig g_sensorConfig;
+SemaphoreHandle_t   configMutex;
+
 void setup() {
     Serial.begin(115200);
     Serial.printf("\n[AmbientNav Rear] firmware %s\n", FIRMWARE_VERSION);
@@ -15,6 +18,10 @@ void setup() {
     cmdQueue    = xQueueCreate(4, sizeof(bool));
     sensorQueue = xQueueCreate(4, sizeof(SensorData));
     sppMutex    = xSemaphoreCreateMutex();
+    configMutex = xSemaphoreCreateMutex();
+
+    g_sensorConfig = {SENSOR_FUSED, 0, 400};
+    sensorConfigLoad();
 
     ultrasonicInit();
     btClassicServerInit();

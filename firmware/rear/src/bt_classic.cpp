@@ -44,6 +44,32 @@ void taskBTServer(void* param) {
                         // Acknowledge
                         sppSend("{\"type\":\"ack\",\"cmd\":\"reverse\"}");
                         Serial.printf("[SPP] reverse %s\n", active ? "ON" : "OFF");
+                    } else if (strcmp(cmd, "sensorcfg") == 0) {
+                        // Sensor config forwarded from the phone via the front board.
+                        if (xSemaphoreTake(configMutex, pdMS_TO_TICKS(20)) == pdTRUE) {
+                            g_sensorConfig.active_sensor =
+                                (uint8_t)(doc["sensor"] | SENSOR_FUSED);
+                            g_sensorConfig.calib_offset_cm =
+                                (int16_t)(doc["calib_cm"] | 0);
+                            g_sensorConfig.max_range_cm =
+                                (uint16_t)(doc["max_range_cm"] | 400);
+                            xSemaphoreGive(configMutex);
+                        }
+                        sensorConfigSave();
+                        sppSend("{\"type\":\"ack\",\"cmd\":\"sensorcfg\"}");
+                        Serial.println("[SPP] sensor config updated + saved");
+                    } else if (strcmp(cmd, "getcfg") == 0) {
+                        char out[128];
+                        if (xSemaphoreTake(configMutex, pdMS_TO_TICKS(20)) == pdTRUE) {
+                            snprintf(out, sizeof(out),
+                                     "{\"type\":\"sensorcfg\",\"sensor\":%u,"
+                                     "\"calib_cm\":%d,\"max_range_cm\":%u}",
+                                     g_sensorConfig.active_sensor,
+                                     g_sensorConfig.calib_offset_cm,
+                                     g_sensorConfig.max_range_cm);
+                            xSemaphoreGive(configMutex);
+                            sppSend(out);
+                        }
                     }
                 }
             } else {
