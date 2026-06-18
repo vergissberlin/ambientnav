@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:ambientnav/core/l10n/app_localizations.dart';
 
 import '../../features/controllers/presentation/controllers_list_screen.dart';
 import '../../features/navigation/presentation/map_screen.dart';

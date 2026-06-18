@@ -2,7 +2,7 @@ import 'package:ambientnav/core/theme/app_theme.dart';
 import 'package:ambientnav/core/theme/theme_controller.dart';
 import 'package:ambientnav/features/settings/presentation/settings_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:ambientnav/core/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
