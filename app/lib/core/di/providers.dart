@@ -59,8 +59,9 @@ final locationServiceProvider = Provider<LocationService>((ref) {
   return LocationService();
 });
 
-/// MapLibre style URL — OpenFreeMap Liberty (free, no API key, street detail).
+/// MapLibre style URLs — OpenFreeMap (free, no API key).
 const String kMapStyleUrl = 'https://tiles.openfreemap.org/styles/liberty';
+const String kMapStyleUrlDark = 'https://tiles.openfreemap.org/styles/dark';
 
 final offlineRepositoryProvider = Provider<OfflineRepository>((ref) {
   return OfflineRegionManager(styleUrl: kMapStyleUrl);
