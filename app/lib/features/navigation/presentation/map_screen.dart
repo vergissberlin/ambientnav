@@ -35,7 +35,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     super.didChangeDependencies();
     final brightness = Theme.of(context).brightness;
     if (_lastBrightness != null && _lastBrightness != brightness) {
-      final url = brightness == Brightness.dark ? kMapStyleUrlDark : kMapStyleUrl;
+      final url =
+          brightness == Brightness.dark ? kMapStyleUrlDark : kMapStyleUrl;
       _mapController?.setStyleString(url);
     }
     _lastBrightness = brightness;
