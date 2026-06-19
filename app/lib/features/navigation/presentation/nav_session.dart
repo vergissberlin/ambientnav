@@ -38,8 +38,9 @@ class NavSession {
       }
 
       if (!_ref.read(simulationEnabledProvider)) {
-        final granted =
-            await _ref.read(locationServiceProvider).ensureNavigationPermission();
+        final granted = await _ref
+            .read(locationServiceProvider)
+            .ensureNavigationPermission();
         if (!granted) {
           nav.fail('location-permission-denied');
           return;

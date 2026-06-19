@@ -86,8 +86,7 @@ class LocationService {
         accuracy: LocationAccuracy.bestForNavigation,
         distanceFilter: 5,
         foregroundNotificationConfig: const ForegroundNotificationConfig(
-          notificationText:
-              'AmbientNav is navigating in the background.',
+          notificationText: 'AmbientNav is navigating in the background.',
           notificationTitle: 'Navigation active',
           enableWakeLock: true,
         ),

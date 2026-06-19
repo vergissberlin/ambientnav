@@ -153,7 +153,8 @@ class Geo {
     final py = (p.latitude - a.latitude) * scaleLat;
 
     final segLen2 = bx * bx + by * by;
-    final t = segLen2 == 0 ? 0.0 : ((px * bx + py * by) / segLen2).clamp(0.0, 1.0);
+    final t =
+        segLen2 == 0 ? 0.0 : ((px * bx + py * by) / segLen2).clamp(0.0, 1.0);
     return (point: _lerp(a, b, t), t: t);
   }
 }
