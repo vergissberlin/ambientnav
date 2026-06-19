@@ -164,6 +164,12 @@ abstract class AppLocalizations {
   /// **'No route found'**
   String get noRouteFound;
 
+  /// No description provided for @locationPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permission is required for navigation'**
+  String get locationPermissionDenied;
+
   /// No description provided for @routeOverview.
   ///
   /// In en, this message translates to:

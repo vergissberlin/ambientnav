@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: #06080E; color: #EEF2FA; overflow-x: hidden; }
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 3px; }
+input[type=range] { width: 100%; cursor: pointer; }
+@keyframes ambPulse { 0%,100%{opacity:.06} 50%{opacity:.13} }
+</style>
+</helmet>
+
+<!-- ambient bg glows -->
+<div style="position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;">
+  <div style="position:absolute;top:-320px;left:-200px;width:860px;height:860px;border-radius:50%;background:radial-gradient(circle,rgba(25,227,255,.09) 0%,transparent 65%);animation:ambPulse 7s ease-in-out infinite;"></div>
+  <div style="position:absolute;bottom:-320px;right:-180px;width:820px;height:820px;border-radius:50%;background:radial-gradient(circle,rgba(255,45,156,.07) 0%,transparent 65%);animation:ambPulse 9s ease-in-out infinite 2.5s;"></div>
+</div>
+
+<!-- layout root -->
+<div style="display:flex;min-height:100vh;position:relative;z-index:1;">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside style="width:252px;flex:none;position:sticky;top:0;height:100vh;overflow-y:auto;background:#0B0F18;border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;">
+
+    <!-- logo -->
+    <div style="padding:26px 22px 20px;border-bottom:1px solid rgba(255,255,255,.06);flex:none;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <img src="./assets/favicon.svg" width="30" height="30" alt="AmbientNav" style="display:block;flex:none;border-radius:7px;">
+        <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;letter-spacing:-.01em;background:linear-gradient(90deg,#19E3FF,#7C5CFF,#FF2D9C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">AmbientNav</span>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;color:#6B7488;text-transform:uppercase;">Design System · v1.0</div>
+    </div>
+
+    <!-- nav -->
+    <nav style="flex:1;padding:12px 10px;overflow-y:auto;">
+      <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="9">
+        <button data-to="{{ item.id }}" onClick="{{ navClick }}" style="width:100%;display:flex;align-items:center;gap:9px;padding:9px 12px;background:{{ item.bg }};border:none;border-radius:8px;cursor:pointer;transition:background .15s;margin-bottom:2px;" style-hover="background: rgba(255,255,255,.04);">
+          <span style="width:5px;height:5px;border-radius:50%;flex:none;background:{{ item.dotColor }};box-shadow:{{ item.dotGlow }};transition:background .2s,box-shadow .2s;"></span>
+          <span style="font-family:'IBM Plex Sans',sans-serif;font-size:13.5px;font-weight:{{ item.weight }};color:{{ item.color }};letter-spacing:.01em;transition:color .15s;white-space:nowrap;">{{ item.label }}</span>
+        </button>
+      </sc-for>
+    </nav>
+
+    <!-- tagline footer -->
+    <div style="padding:16px 22px;border-top:1px solid rgba(255,255,255,.06);flex:none;">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.04em;color:#6B7488;line-height:1.9;">Follow the light.<br><span style="color:#2E3548;font-style:italic;">Folge dem Licht.</span></div>
+    </div>
+  </aside>
+
+  <!-- ═══ MAIN ═══ -->
+  <main style="flex:1;min-width:0;">
+
+    <!-- ─── 1. OVERVIEW ─── -->
+    <section id="overview" data-section="overview" data-screen-label="Overview" style="padding:96px 72px 84px;border-bottom:1px solid rgba(255,255,255,.06);">
+      <div style="max-width:820px;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.26em;color:#19E3FF;text-transform:uppercase;margin-bottom:20px;">AmbientNav · Design System</div>
+        <h1 style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(46px,5.5vw,76px);letter-spacing:-.035em;line-height:.95;margin-bottom:26px;">Follow<br><span style="background:linear-gradient(90deg,#19E3FF 0%,#7C5CFF 48%,#FF2D9C 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">the light.</span></h1>
+        <p style="font-family:'IBM Plex Sans',sans-serif;font-size:17px;color:#9AA4B8;line-height:1.65;max-width:54ch;margin-bottom:44px;">A premium automotive design language for LED-based navigation and proximity guidance. Deep cockpit surfaces, a precise signal palette, and a light vocabulary the eye reads before the mind does.</p>
+
+        <!-- signal range strip -->
+        <div style="margin-bottom:46px;">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;color:#6B7488;text-transform:uppercase;margin-bottom:10px;">The signal range</div>
+          <div style="height:20px;border-radius:999px;background:linear-gradient(90deg,rgba(25,227,255,.88) 0%,rgba(124,92,255,.8) 50%,rgba(255,45,156,.75) 100%);box-shadow:0 0 22px rgba(124,92,255,.22);"></div>
+          <div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:10px;margin-top:8px;padding:0 2px;">
+            <span style="color:#19E3FF;">GUIDE · CYAN</span>
+            <span style="color:#7C5CFF;">VIOLET</span>
+            <span style="color:#FF2D9C;">ALERT · MAGENTA</span>
+          </div>
+        </div>
+
+        <!-- stats row -->
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <div style="background:#0E121C;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:18px 22px;min-width:128px;">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:28px;font-weight:500;color:#19E3FF;line-height:1;margin-bottom:5px;">3</div>
+            <div style="font-size:12.5px;color:#6B7488;">Signal colors</div>
+          </div>
+          <div style="background:#0E121C;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:18px 22px;min-width:128px;">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:28px;font-weight:500;color:#7C5CFF;line-height:1;margin-bottom:5px;">3</div>
+            <div style="font-size:12.5px;color:#6B7488;">Typefaces</div>
+          </div>
+          <div style="background:#0E121C;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:18px 22px;min-width:128px;">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:28px;font-weight:500;color:#FF2D9C;line-height:1;margin-bottom:5px;">52</div>
+            <div style="font-size:12.5px;color:#6B7488;">CSS tokens</div>
+          </div>
+          <div style="background:#0E121C;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:18px 22px;min-width:128px;">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:28px;font-weight:500;color:#EEF2FA;line-height:1;margin-bottom:5px;">4</div>
+            <div style="font-size:12.5px;color:#6B7488;">Components</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── 2. GETTING STARTED ─── -->
+    <section id="getting-started" data-section="getting-started" data-screen-label="Getting Started" style="padding:80px 72px;border-bottom:1px solid rgba(255,255,255,.06);">
+      <div style="max-width:820px;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.22em;color:#19E3FF;text-transform:uppercase;margin-bottom:16px;">01 · Getting started</div>
+        <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:36px;letter-spacing:-.02em;line-height:1.05;margin-bottom:14px;">One import, full system.</h2>
+        <p style="font-size:15px;color:#9AA4B8;line-height:1.65;max-width:52ch;margin-bottom:36px;">Link the single root entry point. Color, type, spacing, and motion tokens load in one stylesheet.</p>
+
+        <!-- code block -->
+        <div style="background:#060910;border:1px solid rgba(255,255,255,.1);border-radius:12px;overflow:hidden;margin-bottom:28px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.06);">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;color:#6B7488;text-transform:uppercase;">HTML</span>
+            <button onClick="{{ copyHtml }}" style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;color:{{ copyHtmlColor }};background:none;border:none;cursor:pointer;padding:3px 9px;border-radius:4px;transition:color .2s;" style-hover="background:rgba(255,255,255,.05);">{{ copyHtmlLabel }}</button>
+          </div>
+          <pre style="margin:0;padding:22px 24px;font-family:'IBM Plex Mono',monospace;font-size:13px;line-height:1.85;color:#C7CEDC;overflow-x:auto;"><code><span style="color:#6B7488;">&lt;!-- In your &lt;head&gt; --&gt;</span>
+<span style="color:#9AA4B8;">&lt;link</span> <span style="color:#19E3FF;">rel</span><span style="color:#C7CEDC;">="stylesheet"</span> <span style="color:#19E3FF;">href</span><span style="color:#C7CEDC;">="./styles.css"</span><span style="color:#9AA4B8;">&gt;</span></code></pre>
+        </div>
+
+        <!-- included files -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(196px,1fr));gap:10px;">
+          <div style="background:#0E121C;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:16px;">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7C5CFF;margin-bottom:6px;letter-spacing:.04em;">tokens/colors.css</div>
+            <div style="font-size:13px;color:#9AA4B8;line-height:1.55;">Signal palette, surfaces, glow shadows</div>
+          </div>
+          <div style="background:#0E121C;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:16px;">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7C5CFF;margin-bottom:6px;letter-spacing:.04em;">tokens/typography.css</div>
+            <div style="font-size:13px;color:#9AA4B8;line-height:1.55;">Families, scale, weights, tracking</div>
+          </div>
+          <div style="background:#0E121C;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:16px;">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7C5CFF;margin-bottom:6px;letter-spacing:.04em;">tokens/spacing.css</div>
+            <div style="font-size:13px;color:#9AA4B8;line-height:1.55;">4px grid, radii, shadows, motion</div>
+          </div>
+          <div style="background:#0E121C;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:16px;">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7C5CFF;margin-bottom:6px;letter-spacing:.04em;">tokens/fonts.css</div>
+            <div style="font-size:13px;color:#9AA4B8;line-height:1.55;">@font-face for three webfonts</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── 3. COLORS ─── -->
+    <section id="colors" data-section="colors" data-screen-label="Colors" style="padding:80px 72px;border-bottom:1px solid rgba(255,255,255,.06);">
+      <div style="max-width:820px;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.22em;color:#19E3FF;text-transform:uppercase;margin-bottom:16px;">02 · Colors</div>
+        <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:36px;letter-spacing:-.02em;margin-bottom:14px;">Signal palette.</h2>
+        <p style="font-size:15px;color:#9AA4B8;line-height:1.65;max-width:52ch;margin-bottom:36px;">Two accents carry meaning. Cyan guides. Magenta warns. Violet bridges. Click any swatch to copy its token.</p>
+
+        <!-- signal accents -->
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;color:#6B7488;text-transform:uppercase;margin-bottom:12px;">Signal accents</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:32px;">
+          <div onClick="{{ copyToken }}" data-value="--amb-cyan: #19E3FF" style="cursor:pointer;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.08);transition:border-color .2s,transform .18s;" style-hover="border-color:rgba(25,227,255,.55);transform:translateY(-2px);">
+            <div style="height:88px;background:#19E3FF;box-shadow:0 0 32px rgba(25,227,255,.5) inset;"></div>
+            <div style="padding:13px;background:#0E121C;">
+              <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px;margin-bottom:2px;">Guide Cyan</div>
+              <div style="font-size:11px;color:#6B7488;font-style:italic;margin-bottom:7px;">Direction &amp; flow</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#9AA4B8;">--amb-cyan</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#6B7488;">#19E3FF</div>
+            </div>
+          </div>
+          <div onClick="{{ copyToken }}" data-value="--amb-violet: #7C5CFF" style="cursor:pointer;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.08);transition:border-color .2s,transform .18s;" style-hover="border-color:rgba(124,92,255,.55);transform:translateY(-2px);">
+            <div style="height:88px;background:#7C5CFF;box-shadow:0 0 32px rgba(124,92,255,.5) inset;"></div>
+            <div style="padding:13px;background:#0E121C;">
+              <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px;margin-bottom:2px;">Signal Violet</div>
+              <div style="font-size:11px;color:#6B7488;font-style:italic;margin-bottom:7px;">Bridge / brand</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#9AA4B8;">--amb-violet</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#6B7488;">#7C5CFF</div>
+            </div>
+          </div>
+          <div onClick="{{ copyToken }}" data-value="--amb-magenta: #FF2D9C" style="cursor:pointer;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.08);transition:border-color .2s,transform .18s;" style-hover="border-color:rgba(255,45,156,.55);transform:translateY(-2px);">
+            <div style="height:88px;background:#FF2D9C;box-shadow:0 0 32px rgba(255,45,156,.5) inset;"></div>
+            <div style="padding:13px;background:#0E121C;">
+              <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px;margin-bottom:2px;">Alert Magenta</div>
+              <div style="font-size:11px;color:#6B7488;font-style:italic;margin-bottom:7px;">Proximity &amp; warning</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#9AA4B8;">--amb-magenta</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#6B7488;">#FF2D9C</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- surfaces sc-for -->
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;color:#6B7488;text-transform:uppercase;margin-bottom:12px;">Cockpit surfaces</div>
+        <div style="display:flex;gap:10px;margin-bottom:32px;flex-wrap:wrap;">
+          <sc-for list="{{ surfaceColors }}" as="sw" hint-placeholder-count="5">
+            <div onClick="{{ copyToken }}" data-value="{{ sw.token }}: {{ sw.hex }}" style="flex:1;min-width:120px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.09);cursor:pointer;transition:border-color .2s;" style-hover="border-color:rgba(255,255,255,.22);">
+              <div style="height:52px;background:{{ sw.bg }};border-bottom:1px solid rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px rgba(255,255,255,.04);"></div>
+              <div style="padding:10px;background:#0E121C;">
+                <div style="font-size:12px;font-weight:600;margin-bottom:2px;color:#EEF2FA;">{{ sw.name }}</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6B7488;">{{ sw.token }}</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:#3D4555;">{{ sw.hex }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- text sc-for -->
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;color:#6B7488;text-transform:uppercase;margin-bottom:12px;">Text ramp</div>
+        <div style="display:flex;gap:10px;margin-bottom:32px;flex-wrap:wrap;">
+          <sc-for list="{{ textColors }}" as="tc" hint-placeholder-count="4">
+            <div onClick="{{ copyToken }}" data-value="{{ tc.token }}: {{ tc.hex }}" style="flex:1;min-width:110px;background:#0E121C;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:14px;cursor:pointer;transition:border-color .2s;" style-hover="border-color:rgba(255,255,255,.22);">
+              <div style="font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:600;line-height:1;margin-bottom:9px;color:{{ tc.color }};">Aa</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6B7488;margin-bottom:2px;">{{ tc.token }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#3D4555;">{{ tc.hex }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- gradient -->
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;color:#6B7488;text-transform:uppercase;margin-bottom:12px;">Brand gradient</div>
+        <div onClick="{{ copyToken }}" data-value="--amb-gradient: linear-gradient(120deg, #19E3FF 0%, #7C5CFF 50%, #FF2D9C 100%)" style="cursor:pointer;background:#0E121C;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:18px 22px;display:flex;align-items:center;gap:22px;max-width:600px;transition:border-color .2s;" style-hover="border-color:rgba(124,92,255,.45);">
+          <div style="width:130px;height:36px;flex:none;border-radius:8px;background:linear-gradient(90deg,#19E3FF 0%,#7C5CFF 50%,#FF2D9C 100%);box-shadow:0 0 18px rgba(124,92,255,.3);"></div>
+          <div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#C7CEDC;margin-bottom:4px;">--amb-gradient</div>
+            <div style="font-size:13px;color:#6B7488;">Cyan → Violet → Magenta · full signal range</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── 4. TYPOGRAPHY ─── -->
+    <section id="typography" data-section="typography" data-screen-label="Typography" style="padding:80px 72px;border-bottom:1px solid rgba(255,255,255,.06);">
+      <div style="max-width:820px;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.22em;color:#19E3FF;text-transform:uppercase;margin-bottom:16px;">03 · Typography</div>
+        <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:36px;letter-spacing:-.02em;margin-bottom:14px;">Three voices, one system.</h2>
+        <p style="font-size:15px;color:#9AA4B8;line-height:1.65;max-width:52ch;margin-bottom:36px;">Space Grotesk commands. IBM Plex Sans informs. IBM Plex Mono measures.</p>
+
+        <!-- Space Grotesk -->
+        <div style="background:#0E121C;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:28px 32px;margin-bottom:14px;">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;color:#7C5CFF;text-transform:uppercase;margin-bottom:20px;">Space Grotesk · Display &amp; headings</div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:58px;letter-spacing:-.035em;line-height:.96;margin-bottom:10px;">Follow the <span style="color:#19E3FF;">light.</span></div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:34px;letter-spacing:-.025em;line-height:1.1;color:#C7CEDC;margin-bottom:8px;">Turn in 200 m</div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-weight:500;font-size:22px;letter-spacing:-.015em;color:#9AA4B8;margin-bottom:22px;">Proximity alert</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <div style="background:#0B0F18;border-radius:7px;padding:9px 12px;"><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6B7488;margin-bottom:3px;">--fs-display</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#9AA4B8;">90px · 700 · −0.035em</div></div>
+            <div style="background:#0B0F18;border-radius:7px;padding:9px 12px;"><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6B7488;margin-bottom:3px;">--fs-h1</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#9AA4B8;">46px · 600</div></div>
+            <div style="background:#0B0F18;border-radius:7px;padding:9px 12px;"><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6B7488;margin-bottom:3px;">--fs-h2</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#9AA4B8;">30px · 600</div></div>
+            <div style="background:#0B0F18;border-radius:7px;padding:9px 12px;"><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6B7488;margin-bottom:3px;">--lh-display</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#9AA4B8;">0.98</div></div>
+          </div>
+        </div>
+
+        <!-- IBM Plex Sans -->
+        <div style="background:#0E121C;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:28px 32px;margin-bottom:14px;">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;color:#7C5CFF;text-transform:uppercase;margin-bottom:20px;">IBM Plex Sans · Body &amp; UI</div>
+          <div style="font-family:'IBM Plex Sans',sans-serif;font-size:18px;font-weight:500;line-height:1.5;margin-bottom:10px;">Ambient light points the way before the next turn.</div>
+          <div style="font-family:'IBM Plex Sans',sans-serif;font-size:16px;color:#9AA4B8;line-height:1.65;max-width:58ch;margin-bottom:8px;">Magenta fills inward as the car ahead gets closer. The strip does not distract — it informs at the periphery of attention.</div>
+          <div style="font-family:'IBM Plex Sans',sans-serif;font-size:14px;font-style:italic;color:#6B7488;margin-bottom:22px;">Folge dem Licht. Die Lichtspur weist den Weg.</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <div style="background:#0B0F18;border-radius:7px;padding:9px 12px;"><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6B7488;margin-bottom:3px;">--fs-lg</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#9AA4B8;">18px</div></div>
+            <div style="background:#0B0F18;border-radius:7px;padding:9px 12px;"><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6B7488;margin-bottom:3px;">--fs-body</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#9AA4B8;">16px · lh 1.6</div></div>
+            <div style="background:#0B0F18;border-radius:7px;padding:9px 12px;"><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6B7488;margin-bottom:3px;">--fs-sm</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#9AA4B8;">14px</div></div>
+          </div>
+        </div>
+
+        <!-- IBM Plex Mono -->
+        <div style="background:#0E121C;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:28px 32px;">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;color:#7C5CFF;text-transform:uppercase;margin-bottom:20px;">IBM Plex Mono · Data &amp; eyebrows</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.26em;color:#19E3FF;text-transform:uppercase;margin-bottom:12px;">LIVE GUIDE · 200 M · LEFT</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:36px;font-weight:500;color:#EEF2FA;margin-bottom:12px;line-height:1;">52<span style="font-size:16px;color:#9AA4B8;"> km/h</span></div>
+          <pre style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#9AA4B8;line-height:1.8;margin-bottom:22px;">--amb-cockpit: #06080E;
+--amb-cyan:    #19E3FF;
+--font-mono:   "IBM Plex Mono";</pre>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <div style="background:#0B0F18;border-radius:7px;padding:9px 12px;"><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6B7488;margin-bottom:3px;">--fs-eyebrow</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#9AA4B8;">12px</div></div>
+            <div style="background:#0B0F18;border-radius:7px;padding:9px 12px;"><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6B7488;margin-bottom:3px;">--ls-eyebrow</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#9AA4B8;">0.26em · UPPERCASE</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── 5. SPACING ─── -->
+    <section id="spacing" data-section="spacing" data-screen-label="Spacing" style="padding:80px 72px;border-bottom:1px solid rgba(255,255,255,.06);">
+      <div style="max-width:820px;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.22em;color:#19E3FF;text-transform:uppercase;margin-bottom:16px;">04 · Spacing &amp; Shape</div>
+        <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:36px;letter-spacing:-.02em;margin-bottom:40px;">4px base grid.</h2>
+
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;color:#6B7488;text-transform:uppercase;margin-bottom:14px;">Spacing scale</div>
+        <div style="background:#0E121C;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:28px 32px;margin-bottom:20px;">
+          <div style="display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;">
+            <sc-for list="{{ spacingItems }}" as="sp" hint-placeholder-count="10">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+                <div style="background:#7C5CFF;border-radius:3px;width:20px;height:{{ sp.h }};box-shadow:0 0 10px rgba(124,92,255,.28);"></div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6B7488;">{{ sp.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;color:#6B7488;text-transform:uppercase;margin-bottom:14px;">Corner radii</div>
+        <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+          <sc-for list="{{ radiiItems }}" as="r" hint-placeholder-count="6">
+            <div style="background:#0E121C;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:16px 18px;min-width:108px;text-align:center;">
+              <div style="width:40px;height:40px;background:#19E3FF;opacity:.7;border-radius:{{ r.val }};margin:0 auto 12px;"></div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA4B8;margin-bottom:2px;">{{ r.token }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6B7488;">{{ r.val }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;color:#6B7488;text-transform:uppercase;margin-bottom:14px;">Motion tokens</div>
+        <div style="background:#0E121C;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:22px 28px;display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start;">
+          <div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7C5CFF;margin-bottom:5px;">--dur-fast</div><div style="font-family:'IBM Plex Mono',monospace;font-size:16px;color:#C7CEDC;">140ms</div></div>
+          <div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7C5CFF;margin-bottom:5px;">--dur-base</div><div style="font-family:'IBM Plex Mono',monospace;font-size:16px;color:#C7CEDC;">240ms</div></div>
+          <div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7C5CFF;margin-bottom:5px;">--dur-slow</div><div style="font-family:'IBM Plex Mono',monospace;font-size:16px;color:#C7CEDC;">420ms</div></div>
+          <div style="flex:1;min-width:200px;"><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7C5CFF;margin-bottom:5px;">--ease-glow</div><div style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#C7CEDC;word-break:break-all;">cubic-bezier(.4, 0, .2, 1)</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── 6. COMPONENTS ─── -->
+    <section id="components" data-section="components" data-screen-label="Components" style="padding:80px 72px;border-bottom:1px solid rgba(255,255,255,.06);">
+      <div style="max-width:820px;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.22em;color:#19E3FF;text-transform:uppercase;margin-bottom:16px;">05 · Components</div>
+        <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:36px;letter-spacing:-.02em;margin-bottom:14px;">Signal-aware primitives.</h2>
+        <p style="font-size:15px;color:#9AA4B8;line-height:1.65;max-width:52ch;margin-bottom:36px;">Colors carry state, not just style. Cyan = guide. Magenta = alert. Every component speaks the light language.</p>
+
+        <!-- buttons -->
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;color:#6B7488;text-transform:uppercase;margin-bottom:12px;">Button · variants</div>
+        <div style="background:#0E121C;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:26px 28px;margin-bottom:16px;">
+          <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:22px;">
+            <button style="display:inline-flex;align-items:center;padding:11px 20px;background:#19E3FF;color:#05323A;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14.5px;letter-spacing:-.01em;border:none;border-radius:8px;cursor:pointer;box-shadow:0 0 20px rgba(25,227,255,.35);transition:filter .15s;" style-hover="filter:brightness(1.12);">Start guide</button>
+            <button style="display:inline-flex;align-items:center;padding:11px 20px;background:#FF2D9C;color:#2A0719;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14.5px;letter-spacing:-.01em;border:none;border-radius:8px;cursor:pointer;box-shadow:0 0 20px rgba(255,45,156,.35);transition:filter .15s;" style-hover="filter:brightness(1.12);">Stop</button>
+            <button style="display:inline-flex;align-items:center;padding:11px 20px;background:linear-gradient(90deg,#19E3FF,#7C5CFF,#FF2D9C);color:#06080E;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14.5px;letter-spacing:-.01em;border:none;border-radius:8px;cursor:pointer;box-shadow:0 0 24px rgba(124,92,255,.3);transition:opacity .15s;" style-hover="opacity:.88;">Pair device</button>
+            <button style="display:inline-flex;align-items:center;padding:11px 20px;background:#151A26;color:#EEF2FA;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14.5px;letter-spacing:-.01em;border:1px solid rgba(255,255,255,.14);border-radius:8px;cursor:pointer;transition:background .15s;" style-hover="background:#1D2434;">Settings</button>
+            <button style="display:inline-flex;align-items:center;padding:11px 20px;background:transparent;color:#9AA4B8;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14.5px;letter-spacing:-.01em;border:1px solid rgba(255,255,255,.08);border-radius:8px;cursor:pointer;transition:border-color .15s;" style-hover="border-color:rgba(255,255,255,.22);">Cancel</button>
+            <button disabled style="display:inline-flex;align-items:center;padding:11px 20px;background:#19E3FF;color:#05323A;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14.5px;letter-spacing:-.01em;border:none;border-radius:8px;cursor:not-allowed;opacity:.32;">Disabled</button>
+          </div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.12em;color:#6B7488;text-transform:uppercase;margin-bottom:10px;">Sizes · sm / md / lg</div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <button style="display:inline-flex;align-items:center;padding:8px 14px;background:#19E3FF;color:#05323A;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px;letter-spacing:-.01em;border:none;border-radius:8px;cursor:pointer;box-shadow:0 0 12px rgba(25,227,255,.3);">Small</button>
+            <button style="display:inline-flex;align-items:center;padding:11px 20px;background:#19E3FF;color:#05323A;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14.5px;letter-spacing:-.01em;border:none;border-radius:8px;cursor:pointer;box-shadow:0 0 20px rgba(25,227,255,.35);">Medium</button>
+            <button style="display:inline-flex;align-items:center;padding:14px 28px;background:#19E3FF;color:#05323A;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:16px;letter-spacing:-.01em;border:none;border-radius:8px;cursor:pointer;box-shadow:0 0 26px rgba(25,227,255,.4);">Large</button>
+          </div>
+        </div>
+
+        <!-- badges -->
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;color:#6B7488;text-transform:uppercase;margin-bottom:12px;">Badge</div>
+        <div style="background:#0E121C;border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:22px 28px;margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+          <span style="display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;padding:6px 11px;border-radius:4px;color:#19E3FF;border:1px solid rgba(25,227,255,.4);background:rgba(25,227,255,.08);box-shadow:0 0 10px rgba(25,227,255,.18);"><span style="width:5px;height:5px;border-radius:50%;background:#19E3FF;box-shadow:0 0 5px #19E3FF;"></span>Live</span>
+          <span style="display:inline-flex;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;padding:6px 11px;border-radius:4px;color:#A38CFF;border:1px solid rgba(124,92,255,.4);background:rgba(124,92,255,.08);">Pairing</span>
+          <span style="display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;padding:6px 11px;border-radius:4px;color:#FF6FC2;border:1px solid rgba(255,45,156,.4);background:rgba(255,45,156,.08);box-shadow:0 0 10px rgba(255,45,156,.18);"><span style="width:5px;height:5px;border-radius:50%;background:#FF2D9C;box-shadow:0 0 5px #FF2D9C;"></span>Proximity</span>
+          <span style="display:inline-flex;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;padding:6px 11px;border-radius:4px;color:#9AA4B8;border:1px solid rgba(255,255,255,.14);">2× ESP32</span>
+          <span style="display:inline-flex;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;padding:6px 11px;border-radius:4px;color:#9AA4B8;border:1px solid rgba(255,255,255,.14);">WS2812B</span>
+        </div>
+
+        <!-- cards -->
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;color:#6B7488;text-transform:uppercase;margin-bottom:12px;">Card · hover to reveal glow</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+          <div style="background:#0E121C;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:22px;transition:background .24s,box-shadow .24s,border-color .24s;" style-hover="background:#151A26;box-shadow:0 0 26px rgba(25,227,255,.16);border-color:rgba(25,227,255,.28);">
+            <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:16px;margin-bottom:6px;">Live guide</div>
+            <div style="font-size:13px;color:#9AA4B8;line-height:1.55;">Cyan flows toward the next turn.</div>
+            <div style="margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#19E3FF;">glow="cyan"</div>
+          </div>
+          <div style="background:#0E121C;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:22px;transition:background .24s,box-shadow .24s,border-color .24s;" style-hover="background:#151A26;box-shadow:0 0 26px rgba(124,92,255,.16);border-color:rgba(124,92,255,.28);">
+            <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:16px;margin-bottom:6px;">Pairing</div>
+            <div style="font-size:13px;color:#9AA4B8;line-height:1.55;">Violet during BLE connection.</div>
+            <div style="margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#A38CFF;">glow="violet"</div>
+          </div>
+          <div style="background:#0E121C;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:22px;transition:background .24s,box-shadow .24s,border-color .24s;" style-hover="background:#151A26;box-shadow:0 0 26px rgba(255,45,156,.16);border-color:rgba(255,45,156,.28);">
+            <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:16px;margin-bottom:6px;">Proximity</div>
+            <div style="font-size:13px;color:#9AA4B8;line-height:1.55;">Magenta fills inward on approach.</div>
+            <div style="margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#FF6FC2;">glow="magenta"</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── 7. LIGHT SYSTEM ─── -->
+    <section id="light-system" data-section="light-system" data-screen-label="Light System" style="padding:80px 72px;border-bottom:1px solid rgba(255,255,255,.06);">
+      <div style="max-width:820px;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.22em;color:#19E3FF;text-transform:uppercase;margin-bottom:16px;">06 · Light system</div>
+        <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:36px;letter-spacing:-.02em;margin-bottom:14px;">The UI is light.</h2>
+        <p style="font-size:15px;color:#9AA4B8;line-height:1.65;max-width:52ch;margin-bottom:36px;">Two behaviors. Cyan <em>flows</em> forward — the eye follows to the turn. Magenta <em>fills inward</em> — the boundary contracts, urgency builds.</p>
+
+        <!-- guide strip -->
+        <div style="background:#0E121C;border:1px solid rgba(25,227,255,.18);border-radius:14px;padding:24px 26px;margin-bottom:14px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+            <div>
+              <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:17px;color:#19E3FF;margin-bottom:3px;">Guide</div>
+              <div style="font-size:13px;color:#9AA4B8;">Cyan flows toward the turn · live animation</div>
+            </div>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;color:#19E3FF;text-transform:uppercase;background:rgba(25,227,255,.08);border:1px solid rgba(25,227,255,.25);padding:5px 10px;border-radius:4px;">● LIVE</span>
+          </div>
+          <div style="display:flex;gap:3px;padding:5px;border-radius:999px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.06);box-shadow:0 0 24px rgba(25,227,255,.14);">
+            <sc-for list="{{ guideCells }}" as="cell" hint-placeholder-count="32">
+              <div style="flex:1;height:16px;border-radius:999px;background:{{ cell.bg }};transition:background .09s linear;"></div>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- alert strip -->
+        <div style="background:#0E121C;border:1px solid rgba(255,45,156,.18);border-radius:14px;padding:24px 26px;margin-bottom:24px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+            <div>
+              <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:17px;color:#FF2D9C;margin-bottom:3px;">Alert</div>
+              <div style="font-size:13px;color:#9AA4B8;">Magenta fills inward · drag to simulate proximity</div>
+            </div>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;color:#FF6FC2;text-transform:uppercase;background:rgba(255,45,156,.08);border:1px solid rgba(255,45,156,.25);padding:5px 10px;border-radius:4px;">{{ proximityLabel }}</span>
+          </div>
+          <div style="margin-bottom:16px;">
+            <input type="range" min="0" max="100" value="{{ proximityPct }}" onChange="{{ setProximity }}" style="accent-color:#FF2D9C;">
+            <div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#6B7488;margin-top:5px;"><span>Far · 160 cm</span><span>Stop · 10 cm</span></div>
+          </div>
+          <div style="display:flex;gap:3px;padding:5px;border-radius:999px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.06);box-shadow:0 0 24px rgba(255,45,156,.14);">
+            <sc-for list="{{ alertCells }}" as="cell" hint-placeholder-count="32">
+              <div style="flex:1;height:16px;border-radius:999px;background:{{ cell.bg }};transition:background .1s linear;"></div>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- rules -->
+        <div style="background:#0B0F18;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:22px 26px;">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;color:#6B7488;text-transform:uppercase;margin-bottom:16px;">Light language rules</div>
+          <div style="display:flex;flex-direction:column;gap:11px;">
+            <div style="display:flex;gap:13px;align-items:flex-start;"><span style="width:7px;height:7px;border-radius:50%;background:#19E3FF;box-shadow:0 0 8px rgba(25,227,255,.8);flex:none;margin-top:6px;"></span><div style="font-size:14px;color:#C7CEDC;line-height:1.6;">Cyan is always direction. Never use it for warning or proximity.</div></div>
+            <div style="display:flex;gap:13px;align-items:flex-start;"><span style="width:7px;height:7px;border-radius:50%;background:#FF2D9C;box-shadow:0 0 8px rgba(255,45,156,.8);flex:none;margin-top:6px;"></span><div style="font-size:14px;color:#C7CEDC;line-height:1.6;">Magenta is always proximity. Never use it for navigation or brand.</div></div>
+            <div style="display:flex;gap:13px;align-items:flex-start;"><span style="width:7px;height:7px;border-radius:50%;background:#7C5CFF;box-shadow:0 0 8px rgba(124,92,255,.8);flex:none;margin-top:6px;"></span><div style="font-size:14px;color:#C7CEDC;line-height:1.6;">Violet is brand and transition states only — between guide and alert.</div></div>
+            <div style="display:flex;gap:13px;align-items:flex-start;"><span style="width:7px;height:7px;border-radius:50%;background:#6B7488;flex:none;margin-top:6px;"></span><div style="font-size:14px;color:#C7CEDC;line-height:1.6;">Full magenta + fast pulse = stop. The strip signals urgency without sound.</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── 8. iOS APP ─── -->
+    <section id="ios-app" data-section="ios-app" data-screen-label="iOS App" style="padding:80px 72px;border-bottom:1px solid rgba(255,255,255,.06);">
+      <div style="max-width:1060px;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.22em;color:#19E3FF;text-transform:uppercase;margin-bottom:16px;">07 · iOS app UI kit</div>
+        <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:36px;letter-spacing:-.02em;margin-bottom:14px;">The only screen surface.</h2>
+        <p style="font-size:15px;color:#9AA4B8;line-height:1.65;max-width:52ch;margin-bottom:28px;">Four interactive screens. Tab through the live guide, parking assist, BLE device pairing, and light settings.</p>
+        <div style="background:#0B0F18;border:1px solid rgba(255,255,255,.08);border-radius:16px;overflow:hidden;">
+          <iframe src="./ui_kits/ios-app/index.html" style="display:block;width:100%;height:680px;border:none;" loading="lazy" title="iOS App UI Kit"></iframe>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── 9. BRAND ─── -->
+    <section id="brand" data-section="brand" data-screen-label="Brand" style="padding:80px 72px 120px;">
+      <div style="max-width:820px;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.22em;color:#19E3FF;text-transform:uppercase;margin-bottom:16px;">08 · Brand</div>
+        <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:36px;letter-spacing:-.02em;margin-bottom:14px;">Premium. Calm. Precise.</h2>
+        <p style="font-size:15px;color:#9AA4B8;line-height:1.65;max-width:52ch;margin-bottom:36px;">AmbientNav does not shout. The product reduces cognitive load — the language follows suit.</p>
+
+        <!-- logo -->
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;color:#6B7488;text-transform:uppercase;margin-bottom:12px;">Logo mark</div>
+        <div style="display:flex;gap:12px;margin-bottom:32px;flex-wrap:wrap;">
+          <div style="background:#0E121C;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:28px;display:flex;flex-direction:column;align-items:center;gap:14px;min-width:160px;flex:none;">
+            <img src="./assets/favicon.svg" width="60" height="60" alt="AmbientNav mark" style="display:block;border-radius:14px;">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6B7488;letter-spacing:.12em;text-transform:uppercase;">Mark · dark</div>
+          </div>
+          <div style="flex:1;min-width:240px;background:#0E121C;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:28px;display:flex;flex-direction:column;gap:10px;justify-content:center;">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <img src="./assets/favicon.svg" width="36" height="36" alt="" style="display:block;border-radius:8px;flex:none;">
+              <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:26px;letter-spacing:-.02em;background:linear-gradient(90deg,#19E3FF,#7C5CFF,#FF2D9C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">AmbientNav</span>
+            </div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.22em;color:#9AA4B8;padding-left:48px;text-transform:uppercase;">Follow the light.</div>
+          </div>
+          <div style="flex:none;min-width:160px;background:#EEF2FA;border:1px solid rgba(0,0,0,.06);border-radius:14px;padding:28px;display:flex;flex-direction:column;align-items:center;gap:14px;">
+            <img src="./assets/favicon.svg" width="60" height="60" alt="" style="display:block;border-radius:14px;">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9AA4B8;letter-spacing:.12em;text-transform:uppercase;">Mark · light</div>
+          </div>
+        </div>
+
+        <!-- voice -->
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;color:#6B7488;text-transform:uppercase;margin-bottom:12px;">Voice &amp; tone</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px;">
+          <div style="background:#0E121C;border:1px solid rgba(25,227,255,.18);border-radius:12px;padding:20px;">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#19E3FF;letter-spacing:.16em;text-transform:uppercase;margin-bottom:12px;">✓ Do</div>
+            <div style="font-size:13.5px;color:#C7CEDC;line-height:1.7;margin-bottom:7px;">"Ambient light points the way before the next turn."</div>
+            <div style="font-size:13.5px;color:#C7CEDC;line-height:1.7;">"Magenta fills inward as the car gets closer."</div>
+          </div>
+          <div style="background:#0E121C;border:1px solid rgba(255,45,156,.18);border-radius:12px;padding:20px;">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#FF2D9C;letter-spacing:.16em;text-transform:uppercase;margin-bottom:12px;">✗ Don't</div>
+            <div style="font-size:13.5px;color:#6B7488;line-height:1.7;text-decoration:line-through;margin-bottom:7px;">"Revolutionary AI-powered smart lighting!!"</div>
+            <div style="font-size:13.5px;color:#6B7488;line-height:1.7;text-decoration:line-through;">"We've built the future of driving."</div>
+          </div>
+        </div>
+
+        <!-- naming -->
+        <div style="background:#0B0F18;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:22px 26px;">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;color:#6B7488;text-transform:uppercase;margin-bottom:14px;">Naming convention</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;gap:16px;">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#19E3FF;background:rgba(25,227,255,.08);border:1px solid rgba(25,227,255,.2);padding:6px 14px;border-radius:6px;flex:none;">AmbientNav</span>
+              <span style="font-size:13px;color:#9AA4B8;">One word, internal capital N. Always.</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:16px;">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#6B7488;background:rgba(255,45,156,.06);border:1px solid rgba(255,45,156,.14);padding:6px 14px;border-radius:6px;flex:none;text-decoration:line-through;">Ambient Nav</span>
+              <span style="font-size:13px;color:#6B7488;">Never split. Never all-lowercase.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- copy toast -->
+<sc-if value="{{ showCopied }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;bottom:28px;right:28px;background:#0E121C;border:1px solid rgba(25,227,255,.3);border-radius:8px;padding:10px 18px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.04em;color:#19E3FF;box-shadow:0 0 20px rgba(25,227,255,.14);z-index:9999;">✓ Copied to clipboard</div>
+</sc-if>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    activeSection: 'overview',
+    phase: 0,
+    copied: null,
+    copiedHtml: false,
+    proximityPct: 30,
+  };
+
+  componentDidMount() {
+    this._setupObserver();
+    this._timer = setInterval(() => {
+      this.setState(s => ({ phase: (s.phase + 0.1) % 2 }));
+    }, 80);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this._timer);
+    if (this._observer) this._observer.disconnect();
+  }
+
+  _setupObserver() {
+    const els = document.querySelectorAll('[data-section]');
+    this._observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) this.setState({ activeSection: e.target.dataset.section });
+      });
+    }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+    els.forEach(el => this._observer.observe(el));
+  }
+
+  _guideCells(phase) {
+    const n = 32;
+    return Array.from({ length: n }, (_, i) => {
+      const t = i / (n - 1);
+      const wave = Math.max(0, Math.sin((t * 4 - phase) * Math.PI));
+      const a = Math.min(1, 0.07 + t * 0.58 + wave * 0.4);
+      return { bg: 'rgba(25,227,255,' + a.toFixed(2) + ')' };
+    });
+  }
+
+  _alertCells(pct) {
+    const n = 32;
+    const intensity = pct / 100;
+    return Array.from({ length: n }, (_, i) => {
+      const t = i / (n - 1);
+      const edge = Math.min(t, 1 - t) * 2;
+      const on = edge >= 1 - intensity;
+      const a = on ? (0.45 + intensity * 0.55).toFixed(2) : '0.05';
+      return { bg: 'rgba(255,45,156,' + a + ')' };
+    });
+  }
+
+  renderVals() {
+    const { activeSection, phase, copied, copiedHtml, proximityPct } = this.state;
+
+    const sections = [
+      { id: 'overview',        label: 'Overview'        },
+      { id: 'getting-started', label: 'Getting started' },
+      { id: 'colors',          label: 'Colors'          },
+      { id: 'typography',      label: 'Typography'      },
+      { id: 'spacing',         label: 'Spacing'         },
+      { id: 'components',      label: 'Components'      },
+      { id: 'light-system',    label: 'Light system'    },
+      { id: 'ios-app',         label: 'iOS app'         },
+      { id: 'brand',           label: 'Brand'           },
+    ];
+
+    const navItems = sections.map(s => {
+      const active = activeSection === s.id;
+      return {
+        id: s.id,
+        label: s.label,
+        color: active ? '#19E3FF' : '#9AA4B8',
+        bg: active ? 'rgba(25,227,255,.07)' : 'transparent',
+        dotColor: active ? '#19E3FF' : '#232A3A',
+        dotGlow: active ? '0 0 8px rgba(25,227,255,.55)' : 'none',
+        weight: active ? '500' : '400',
+      };
+    });
+
+    const surfaceColors = [
+      { name: 'Cockpit',  token: '--amb-cockpit',   hex: '#06080E', bg: '#06080E'  },
+      { name: 'Surface',  token: '--amb-surface',   hex: '#0B0F18', bg: '#0B0F18'  },
+      { name: 'Panel',    token: '--amb-surface-2', hex: '#0E121C', bg: '#0E121C'  },
+      { name: 'Elevated', token: '--amb-surface-3', hex: '#151A26', bg: '#151A26'  },
+      { name: 'Daylight', token: '--amb-daylight',  hex: '#F4F6FB', bg: '#F4F6FB'  },
+    ];
+
+    const textColors = [
+      { name: 'Primary',   token: '--amb-text',   hex: '#EEF2FA', color: '#EEF2FA' },
+      { name: 'Secondary', token: '--amb-text-2', hex: '#C7CEDC', color: '#C7CEDC' },
+      { name: 'Tertiary',  token: '--amb-text-3', hex: '#9AA4B8', color: '#9AA4B8' },
+      { name: 'Faint',     token: '--amb-text-4', hex: '#6B7488', color: '#6B7488' },
+    ];
+
+    const spacingItems = [
+      { h: '4px',   label: '4'   },
+      { h: '8px',   label: '8'   },
+      { h: '12px',  label: '12'  },
+      { h: '16px',  label: '16'  },
+      { h: '24px',  label: '24'  },
+      { h: '32px',  label: '32'  },
+      { h: '48px',  label: '48'  },
+      { h: '64px',  label: '64'  },
+      { h: '92px',  label: '92'  },
+      { h: '120px', label: '120' },
+    ];
+
+    const radiiItems = [
+      { token: '--radius-xs',    val: '4px'   },
+      { token: '--radius-sm',    val: '8px'   },
+      { token: '--radius-md',    val: '12px'  },
+      { token: '--radius-lg',    val: '16px'  },
+      { token: '--radius-xl',    val: '24px'  },
+      { token: '--radius-strip', val: '999px' },
+    ];
+
+    const distCm = Math.round(160 - proximityPct * 1.5);
+
+    return {
+      navItems,
+      surfaceColors,
+      textColors,
+      spacingItems,
+      radiiItems,
+      guideCells: this._guideCells(phase),
+      alertCells: this._alertCells(proximityPct),
+      proximityPct,
+      proximityLabel: distCm + ' cm',
+      showCopied: !!copied,
+      copyHtmlLabel: copiedHtml ? 'Copied!' : 'Copy',
+      copyHtmlColor: copiedHtml ? '#19E3FF' : '#6B7488',
+
+      navClick: e => {
+        const id = e.currentTarget.dataset.to;
+        const el = document.getElementById(id);
+        if (el) {
+          const top = el.getBoundingClientRect().top + window.scrollY - 24;
+          window.scrollTo({ top, behavior: 'smooth' });
+        }
+      },
+
+      copyToken: e => {
+        const val = e.currentTarget.dataset.value;
+        if (!val) return;
+        navigator.clipboard.writeText(val).catch(() => {});
+        this.setState({ copied: val });
+        setTimeout(() => this.setState({ copied: null }), 2000);
+      },
+
+      copyHtml: () => {
+        navigator.clipboard.writeText('<link rel="stylesheet" href="./styles.css">').catch(() => {});
+        this.setState({ copiedHtml: true });
+        setTimeout(() => this.setState({ copiedHtml: false }), 2000);
+      },
+
+      setProximity: e => this.setState({ proximityPct: Number(e.target.value) }),
+    };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -42,6 +42,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get noRouteFound => 'Keine Route gefunden';
 
   @override
+  String get locationPermissionDenied =>
+      'Standortberechtigung ist für die Navigation erforderlich';
+
+  @override
   String get routeOverview => 'Routenübersicht';
 
   @override

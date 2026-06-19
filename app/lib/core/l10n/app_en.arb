@@ -11,6 +11,7 @@
   "downloadOffline": "Download for offline use",
   "offlineReady": "Offline route ready",
   "noRouteFound": "No route found",
+  "locationPermissionDenied": "Location permission is required for navigation",
   "routeOverview": "Route overview",
   "followRoute": "Follow route",
   "developer": "Developer",

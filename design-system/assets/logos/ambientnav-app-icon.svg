@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="aGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#19E3FF"></stop>
+      <stop offset="50%" stop-color="#7C5CFF"></stop>
+      <stop offset="100%" stop-color="#FF2D9C"></stop>
+    </linearGradient>
+    <radialGradient id="iconGlow" cx="28%" cy="22%" r="85%">
+      <stop offset="0%" stop-color="#13243B"></stop>
+      <stop offset="55%" stop-color="#0A0F1A"></stop>
+      <stop offset="100%" stop-color="#06080E"></stop>
+    </radialGradient>
+    <filter id="ledBlur" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="9"></feGaussianBlur>
+    </filter>
+  </defs>
+
+  
+  <path d="M0 233.4C0 151.6 0 110.7 15.9 79.5A146 146 0 0 1 79.5 15.9C110.7 0 151.6 0 233.4 0h557.2c81.8 0 122.7 0 153.9 15.9a146 146 0 0 1 63.6 63.6C1024 110.7 1024 151.6 1024 233.4v557.2c0 81.8 0 122.7-15.9 153.9a146 146 0 0 1-63.6 63.6C913.3 1024 872.4 1024 790.6 1024H233.4c-81.8 0-122.7 0-153.9-15.9a146 146 0 0 1-63.6-63.6C0 913.3 0 872.4 0 790.6Z" fill="url(#iconGlow)"></path>
+
+  
+  <circle cx="300" cy="250" r="240" fill="#19E3FF" opacity="0.10" filter="url(#ledBlur)"></circle>
+  <circle cx="760" cy="800" r="240" fill="#FF2D9C" opacity="0.10" filter="url(#ledBlur)"></circle>
+
+  
+  <g transform="translate(512 530) scale(5.1) translate(-50 -50)" fill="none" stroke="url(#aGrad)" stroke-width="8.5" stroke-linecap="round" stroke-dasharray="0.1 11.5" style="filter:drop-shadow(0 0 4px rgba(124,92,255,.7))">
+    <path d="M23 83 L50 17 L77 83"></path>
+    <path d="M35 59 L65 59"></path>
+  </g>
+</svg>

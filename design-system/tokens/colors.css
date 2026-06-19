@@ -1,0 +1,52 @@
+/* AmbientNav — Color system
+   A signal palette: two accents carry meaning, a deep base carries calm.
+   Cyan = direction/guidance · Magenta = proximity/warning · Violet = the bridge. */
+
+:root {
+  /* ---- Signal accents (semantic light language) ---- */
+  --amb-cyan: #19E3FF;          /* Guide Cyan — direction & flow      */
+  --amb-cyan-soft: #5CEFFF;
+  --amb-cyan-deep: #05323A;
+  --amb-violet: #7C5CFF;        /* Signal Violet — transition / brand */
+  --amb-violet-soft: #A38CFF;
+  --amb-magenta: #FF2D9C;       /* Alert Magenta — proximity & warning*/
+  --amb-magenta-soft: #FF6FC2;
+  --amb-magenta-deep: #3A0A24;
+
+  /* ---- The brand gradient (full signal range) ---- */
+  --amb-gradient: linear-gradient(120deg, #19E3FF 0%, #7C5CFF 50%, #FF2D9C 100%);
+  --amb-gradient-h: linear-gradient(90deg, #19E3FF 0%, #7C5CFF 50%, #FF2D9C 100%);
+
+  /* ---- Cockpit base & surfaces (dark first) ---- */
+  --amb-cockpit: #06080E;       /* deepest background  */
+  --amb-surface: #0B0F18;       /* raised surface      */
+  --amb-surface-2: #0E121C;     /* card / panel        */
+  --amb-surface-3: #151A26;     /* hover / elevated    */
+  --amb-line: rgba(255,255,255,.08);
+  --amb-line-strong: rgba(255,255,255,.14);
+
+  /* ---- Text on dark ---- */
+  --amb-text: #EEF2FA;          /* primary text        */
+  --amb-text-2: #C7CEDC;        /* secondary           */
+  --amb-text-3: #9AA4B8;        /* tertiary / muted    */
+  --amb-text-4: #6B7488;        /* faint / captions    */
+
+  /* ---- Neutrals (for light contexts / knockouts) ---- */
+  --amb-daylight: #F4F6FB;
+  --amb-ash: #9AA4B8;
+  --amb-ink: #0B0F18;
+
+  /* ---- Glow shadows (light blooms, never grey) ---- */
+  --amb-glow-cyan: 0 0 24px rgba(25,227,255,.55);
+  --amb-glow-violet: 0 0 24px rgba(124,92,255,.55);
+  --amb-glow-magenta: 0 0 24px rgba(255,45,156,.55);
+
+  /* ---- Semantic aliases ---- */
+  --bg: var(--amb-cockpit);
+  --surface: var(--amb-surface-2);
+  --text-body: var(--amb-text-2);
+  --text-heading: var(--amb-text);
+  --accent: var(--amb-cyan);
+  --warn: var(--amb-magenta);
+  --border: var(--amb-line);
+}

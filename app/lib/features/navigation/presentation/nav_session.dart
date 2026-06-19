@@ -5,6 +5,7 @@ import '../../../core/di/providers.dart';
 import '../data/geocoding_service.dart';
 import '../domain/entities/route.dart';
 import 'nav_controller.dart';
+import 'navigation_location_runner.dart';
 import 'route_simulation_runner.dart';
 import 'simulated_position.dart';
 
@@ -35,17 +36,29 @@ class NavSession {
         nav.fail('no-route');
         return;
       }
+
+      if (!_ref.read(simulationEnabledProvider)) {
+        final granted = await _ref
+            .read(locationServiceProvider)
+            .ensureNavigationPermission();
+        if (!granted) {
+          nav.fail('location-permission-denied');
+          return;
+        }
+      }
+
       nav.setRoute(route);
       // Start each trip in heading-up follow mode.
       _ref.read(cameraModeProvider.notifier).state = CameraMode.follow;
 
-      // Dev: drive a virtual vehicle along the route instead of real GPS.
-      // Guarded so a simulation problem never aborts navigation.
-      try {
-        if (_ref.read(simulationEnabledProvider)) {
+      if (_ref.read(simulationEnabledProvider)) {
+        // Dev: drive a virtual vehicle along the route instead of real GPS.
+        try {
           _ref.read(routeSimulationRunnerProvider).start(route);
-        }
-      } catch (_) {}
+        } catch (_) {}
+      } else {
+        await _ref.read(navigationLocationRunnerProvider).start(route);
+      }
     } catch (e) {
       nav.fail(e.toString());
     }
@@ -53,6 +66,7 @@ class NavSession {
 
   void stop() {
     _ref.read(routeSimulationRunnerProvider).stop();
+    _ref.read(navigationLocationRunnerProvider).stop();
     _ref.read(cameraModeProvider.notifier).state = CameraMode.follow;
     _ref.read(navControllerProvider.notifier).stop();
   }

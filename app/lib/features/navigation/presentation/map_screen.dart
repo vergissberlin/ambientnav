@@ -4,9 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 import '../../../core/di/providers.dart';
-import '../../controllers/domain/entities/controller_role.dart';
-import '../../controllers/presentation/controllers_controller.dart';
-import '../domain/usecases/maneuver_to_ble_command.dart';
 import 'nav_controller.dart';
 import 'nav_session.dart';
 import 'search_screen.dart';
@@ -27,7 +24,17 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   MapLibreMapController? _mapController;
   Line? _routeLine;
   Circle? _simCircle;
-  static const _maneuverToCommand = ManeuverToBleCommand();
+
+  String _navErrorMessage(AppLocalizations l10n, String? error) {
+    switch (error) {
+      case 'no-route':
+        return l10n.noRouteFound;
+      case 'location-permission-denied':
+        return l10n.locationPermissionDenied;
+      default:
+        return error ?? l10n.noRouteFound;
+    }
+  }
 
   /// Closer zoom as the next maneuver approaches, so the intersection is legible.
   double _followZoom(double distanceToManeuver) =>
@@ -119,30 +126,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final error = ref.read(navControllerProvider).error;
     if (error != null && mounted) {
       final l10n = AppLocalizations.of(context);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(l10n.noRouteFound)));
-    }
-  }
-
-  /// Redraw the line + speak/forward each new maneuver.
-  void _onManeuver(NavigationState? prev, NavigationState next) {
-    _drawRouteLine();
-    final maneuver = next.nextManeuver;
-    if (next.phase != NavPhase.navigating || maneuver == null) return;
-    if (prev?.nextManeuver == maneuver) return;
-
-    // Voice guidance (guarded — TTS plugin may be absent in tests).
-    try {
-      ref.read(voiceGuidanceServiceProvider).speak(maneuver.instruction);
-    } catch (_) {}
-
-    // Forward to a connected front controller, if any.
-    final command = _maneuverToCommand(maneuver, next.distanceToManeuverMeters);
-    final controllers = ref.read(controllersControllerProvider).devices;
-    for (final c in controllers) {
-      if (c.isConnected && c.role == ControllerRole.front) {
-        ref.read(controllerRepositoryProvider).sendNavCommand(c.id, command);
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_navErrorMessage(l10n, error))),
+      );
     }
   }
 
@@ -169,7 +155,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final cameraMode = ref.watch(cameraModeProvider);
     final following = cameraMode == CameraMode.follow;
 
-    ref.listen(navControllerProvider, _onManeuver);
+    ref.listen(navControllerProvider, (_, __) => _drawRouteLine());
     ref.listen(simulatedPositionProvider, (_, p) => _updateSimPosition(p));
 
     // Real-GPS heading-up follow is handled natively by MapLibre; the simulator

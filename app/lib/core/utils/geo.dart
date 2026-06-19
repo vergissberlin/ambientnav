@@ -91,4 +91,83 @@ class Geo {
   }
 
   static double _rad(double deg) => deg * math.pi / 180.0;
+
+  /// Result of projecting a point onto a route polyline.
+  static SnapResult snapToPolyline(GeoPoint point, List<GeoPoint> polyline) {
+    if (polyline.isEmpty) {
+      return const SnapResult(
+        snapped: GeoPoint(0, 0),
+        distanceAlongMeters: 0,
+        bearingDeg: 0,
+      );
+    }
+    if (polyline.length == 1) {
+      return SnapResult(
+        snapped: polyline.first,
+        distanceAlongMeters: 0,
+        bearingDeg: 0,
+      );
+    }
+
+    var bestDist = double.infinity;
+    var bestAlong = 0.0;
+    var bestPoint = polyline.first;
+    var bestBearing = 0.0;
+    var cumulative = 0.0;
+
+    for (var i = 1; i < polyline.length; i++) {
+      final a = polyline[i - 1];
+      final b = polyline[i];
+      final segLen = haversineMeters(a, b);
+      final proj = _projectOntoSegment(point, a, b);
+      final distToSeg = haversineMeters(point, proj.point);
+      if (distToSeg < bestDist) {
+        bestDist = distToSeg;
+        bestAlong = cumulative + proj.t * segLen;
+        bestPoint = proj.point;
+        bestBearing = segLen == 0 ? 0 : initialBearing(a, b);
+      }
+      cumulative += segLen;
+    }
+
+    return SnapResult(
+      snapped: bestPoint,
+      distanceAlongMeters: bestAlong,
+      bearingDeg: bestBearing,
+    );
+  }
+
+  static ({GeoPoint point, double t}) _projectOntoSegment(
+    GeoPoint p,
+    GeoPoint a,
+    GeoPoint b,
+  ) {
+    final latMid = (a.latitude + b.latitude) / 2;
+    final cosLat = math.cos(_rad(latMid));
+    final scaleLon = earthRadiusM * math.pi / 180.0 * cosLat;
+    final scaleLat = earthRadiusM * math.pi / 180.0;
+
+    final bx = (b.longitude - a.longitude) * scaleLon;
+    final by = (b.latitude - a.latitude) * scaleLat;
+    final px = (p.longitude - a.longitude) * scaleLon;
+    final py = (p.latitude - a.latitude) * scaleLat;
+
+    final segLen2 = bx * bx + by * by;
+    final t =
+        segLen2 == 0 ? 0.0 : ((px * bx + py * by) / segLen2).clamp(0.0, 1.0);
+    return (point: _lerp(a, b, t), t: t);
+  }
+}
+
+/// A GPS point snapped onto a polyline with progress metadata.
+class SnapResult {
+  const SnapResult({
+    required this.snapped,
+    required this.distanceAlongMeters,
+    required this.bearingDeg,
+  });
+
+  final GeoPoint snapped;
+  final double distanceAlongMeters;
+  final double bearingDeg;
 }

@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 1754" width="1240" height="1754">
+  <defs>
+    <linearGradient id="lhGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#19E3FF"></stop>
+      <stop offset="50%" stop-color="#7C5CFF"></stop>
+      <stop offset="100%" stop-color="#FF2D9C"></stop>
+    </linearGradient>
+    <linearGradient id="lhRule" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#19E3FF"></stop>
+      <stop offset="50%" stop-color="#7C5CFF"></stop>
+      <stop offset="100%" stop-color="#FF2D9C"></stop>
+    </linearGradient>
+  </defs>
+
+  
+  <rect width="1240" height="1754" fill="#FFFFFF"></rect>
+
+  
+  <g transform="translate(96 104)">
+    <g transform="scale(0.92)" fill="none" stroke="url(#lhGrad)" stroke-width="8.5" stroke-linecap="round" stroke-dasharray="0.1 11.5">
+      <path d="M23 83 L50 17 L77 83"></path>
+      <path d="M35 59 L65 59"></path>
+    </g>
+    <text x="112" y="60" font-family="Space Grotesk, sans-serif" font-weight="600" font-size="42" letter-spacing="-1.2" fill="#0B0F18">Ambient<tspan fill="#119FBE">Nav</tspan></text>
+    <text x="114" y="88" font-family="IBM Plex Mono, monospace" font-size="13" letter-spacing="3.4" fill="#6B7488">FOLLOW THE LIGHT</text>
+  </g>
+
+  
+  <g transform="translate(1144 112)" text-anchor="end" font-family="IBM Plex Mono, monospace" fill="#6B7488" font-size="14">
+    <text y="0" letter-spacing="0.5">AmbientNav Systems GmbH</text>
+    <text y="22" letter-spacing="0.5">Lindenstraße 12 · 60311 Frankfurt</text>
+    <text y="44" letter-spacing="0.5">hello@ambientnav.io · ambientnav.io</text>
+  </g>
+
+  
+  <rect x="96" y="228" width="1048" height="3" rx="1.5" fill="url(#lhRule)"></rect>
+
+  
+  <g fill="#D5DAE4">
+    <rect x="96" y="360" width="220" height="15" rx="7.5" fill="#0B0F18"></rect>
+    <rect x="96" y="420" width="900" height="11" rx="5.5"></rect>
+    <rect x="96" y="448" width="980" height="11" rx="5.5"></rect>
+    <rect x="96" y="476" width="930" height="11" rx="5.5"></rect>
+    <rect x="96" y="504" width="640" height="11" rx="5.5"></rect>
+
+    <rect x="96" y="576" width="980" height="11" rx="5.5"></rect>
+    <rect x="96" y="604" width="940" height="11" rx="5.5"></rect>
+    <rect x="96" y="632" width="990" height="11" rx="5.5"></rect>
+    <rect x="96" y="660" width="500" height="11" rx="5.5"></rect>
+  </g>
+
+  
+  <rect x="96" y="1606" width="1048" height="1.5" fill="#E2E6EE"></rect>
+  <g transform="translate(96 1652)" font-family="IBM Plex Mono, monospace" fill="#9AA4B8" font-size="12.5" letter-spacing="0.4">
+    <text y="0">AmbientNav Systems GmbH · Frankfurt am Main · HRB 000000</text>
+    <text y="22">USt-IdNr. DE000000000 · IBAN DE00 0000 0000 0000 0000 00</text>
+  </g>
+  
+  <g transform="translate(1100 1636) scale(0.42)" fill="none" stroke="url(#lhGrad)" stroke-width="9" stroke-linecap="round" stroke-dasharray="0.1 12">
+    <path d="M23 83 L50 17 L77 83"></path>
+    <path d="M35 59 L65 59"></path>
+  </g>
+</svg>

@@ -361,3 +361,13 @@ This project uses **trunk-based development** on `main`.
 - When asked for a PR, prefer pushing commits to `main` and note that this repo uses trunk-based development — only create a PR if explicitly requested.
 
 **Exception:** Automated CI branches (e.g. bot-created translation branches) are allowed. Large, agent-driven feature work (such as the initial Flutter app) may also be developed on a `claude/*` branch and merged via PR; the maintainer should confirm whether to fold such work back into the trunk-based flow.
+
+---
+
+## Design System
+
+The design system lives under `design-system/` at the repository root.
+
+- Colors, typography, spacing tokens, and brand assets are defined there — always consult this directory before introducing new visual constants.
+- Do not duplicate design tokens in the Flutter app; derive them from the design system where possible.
+- Brand logos and visual assets are under `design-system/assets/`.
