@@ -1,0 +1,42 @@
+name: "📖 Documentation Issue"
+description: Report missing, incorrect, or unclear documentation
+title: "[Docs]: "
+labels: ["documentation"]
+body:
+  - type: markdown
+    attributes:
+      value: Good documentation helps everyone. Thank you for helping us improve it!
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Issue type / Art des Problems
+      options:
+        - "Incorrect information / Falsche Information"
+        - "Missing content / Fehlender Inhalt"
+        - "Unclear explanation / Unklare Erklärung"
+        - "Broken link / Defekter Link"
+        - "Translation error / Übersetzungsfehler"
+        - "Other / Sonstiges"
+    validations:
+      required: true
+
+  - type: input
+    id: page
+    attributes:
+      label: Affected page / Betroffene Seite
+      placeholder: "e.g. /getting-started or https://vergissberlin.github.io/ambientnav/getting-started/"
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the issue / Beschreibe das Problem
+      placeholder: What is wrong or missing?
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested improvement / Verbesserungsvorschlag
+      placeholder: How should it read instead? Feel free to paste corrected text.

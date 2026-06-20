@@ -1,0 +1,212 @@
+<!-- @dsCard group="Brand" viewport="800x220" subtitle="Turn-signal dot animation · ambient · guide · alert" name="Logo animated" -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    body {
+      margin: 0;
+      background: var(--amb-cockpit);
+      padding: 20px;
+      display: flex;
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .tile {
+      flex: 1;
+      border-radius: 14px;
+      border: 1px solid var(--amb-line);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 28px 12px 20px;
+      background: var(--amb-surface);
+    }
+
+    .cap {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--amb-text-4);
+      text-align: center;
+    }
+
+    svg { overflow: visible; }
+
+    /* ── Ambient: all dots breathe with gradient colours ── */
+    @keyframes amb-breathe {
+      0%, 100% { opacity: .32; }
+      50%       { opacity: .88; }
+    }
+
+    .dot-ambient { animation: amb-breathe 3s ease-in-out infinite; }
+
+    /* ── Guide: single dot flashes bright then fades ── */
+    /* Period 1400ms, active window ~40% of period */
+    @keyframes guide-flash {
+      0%   { opacity: .15; filter: none; }
+      12%  { opacity: 1;   filter: drop-shadow(0 0 5px rgba(25,227,255,.95)); }
+      40%  { opacity: .4;  filter: drop-shadow(0 0 2px rgba(25,227,255,.3)); }
+      100% { opacity: .15; filter: none; }
+    }
+
+    .dot-guide-active {
+      animation: guide-flash 1400ms ease-in-out infinite;
+      fill: rgba(25, 227, 255, 0.18);
+    }
+
+    .dot-guide-dim { fill: rgba(124, 92, 255, 0.15); }
+
+    /* ── Alert: all dots pulse magenta simultaneously ── */
+    @keyframes alert-pulse {
+      0%, 100% { opacity: .2; filter: none; }
+      50%       { opacity: 1;  filter: drop-shadow(0 0 6px rgba(255,45,156,.9)); }
+    }
+
+    .dot-alert { animation: alert-pulse 900ms ease-in-out infinite; fill: rgba(255, 45, 156, 0.2); }
+  </style>
+</head>
+<body>
+
+  <!-- ── 1 · Ambient ── -->
+  <div class="tile">
+    <svg viewBox="0 0 100 100" width="72" height="72">
+      <!-- Background silhouette -->
+      <g fill="none" stroke="rgba(255,255,255,.05)" stroke-width="8.5"
+         stroke-linecap="round" stroke-dasharray="0.1 11.5">
+        <path d="M23 83 L50 17 L77 83"/>
+        <path d="M35 59 L65 59"/>
+      </g>
+      <!-- Animated dots — gradient colours, staggered delay -->
+      <g style="filter:drop-shadow(0 0 8px rgba(124,92,255,.35))">
+        <!-- left leg, gradT 0.00–0.42 → cyan tones -->
+        <circle class="dot-ambient" cx="23.0" cy="83.0" r="4.25" fill="rgba(25,227,255,.35)"  style="animation-delay:   0ms"/>
+        <circle class="dot-ambient" cx="27.4" cy="72.2" r="4.25" fill="rgba(50,210,255,.35)"  style="animation-delay: 187ms"/>
+        <circle class="dot-ambient" cx="31.8" cy="61.5" r="4.25" fill="rgba(75,193,255,.35)"  style="animation-delay: 375ms"/>
+        <circle class="dot-ambient" cx="36.2" cy="50.8" r="4.25" fill="rgba(99,176,255,.35)"  style="animation-delay: 562ms"/>
+        <circle class="dot-ambient" cx="40.6" cy="40.0" r="4.25" fill="rgba(124,160,255,.35)" style="animation-delay: 750ms"/>
+        <circle class="dot-ambient" cx="45.0" cy="29.3" r="4.25" fill="rgba(124,126,255,.35)" style="animation-delay: 937ms"/>
+        <!-- apex → violet -->
+        <circle class="dot-ambient" cx="49.4" cy="18.5" r="4.25" fill="rgba(124,92,255,.35)"  style="animation-delay:1125ms"/>
+        <!-- right leg, gradT 0.58–1.00 → magenta tones -->
+        <circle class="dot-ambient" cx="53.8" cy="26.2" r="4.25" fill="rgba(148,79,233,.35)"  style="animation-delay:1312ms"/>
+        <circle class="dot-ambient" cx="58.2" cy="36.9" r="4.25" fill="rgba(172,66,210,.35)"  style="animation-delay:1500ms"/>
+        <circle class="dot-ambient" cx="62.6" cy="47.7" r="4.25" fill="rgba(197,54,188,.35)"  style="animation-delay:1687ms"/>
+        <circle class="dot-ambient" cx="66.9" cy="58.4" r="4.25" fill="rgba(221,41,165,.35)"  style="animation-delay:1875ms"/>
+        <circle class="dot-ambient" cx="71.3" cy="69.2" r="4.25" fill="rgba(246,29,142,.35)"  style="animation-delay:2062ms"/>
+        <circle class="dot-ambient" cx="75.7" cy="79.9" r="4.25" fill="rgba(255,45,156,.35)"  style="animation-delay:2250ms"/>
+        <!-- crossbar → mid-violet -->
+        <circle class="dot-ambient" cx="35.1" cy="59.0" r="4.25" fill="rgba(99,139,255,.35)"  style="animation-delay:2437ms"/>
+        <circle class="dot-ambient" cx="46.7" cy="59.0" r="4.25" fill="rgba(124,108,255,.35)" style="animation-delay:2625ms"/>
+        <circle class="dot-ambient" cx="58.3" cy="59.0" r="4.25" fill="rgba(148,90,255,.35)"  style="animation-delay:2812ms"/>
+      </g>
+    </svg>
+    <div class="cap">Ambient</div>
+  </div>
+
+  <!-- ── 2 · Guide Right ── -->
+  <div class="tile">
+    <svg viewBox="0 0 100 100" width="72" height="72">
+      <g fill="none" stroke="rgba(255,255,255,.05)" stroke-width="8.5"
+         stroke-linecap="round" stroke-dasharray="0.1 11.5">
+        <path d="M23 83 L50 17 L77 83"/>
+        <path d="M35 59 L65 59"/>
+      </g>
+      <!-- Sequence: apex(6) → right bottom(12), delay 150ms each -->
+      <g style="filter:drop-shadow(0 0 9px rgba(25,227,255,.4))">
+        <!-- Left leg: dim -->
+        <circle class="dot-guide-dim" cx="23.0" cy="83.0" r="4.25"/>
+        <circle class="dot-guide-dim" cx="27.4" cy="72.2" r="4.25"/>
+        <circle class="dot-guide-dim" cx="31.8" cy="61.5" r="4.25"/>
+        <circle class="dot-guide-dim" cx="36.2" cy="50.8" r="4.25"/>
+        <circle class="dot-guide-dim" cx="40.6" cy="40.0" r="4.25"/>
+        <circle class="dot-guide-dim" cx="45.0" cy="29.3" r="4.25"/>
+        <!-- Apex + right leg: active, sequenced -->
+        <circle class="dot-guide-active" cx="49.4" cy="18.5" r="4.25" style="animation-delay:  0ms"/>
+        <circle class="dot-guide-active" cx="53.8" cy="26.2" r="4.25" style="animation-delay:150ms"/>
+        <circle class="dot-guide-active" cx="58.2" cy="36.9" r="4.25" style="animation-delay:300ms"/>
+        <circle class="dot-guide-active" cx="62.6" cy="47.7" r="4.25" style="animation-delay:450ms"/>
+        <circle class="dot-guide-active" cx="66.9" cy="58.4" r="4.25" style="animation-delay:600ms"/>
+        <circle class="dot-guide-active" cx="71.3" cy="69.2" r="4.25" style="animation-delay:750ms"/>
+        <circle class="dot-guide-active" cx="75.7" cy="79.9" r="4.25" style="animation-delay:900ms"/>
+        <!-- Crossbar: dim -->
+        <circle class="dot-guide-dim" cx="35.1" cy="59.0" r="4.25"/>
+        <circle class="dot-guide-dim" cx="46.7" cy="59.0" r="4.25"/>
+        <circle class="dot-guide-dim" cx="58.3" cy="59.0" r="4.25"/>
+      </g>
+    </svg>
+    <div class="cap">Guide · right</div>
+  </div>
+
+  <!-- ── 3 · Guide Left ── -->
+  <div class="tile">
+    <svg viewBox="0 0 100 100" width="72" height="72">
+      <g fill="none" stroke="rgba(255,255,255,.05)" stroke-width="8.5"
+         stroke-linecap="round" stroke-dasharray="0.1 11.5">
+        <path d="M23 83 L50 17 L77 83"/>
+        <path d="M35 59 L65 59"/>
+      </g>
+      <!-- Sequence: apex(6) → left bottom(0), delay 150ms each -->
+      <g style="filter:drop-shadow(0 0 9px rgba(25,227,255,.4))">
+        <!-- Left leg: active, sequenced (apex first, bottom last) -->
+        <circle class="dot-guide-active" cx="23.0" cy="83.0" r="4.25" style="animation-delay:900ms"/>
+        <circle class="dot-guide-active" cx="27.4" cy="72.2" r="4.25" style="animation-delay:750ms"/>
+        <circle class="dot-guide-active" cx="31.8" cy="61.5" r="4.25" style="animation-delay:600ms"/>
+        <circle class="dot-guide-active" cx="36.2" cy="50.8" r="4.25" style="animation-delay:450ms"/>
+        <circle class="dot-guide-active" cx="40.6" cy="40.0" r="4.25" style="animation-delay:300ms"/>
+        <circle class="dot-guide-active" cx="45.0" cy="29.3" r="4.25" style="animation-delay:150ms"/>
+        <circle class="dot-guide-active" cx="49.4" cy="18.5" r="4.25" style="animation-delay:  0ms"/>
+        <!-- Right leg: dim -->
+        <circle class="dot-guide-dim" cx="53.8" cy="26.2" r="4.25"/>
+        <circle class="dot-guide-dim" cx="58.2" cy="36.9" r="4.25"/>
+        <circle class="dot-guide-dim" cx="62.6" cy="47.7" r="4.25"/>
+        <circle class="dot-guide-dim" cx="66.9" cy="58.4" r="4.25"/>
+        <circle class="dot-guide-dim" cx="71.3" cy="69.2" r="4.25"/>
+        <circle class="dot-guide-dim" cx="75.7" cy="79.9" r="4.25"/>
+        <!-- Crossbar: dim -->
+        <circle class="dot-guide-dim" cx="35.1" cy="59.0" r="4.25"/>
+        <circle class="dot-guide-dim" cx="46.7" cy="59.0" r="4.25"/>
+        <circle class="dot-guide-dim" cx="58.3" cy="59.0" r="4.25"/>
+      </g>
+    </svg>
+    <div class="cap">Guide · left</div>
+  </div>
+
+  <!-- ── 4 · Alert ── -->
+  <div class="tile">
+    <svg viewBox="0 0 100 100" width="72" height="72">
+      <g fill="none" stroke="rgba(255,255,255,.05)" stroke-width="8.5"
+         stroke-linecap="round" stroke-dasharray="0.1 11.5">
+        <path d="M23 83 L50 17 L77 83"/>
+        <path d="M35 59 L65 59"/>
+      </g>
+      <!-- All dots pulse magenta, slight edge-to-center stagger -->
+      <g style="filter:drop-shadow(0 0 10px rgba(255,45,156,.5))">
+        <circle class="dot-alert" cx="23.0" cy="83.0" r="4.25" style="animation-delay:  0ms"/>
+        <circle class="dot-alert" cx="27.4" cy="72.2" r="4.25" style="animation-delay: 40ms"/>
+        <circle class="dot-alert" cx="31.8" cy="61.5" r="4.25" style="animation-delay: 80ms"/>
+        <circle class="dot-alert" cx="36.2" cy="50.8" r="4.25" style="animation-delay:120ms"/>
+        <circle class="dot-alert" cx="40.6" cy="40.0" r="4.25" style="animation-delay:160ms"/>
+        <circle class="dot-alert" cx="45.0" cy="29.3" r="4.25" style="animation-delay:200ms"/>
+        <circle class="dot-alert" cx="49.4" cy="18.5" r="4.25" style="animation-delay:240ms"/>
+        <circle class="dot-alert" cx="53.8" cy="26.2" r="4.25" style="animation-delay:200ms"/>
+        <circle class="dot-alert" cx="58.2" cy="36.9" r="4.25" style="animation-delay:160ms"/>
+        <circle class="dot-alert" cx="62.6" cy="47.7" r="4.25" style="animation-delay:120ms"/>
+        <circle class="dot-alert" cx="66.9" cy="58.4" r="4.25" style="animation-delay: 80ms"/>
+        <circle class="dot-alert" cx="71.3" cy="69.2" r="4.25" style="animation-delay: 40ms"/>
+        <circle class="dot-alert" cx="75.7" cy="79.9" r="4.25" style="animation-delay:  0ms"/>
+        <circle class="dot-alert" cx="35.1" cy="59.0" r="4.25" style="animation-delay:100ms"/>
+        <circle class="dot-alert" cx="46.7" cy="59.0" r="4.25" style="animation-delay:140ms"/>
+        <circle class="dot-alert" cx="58.3" cy="59.0" r="4.25" style="animation-delay:180ms"/>
+      </g>
+    </svg>
+    <div class="cap">Alert</div>
+  </div>
+
+</body>
+</html>

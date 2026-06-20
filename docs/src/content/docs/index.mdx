@@ -16,6 +16,10 @@ hero:
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
+import HeroVisual from '../../components/HeroVisual.astro';
+import SystemDiagram from '../../components/SystemDiagram.astro';
+
+<HeroVisual lang="en" />
 
 ## What is AmbientNav?
 
@@ -38,13 +42,7 @@ AmbientNav turns addressable LED strips into a real-time navigation guide and pr
 
 ## System Overview
 
-```
-📱 iPhone App  ──BLE──▶  ESP32 Front (Master)  ──BT Classic──▶  ESP32 Rear (Slave)
-                              │                                        │
-                          LED Strip                               LED Strip
-                          (front)                                  (rear)
-                                                               ◀── 3× HC-SR04
-```
+<SystemDiagram lang="en" />
 
 | Scenario | LED Effect |
 |---|---|
