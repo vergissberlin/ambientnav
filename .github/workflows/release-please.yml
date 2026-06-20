@@ -72,3 +72,12 @@ jobs:
       release_tag: ${{ needs.release-please.outputs.tag_name }}
     permissions:
       contents: write
+
+  app:
+    needs: release-please
+    if: needs.release-please.outputs.release_created == 'true'
+    uses: ./.github/workflows/build-app.yml
+    with:
+      release_tag: ${{ needs.release-please.outputs.tag_name }}
+    permissions:
+      contents: write

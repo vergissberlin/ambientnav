@@ -10,6 +10,15 @@ on:
     paths:
       - 'app/**'
       - '.github/workflows/build-app.yml'
+  workflow_call:
+    inputs:
+      release_tag:
+        description: 'Release tag name (e.g. ambientnav-v0.5.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
 
 # Pin the Flutter version used across all jobs.
 env:
@@ -112,3 +121,46 @@ jobs:
 
       - name: Build iOS (no codesign)
         run: flutter build ios --no-codesign
+
+      - name: Package iOS app as zip
+        run: |
+          cd build/ios/iphoneos
+          zip -r Runner.app.zip Runner.app
+
+      - name: Upload iOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ambientnav-app-ios
+          path: app/build/ios/iphoneos/Runner.app.zip
+          retention-days: 30
+
+  attach-release-assets:
+    name: Attach app builds to GitHub Release
+    if: github.event_name == 'workflow_call'
+    needs: [build-android, build-ios]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Android APK
+        uses: actions/download-artifact@v4
+        with:
+          name: ambientnav-app-android
+          path: dist/
+
+      - name: Download iOS app zip
+        uses: actions/download-artifact@v4
+        with:
+          name: ambientnav-app-ios
+          path: dist/
+
+      - name: Rename artifacts with version tag
+        run: |
+          mv dist/app-debug.apk   dist/ambientnav-${{ inputs.release_tag }}-android-debug.apk
+          mv dist/Runner.app.zip  dist/ambientnav-${{ inputs.release_tag }}-ios-unsigned.zip
+
+      - name: Attach builds to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.release_tag }}
+          files: |
+            dist/ambientnav-${{ inputs.release_tag }}-android-debug.apk
+            dist/ambientnav-${{ inputs.release_tag }}-ios-unsigned.zip
