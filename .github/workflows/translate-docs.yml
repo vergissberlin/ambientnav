@@ -16,8 +16,12 @@ jobs:
       - name: Collect all EN docs
         id: changed
         run: |
-          files=$(find docs/src/content/docs -maxdepth 1 \( -name "*.md" -o -name "*.mdx" \) | sort | tr '\n' '\n')
-          echo "all_changed_files=$files" >> $GITHUB_OUTPUT
+          files=$(find docs/src/content/docs -maxdepth 1 \( -name "*.md" -o -name "*.mdx" \) | sort)
+          {
+            echo "all_changed_files<<EOF"
+            echo "$files"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
           echo "any_changed=$([ -n "$files" ] && echo true || echo false)" >> $GITHUB_OUTPUT
 
       - uses: pnpm/action-setup@v4
