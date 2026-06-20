@@ -7,6 +7,12 @@ on:
       - 'firmware/**'
   release:
     types: [published]
+  workflow_call:
+    inputs:
+      release_tag:
+        description: 'Release tag name (e.g. ambientnav-v0.5.0)'
+        required: true
+        type: string
 
 permissions:
   contents: write  # needed to upload release assets and commit merged binaries
@@ -98,7 +104,7 @@ jobs:
 
   attach-release-assets:
     name: Attach binaries to GitHub Release
-    if: github.event_name == 'release'
+    if: github.event_name == 'release' || github.event_name == 'workflow_call'
     needs: [build-front, build-rear]
     runs-on: ubuntu-latest
     steps:
@@ -106,6 +112,10 @@ jobs:
         with:
           ref: main
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Resolve release tag
+        id: tag
+        run: echo "name=${{ inputs.release_tag || github.ref_name }}" >> "$GITHUB_OUTPUT"
 
       - name: Download front artifact
         uses: actions/download-artifact@v4
@@ -133,26 +143,27 @@ jobs:
 
       - name: Rename binaries with version tag
         run: |
-          mv dist/front/firmware.bin                   dist/ambientnav-front-${{ github.ref_name }}.bin
-          mv dist/rear/firmware.bin                    dist/ambientnav-rear-${{ github.ref_name }}.bin
-          mv dist/front-merged/firmware-merged.bin     dist/ambientnav-front-${{ github.ref_name }}-merged.bin
-          mv dist/rear-merged/firmware-merged.bin      dist/ambientnav-rear-${{ github.ref_name }}-merged.bin
+          mv dist/front/firmware.bin                   dist/ambientnav-front-${{ steps.tag.outputs.name }}.bin
+          mv dist/rear/firmware.bin                    dist/ambientnav-rear-${{ steps.tag.outputs.name }}.bin
+          mv dist/front-merged/firmware-merged.bin     dist/ambientnav-front-${{ steps.tag.outputs.name }}-merged.bin
+          mv dist/rear-merged/firmware-merged.bin      dist/ambientnav-rear-${{ steps.tag.outputs.name }}-merged.bin
 
       - name: Commit merged binaries to docs/public for GitHub Pages serving
         run: |
-          cp dist/ambientnav-front-${{ github.ref_name }}-merged.bin docs/public/firmware-front.bin
-          cp dist/ambientnav-rear-${{ github.ref_name }}-merged.bin  docs/public/firmware-rear.bin
+          cp dist/ambientnav-front-${{ steps.tag.outputs.name }}-merged.bin docs/public/firmware-front.bin
+          cp dist/ambientnav-rear-${{ steps.tag.outputs.name }}-merged.bin  docs/public/firmware-rear.bin
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add docs/public/firmware-front.bin docs/public/firmware-rear.bin
-          git diff --cached --quiet || git commit -m "chore: update web flash binaries for ${{ github.ref_name }}"
+          git diff --cached --quiet || git commit -m "chore: update web flash binaries for ${{ steps.tag.outputs.name }}"
           git push origin main
 
       - name: Attach binaries to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.tag.outputs.name }}
           files: |
-            dist/ambientnav-front-${{ github.ref_name }}.bin
-            dist/ambientnav-rear-${{ github.ref_name }}.bin
-            dist/ambientnav-front-${{ github.ref_name }}-merged.bin
-            dist/ambientnav-rear-${{ github.ref_name }}-merged.bin
+            dist/ambientnav-front-${{ steps.tag.outputs.name }}.bin
+            dist/ambientnav-rear-${{ steps.tag.outputs.name }}.bin
+            dist/ambientnav-front-${{ steps.tag.outputs.name }}-merged.bin
+            dist/ambientnav-rear-${{ steps.tag.outputs.name }}-merged.bin
