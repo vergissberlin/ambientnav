@@ -1,14 +1,50 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync, writeFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { join, dirname } from 'path';
+import { execSync } from 'child_process';
 import { remarkMermaid } from './src/plugins/remark-mermaid.mjs';
 import starlightVersions from 'starlight-versions';
 import { unified } from '@astrojs/markdown-remark';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const { version } = JSON.parse(readFileSync(join(__dirname, '../package.json'), 'utf-8'));
+
+// Derive the default sidebar structure used as fallback for auto-generated version files.
+const defaultVersionSidebar = {
+  sidebar: [
+    { label: 'Getting Started', translations: { de: 'Erste Schritte' }, link: '/getting-started/' },
+    { label: 'Flash Firmware', translations: { de: 'Firmware flashen' }, link: '/flash/' },
+    { label: 'Hardware', translations: { de: 'Hardware' }, items: [
+      { label: 'Wiring', translations: { de: 'Verkabelung' }, link: '/wiring/' },
+    ]},
+    { label: 'Reference', translations: { de: 'Referenz' }, items: [
+      { label: 'Architecture', translations: { de: 'Architektur' }, link: '/architecture/' },
+      { label: 'Agents', translations: { de: 'Agenten' }, link: '/agents/' },
+      { label: 'Protocols', translations: { de: 'Protokolle' }, link: '/protocols/' },
+      { label: 'LED Effects', translations: { de: 'LED-Effekte' }, link: '/led-effects/' },
+    ]},
+  ],
+};
+
+// Read all git tags, filter to ambientnav releases, sort descending.
+const previousVersions = execSync('git tag --sort=-version:refname', { encoding: 'utf-8' })
+  .trim()
+  .split('\n')
+  .filter(tag => /^ambientnav-v\d+\.\d+\.\d+$/.test(tag))
+  .reduce((acc, tag) => {
+    const [, major, minor, patch] = tag.match(/ambientnav-v(\d+)\.(\d+)\.(\d+)/);
+    const label = `v${major}.${minor}.${patch}`;
+    if (label === `v${version}`) return acc; // skip current version
+    const slug = `${major}.${minor}`;
+    const jsonPath = join(__dirname, `src/content/versions/${slug}.json`);
+    if (!existsSync(jsonPath)) {
+      writeFileSync(jsonPath, JSON.stringify(defaultVersionSidebar, null, 2) + '\n');
+    }
+    acc.push({ slug, label });
+    return acc;
+  }, []);
 
 export default defineConfig({
   site: 'https://vergissberlin.github.io',
@@ -29,7 +65,7 @@ export default defineConfig({
       },
       plugins: [
         starlightVersions({
-          versions: [{ slug: '0.1', label: 'v0.1.0' }],
+          versions: previousVersions,
           current: { label: `v${version}` },
         }),
       ],
