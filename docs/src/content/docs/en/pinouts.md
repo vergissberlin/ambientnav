@@ -123,3 +123,145 @@ The LEDs dominate the power budget. Use a dedicated **5 V / 3 A** DC-DC converte
 | **Total per board** | **~1.2 – 1.4 A** |
 
 Keep power and signal GND connected together at a single point (star topology) to prevent ground loops.
+
+---
+
+## WokWi Simulator
+
+[WokWi](https://wokwi.com) is a free browser-based electronics simulator that supports the ESP32, WS2812B NeoPixels, and HC-SR04 sensors used in this project. Use the diagrams below to simulate the circuits without physical hardware.
+
+**How to open a diagram in WokWi:**
+1. Go to [wokwi.com](https://wokwi.com) and create a new ESP32 project.
+2. Click the `diagram.json` tab and replace its contents with the JSON below.
+3. Press **Start Simulation**.
+
+The `diagram.json` files are also stored in the repository under `wokwi/front/` and `wokwi/rear/`.
+
+### Front board — `wokwi/front/diagram.json`
+
+Three NeoPixels represent a segment of the WS2812B LED strip. GPIO 5 drives the data line through a 330 Ω resistor.
+
+```json
+{
+  "version": 1,
+  "author": "AmbientNav",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "wokwi-esp32-devkit-v1",
+      "id": "esp32",
+      "top": 32,
+      "left": 208,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r_led",
+      "top": 174.72,
+      "left": 64,
+      "rotate": 90,
+      "attrs": { "value": "330" }
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "px1",
+      "top": 128,
+      "left": -64,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "px2",
+      "top": 176,
+      "left": -64,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "px3",
+      "top": 224,
+      "left": -64,
+      "attrs": {}
+    }
+  ],
+  "connections": [
+    ["esp32:D5",    "r_led:1",  "white",  ["h-32"]],
+    ["r_led:2",     "px1:DIN",  "white",  ["h-32"]],
+    ["px1:DOUT",    "px2:DIN",  "white",  []],
+    ["px2:DOUT",    "px3:DIN",  "white",  []],
+    ["esp32:VIN",   "px1:VCC",  "red",    ["h-170", "v-80"]],
+    ["px1:VCC",     "px2:VCC",  "red",    []],
+    ["px2:VCC",     "px3:VCC",  "red",    []],
+    ["esp32:GND.1", "px1:GND",  "black",  ["h-170", "v-60"]],
+    ["px1:GND",     "px2:GND",  "black",  []],
+    ["px2:GND",     "px3:GND",  "black",  []]
+  ]
+}
+```
+
+### Rear board — `wokwi/rear/diagram.json`
+
+Three HC-SR04 sensors connect via TRIG lines (GPIO 25/26/27). Each ECHO line passes through a 1 kΩ + 2 kΩ voltage divider before reaching the ESP32 input-only pins (GPIO 34/35/36). Three NeoPixels represent the LED strip zones.
+
+```json
+{
+  "version": 1,
+  "author": "AmbientNav",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "wokwi-esp32-devkit-v1",
+      "id": "esp32",
+      "top": 96,
+      "left": 192,
+      "attrs": {}
+    },
+    { "type": "wokwi-hc-sr04", "id": "us_l", "top": 32,  "left": -192, "attrs": {} },
+    { "type": "wokwi-hc-sr04", "id": "us_c", "top": 224, "left": -192, "attrs": {} },
+    { "type": "wokwi-hc-sr04", "id": "us_r", "top": 416, "left": -192, "attrs": {} },
+    { "type": "wokwi-resistor", "id": "r_el1", "top": 62.72,  "left": 32, "rotate": 90, "attrs": { "value": "1000" } },
+    { "type": "wokwi-resistor", "id": "r_el2", "top": 62.72,  "left": 80, "rotate": 90, "attrs": { "value": "2000" } },
+    { "type": "wokwi-resistor", "id": "r_ec1", "top": 254.72, "left": 32, "rotate": 90, "attrs": { "value": "1000" } },
+    { "type": "wokwi-resistor", "id": "r_ec2", "top": 254.72, "left": 80, "rotate": 90, "attrs": { "value": "2000" } },
+    { "type": "wokwi-resistor", "id": "r_er1", "top": 446.72, "left": 32, "rotate": 90, "attrs": { "value": "1000" } },
+    { "type": "wokwi-resistor", "id": "r_er2", "top": 446.72, "left": 80, "rotate": 90, "attrs": { "value": "2000" } },
+    { "type": "wokwi-resistor", "id": "r_led", "top": 350.72, "left": 448, "rotate": 90, "attrs": { "value": "330" } },
+    { "type": "wokwi-neopixel", "id": "px1", "top": 320, "left": 560, "attrs": {} },
+    { "type": "wokwi-neopixel", "id": "px2", "top": 368, "left": 560, "attrs": {} },
+    { "type": "wokwi-neopixel", "id": "px3", "top": 416, "left": 560, "attrs": {} }
+  ],
+  "connections": [
+    ["esp32:3V3",    "us_l:VCC",  "red",    ["h-300"]],
+    ["esp32:3V3",    "us_c:VCC",  "red",    ["h-300"]],
+    ["esp32:3V3",    "us_r:VCC",  "red",    ["h-300"]],
+    ["esp32:GND.1",  "us_l:GND",  "black",  ["h-270"]],
+    ["esp32:GND.1",  "us_c:GND",  "black",  ["h-270"]],
+    ["esp32:GND.1",  "us_r:GND",  "black",  ["h-270"]],
+    ["esp32:D25",    "us_l:TRIG", "orange", ["h-30", "v-90", "h-370"]],
+    ["esp32:D26",    "us_c:TRIG", "orange", ["h-30", "v-90", "h-370"]],
+    ["esp32:D27",    "us_r:TRIG", "orange", ["h-30", "v-90", "h-370"]],
+    ["us_l:ECHO",    "r_el1:1",   "green",  []],
+    ["r_el1:2",      "esp32:D34", "green",  []],
+    ["r_el1:2",      "r_el2:1",   "green",  []],
+    ["r_el2:2",      "esp32:GND.1","black", []],
+    ["us_c:ECHO",    "r_ec1:1",   "green",  []],
+    ["r_ec1:2",      "esp32:D35", "green",  []],
+    ["r_ec1:2",      "r_ec2:1",   "green",  []],
+    ["r_ec2:2",      "esp32:GND.1","black", []],
+    ["us_r:ECHO",    "r_er1:1",   "green",  []],
+    ["r_er1:2",      "esp32:VP",  "green",  []],
+    ["r_er1:2",      "r_er2:1",   "green",  []],
+    ["r_er2:2",      "esp32:GND.1","black", []],
+    ["esp32:D18",    "r_led:1",   "white",  []],
+    ["r_led:2",      "px1:DIN",   "white",  []],
+    ["px1:DOUT",     "px2:DIN",   "white",  []],
+    ["px2:DOUT",     "px3:DIN",   "white",  []],
+    ["esp32:VIN",    "px1:VCC",   "red",    []],
+    ["px1:VCC",      "px2:VCC",   "red",    []],
+    ["px2:VCC",      "px3:VCC",   "red",    []],
+    ["esp32:GND.2",  "px1:GND",   "black",  []],
+    ["px1:GND",      "px2:GND",   "black",  []],
+    ["px2:GND",      "px3:GND",   "black",  []]
+  ]
+}
+```

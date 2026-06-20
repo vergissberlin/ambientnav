@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "author": "AmbientNav",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "wokwi-esp32-devkit-v1",
+      "id": "esp32",
+      "top": 32,
+      "left": 208,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r_led",
+      "top": 174.72,
+      "left": 64,
+      "rotate": 90,
+      "attrs": { "value": "330" }
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "px1",
+      "top": 128,
+      "left": -64,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "px2",
+      "top": 176,
+      "left": -64,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-neopixel",
+      "id": "px3",
+      "top": 224,
+      "left": -64,
+      "attrs": {}
+    }
+  ],
+  "connections": [
+    ["esp32:D5",    "r_led:1",  "white",  ["h-32"]],
+    ["r_led:2",     "px1:DIN",  "white",  ["h-32"]],
+    ["px1:DOUT",    "px2:DIN",  "white",  []],
+    ["px2:DOUT",    "px3:DIN",  "white",  []],
+    ["esp32:VIN",   "px1:VCC",  "red",    ["h-170", "v-80"]],
+    ["px1:VCC",     "px2:VCC",  "red",    []],
+    ["px2:VCC",     "px3:VCC",  "red",    []],
+    ["esp32:GND.1", "px1:GND",  "black",  ["h-170", "v-60"]],
+    ["px1:GND",     "px2:GND",  "black",  []],
+    ["px2:GND",     "px3:GND",  "black",  []]
+  ]
+}
