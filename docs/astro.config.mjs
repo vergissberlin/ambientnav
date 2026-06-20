@@ -129,14 +129,51 @@ export default defineConfig({
           link: '/getting-started/',
         },
         {
-          label: 'Flash Firmware',
-          translations: { de: 'Firmware flashen' },
-          link: '/flash/',
+          label: 'Setup',
+          translations: { de: 'Einrichtung' },
+          items: [
+            {
+              label: 'Wiring',
+              translations: { de: 'Verkabelung' },
+              link: '/wiring/',
+            },
+            {
+              label: 'Flash Firmware',
+              translations: { de: 'Firmware flashen' },
+              link: '/flash/',
+            },
+            {
+              label: 'Flash Firmware (Manual)',
+              translations: { de: 'Firmware flashen (manuell)' },
+              link: '/flash-firmware/',
+            },
+          ],
         },
         {
-          label: 'Flash Firmware (Manual)',
-          translations: { de: 'Firmware flashen (manuell)' },
-          link: '/flash-firmware/',
+          label: 'App',
+          translations: { de: 'App' },
+          items: [
+            {
+              label: 'Navigation',
+              translations: { de: 'Navigation' },
+              link: '/app/navigation/',
+            },
+            {
+              label: 'Pairing & Security',
+              translations: { de: 'Kopplung & Sicherheit' },
+              link: '/app/pairing/',
+            },
+            {
+              label: 'LED Configuration',
+              translations: { de: 'LED-Konfiguration' },
+              link: '/app/led-config/',
+            },
+            {
+              label: 'Firmware Updates (OTA)',
+              translations: { de: 'Firmware-Updates (OTA)' },
+              link: '/app/ota/',
+            },
+          ],
         },
         {
           label: 'Modules',
@@ -156,17 +193,6 @@ export default defineConfig({
               label: 'Rear Parking Aid Strip',
               translations: { de: 'Hinteres Einparkhilfe-Band' },
               link: '/modules/rear-led-strip/',
-            },
-          ],
-        },
-        {
-          label: 'Hardware',
-          translations: { de: 'Hardware' },
-          items: [
-            {
-              label: 'Wiring',
-              translations: { de: 'Verkabelung' },
-              link: '/wiring/',
             },
           ],
         },
@@ -204,6 +230,48 @@ export default defineConfig({
               label: 'Ideas & Feature Requests',
               translations: { de: 'Ideen & Feature-Wünsche' },
               link: '/ideas/',
+            },
+          ],
+        },
+        {
+          label: 'Contributing',
+          translations: { de: 'Mitwirken' },
+          collapsed: true,
+          items: [
+            {
+              label: 'Overview',
+              translations: { de: 'Übersicht' },
+              link: '/contributing/',
+            },
+            {
+              label: 'Development Environment',
+              translations: { de: 'Entwicklungsumgebung' },
+              link: '/contributing/environment/',
+            },
+            {
+              label: 'Flutter App',
+              translations: { de: 'Flutter App' },
+              link: '/contributing/flutter-app/',
+            },
+            {
+              label: 'Firmware',
+              translations: { de: 'Firmware' },
+              link: '/contributing/firmware/',
+            },
+            {
+              label: 'Design System',
+              translations: { de: 'Design-System' },
+              link: '/contributing/design-system/',
+            },
+            {
+              label: 'Testing',
+              translations: { de: 'Testen' },
+              link: '/contributing/testing/',
+            },
+            {
+              label: 'CI/CD & Releases',
+              translations: { de: 'CI/CD & Releases' },
+              link: '/contributing/ci-cd/',
             },
           ],
         },
