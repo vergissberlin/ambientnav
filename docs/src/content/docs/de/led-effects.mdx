@@ -1,107 +1,51 @@
 ---
 title: LED-Effekte
-description: Vollständiger Katalog der Navigations- und Einparkhilfe-LED-Effekte für den vorderen und hinteren WS2812B-Streifen — mit Live-CSS-Vorschauen.
+description: Die Lichter von AmbientNav im Überblick — Navigationshinweise vorne, Einparkhilfe hinten.
 ---
 
 import LedEffectsVisualizer from '../../../components/LedEffectsVisualizer.astro';
 
-AmbientNav steuert zwei unabhängige WS2812B LED-Streifen über FastLED. Der vordere Streifen übernimmt Navigation und Blinker-Feedback; der hintere Streifen übernimmt die Einparkhilfe.
+Zwei LED-Streifen arbeiten zusammen: Der vordere Streifen reagiert auf die Navigation, der hintere hilft dir beim sicheren Rückwärtsfahren.
 
 <LedEffectsVisualizer />
 
----
+## Vordere LEDs
 
-## Vorderer Streifen — Navigationseffekte
+Der vordere Streifen passt sich deiner aktuellen Fahrsituation an:
 
-Der vordere Streifen wird vom EffectAgent auf dem vorderen ESP32 gesteuert. Effekte werden durch Navigationsbefehle der iOS App ausgelöst.
+- **Ambient Glow** — keine aktive Navigation, ein ruhiges Atemlicht füllt den Streifen.
+- **Abbiegen links / rechts** — ein Lichtpunkt läuft in die Abbiegungsrichtung, sobald die nächste Abbiegung weniger als 200 m entfernt ist.
+- **Geradeaus** — ein sanfter Puls erscheint in der Mitte des Streifens.
+- **Linker / rechter Blinker** — die entsprechende Hälfte des Streifens blinkt, solange der Blinker gesetzt ist.
+- **Warnblinker** — der gesamte Streifen blinkt, wenn der Warnblinker aktiv ist.
 
-| Effekt-ID | Auslöser | Farbe | Zeitverhalten |
-|---|---|---|---|
-| `NAV_LEFT` | Links abbiegen, Abstand < 200 m | Amber `#FFA500` | Sweep Mitte → linker Rand, 600 ms Zyklus |
-| `NAV_RIGHT` | Rechts abbiegen, Abstand < 200 m | Amber `#FFA500` | Sweep Mitte → rechter Rand, 600 ms Zyklus |
-| `NAV_STRAIGHT` | Geradeaus weiterfahren | Weiß `#FFFFFF` | Einzelner Puls zur Mitte, 800 ms |
-| `INDICATOR_LEFT` | Linker Blinker aktiv | Amber `#FFA500` | Schnelles Blinken, nur linke Hälfte, 400 ms ein/aus |
-| `INDICATOR_RIGHT` | Rechter Blinker aktiv | Amber `#FFA500` | Schnelles Blinken, nur rechte Hälfte, 400 ms ein/aus |
-| `HAZARD` | Warnblinker | Amber `#FFA500` | Gesamter Streifen blinkt, 400 ms ein/aus |
-| `AMBIENT` | Leerlauf / keine Navigation | Konfigurierbar | Langsames Sinus-Atmen, 3 s Periode |
+## Hintere LEDs
 
-### Priorität
+Beim Einlegen des Rückwärtsgangs schaltet der hintere Streifen automatisch in den Einparkmodus:
 
-Wenn die Navigations-App gleichzeitig eine bevorstehende Abbiegung signalisiert und der Blinker aktiv ist, haben `NAV_LEFT` / `NAV_RIGHT` Vorrang vor `INDICATOR_LEFT` / `INDICATOR_RIGHT`, da sie zusätzliche Abstandsinformationen liefern.
+- Drei Zonen — **links**, **mitte**, **rechts** — zeigen je einen Abstandssensor an der Stoßstange an.
+- Ein voller, heller Balken bedeutet: der Weg ist frei.
+- Der Balken wird kürzer und ändert die Farbe, je näher ein Hindernis kommt.
+- Ein kurzer, schnell blinkender Balken bedeutet **stopp** — ein Hindernis ist sehr nah.
 
-### Sweep-Animation
-
-Die `NAV_LEFT`- und `NAV_RIGHT`-Sweeps verwenden einen bewegenden Punkt, der in der Streifenmitte beginnt und zum Rand wandert. Die Punktbreite beträgt 15 % der Gesamt-LED-Anzahl, mit einem weichen Fade-Schweif.
-
-```
-NAV_LEFT:   ████░░░░░░░░░  →  ░░░░░░░░░████
-            Mitte               linker Rand
-```
+Rückwärtsgang rausnehmen und der hintere Streifen kehrt zum ruhigen Atemlicht zurück.
 
 ---
 
-## Hinterer Streifen — Einparkhilfe
+## Schnellstart
 
-Der hintere Streifen ist in drei gleiche Zonen unterteilt, die jeweils unabhängig vom entsprechenden HC-SR04-Sensor gesteuert werden. Die Zonen spiegeln die Hindernisannäherung für links, mitte und rechts wider.
+### 1. App installieren
 
-### Zonenfüllung nach Abstand
+Lade **AmbientNav** aus dem App Store und öffne die App auf deinem iPhone.
 
-| Abstand | Füllgrad | Farbe | Blinken |
-|---|---|---|---|
-| > 150 cm | 100 % | Grün `#00FF00` | Nein |
-| 100–150 cm | 80 % | Gelbgrün `#AAFF00` | Nein |
-| 50–100 cm | 50 % | Amber `#FFA500` | Nein |
-| 20–50 cm | 20 % | Orange `#FF4400` | Nein |
-| < 20 cm | 10 % | Rot `#FF0000` | 200 ms ein/aus |
+### 2. Firmware installieren
 
-### Füllformel
+Folge der [Firmware-Anleitung](/de/flash/), um die Software auf beide Mikrocontroller zu laden — kein Programmieren erforderlich.
 
-Die Zonenfüllung wird pro Sensor unabhängig berechnet:
+### 3. Hardware anschließen
 
-```
-fill = clamp((distance_cm - 20) / 130, 0.1, 1.0)
-```
+Die [Verkabelungsanleitung](/de/wiring/) zeigt Schritt für Schritt, wie LED-Streifen, Abstandssensoren und Stromversorgung angeschlossen werden.
 
-Zuordnung:
-- `Abstand = 150 cm` → `fill = 1,0` (100 %, voller Balken)
-- `Abstand = 20 cm`  → `fill = 0,1` (10 %, minimaler Balken)
-- `Abstand < 20 cm`  → auf `0,1` begrenzt, plus schnelles Blinken
-- `Abstand = 999`    → `fill = 1,0` (kein Hindernis, voller grüner Balken)
+### 4. Einschalten und verbinden
 
-### Zonenlayout
-
-```
-Fahrzeugheck:
-
- Linke Zone           Mittlere Zone         Rechte Zone
-[██████████]         [██████████]          [██████████]
- HC-SR04 L            HC-SR04 M             HC-SR04 R
-```
-
-Jede Zone belegt ein Drittel der Gesamt-LED-Anzahl. Die Zonen sind unabhängig — die mittlere Zone kann kritischen Abstand anzeigen, während die Seitenzonen frei sind.
-
-### Aktivierung des Rückfahrmodus
-
-Der Einparkhilfe-Effekt des hinteren Streifens ist nur aktiv, wenn der vordere ESP32 `{ "cmd": "reverse", "active": true }` sendet. Außerhalb des Rückfahrmodus zeigt der hintere Streifen den `AMBIENT`-Effekt.
-
----
-
-## FastLED Konfiguration
-
-Beide Streifen verwenden WS2812B LEDs mit 5 V und dem 800-kHz-Datenprotokoll.
-
-```cpp
-// Front strip
-#define FRONT_LED_PIN   5
-#define FRONT_LED_COUNT 60
-CRGB frontLeds[FRONT_LED_COUNT];
-FastLED.addLeds<WS2812B, FRONT_LED_PIN, GRB>(frontLeds, FRONT_LED_COUNT).setCorrection(TypicalLEDStrip);
-
-// Rear strip
-#define REAR_LED_PIN    18
-#define REAR_LED_COUNT  60
-CRGB rearLeds[REAR_LED_COUNT];
-FastLED.addLeds<WS2812B, REAR_LED_PIN, GRB>(rearLeds, REAR_LED_COUNT).setCorrection(TypicalLEDStrip);
-```
-
-`FastLED.setBrightness(128)` begrenzt die globale Helligkeit auf 50 %, um innerhalb des 3-A-Leistungsbudgets zu bleiben. Die individuelle Effekthelligkeit wird relativ zu dieser globalen Begrenzung skaliert.
+Stromversorgung anschließen, App starten und auf **Verbinden** tippen, um mit deinem Fahrzeug zu koppeln. Die Lichter gehen automatisch an.
