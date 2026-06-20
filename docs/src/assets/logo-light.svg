@@ -1,6 +1,33 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
-  <g fill="none" stroke="#0B0F18" stroke-width="8.5" stroke-linecap="round" stroke-dasharray="0.1 11.5">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" role="img" aria-label="AmbientNav">
+  <style>
+    /* Ambient "breathing" dot animation — mirrors the design-system brand-logo-animated reference. */
+    @keyframes ambnav-breathe { 0%, 100% { opacity: .3; } 50% { opacity: 1; } }
+    .ambnav-dot { animation: ambnav-breathe 3s ease-in-out infinite; }
+    /* Respect reduced-motion preferences — hold dots at a steady mid opacity. */
+    @media (prefers-reduced-motion: reduce) { .ambnav-dot { animation: none; opacity: .8; } }
+  </style>
+  <!-- Faint background silhouette of the AmbientNav "A" mark -->
+  <g fill="none" stroke="rgba(11,15,24,.1)" stroke-width="8.5" stroke-linecap="round" stroke-dasharray="0.1 11.5">
     <path d="M23 83 L50 17 L77 83"/>
     <path d="M35 59 L65 59"/>
+  </g>
+  <!-- Animated dots — monochrome dark for contrast on light backgrounds, staggered delays -->
+  <g fill="#0B0F18">
+    <circle class="ambnav-dot" cx="23.0" cy="83.0" r="4.25" style="animation-delay:0ms"/>
+    <circle class="ambnav-dot" cx="27.4" cy="72.2" r="4.25" style="animation-delay:187ms"/>
+    <circle class="ambnav-dot" cx="31.8" cy="61.5" r="4.25" style="animation-delay:375ms"/>
+    <circle class="ambnav-dot" cx="36.2" cy="50.8" r="4.25" style="animation-delay:562ms"/>
+    <circle class="ambnav-dot" cx="40.6" cy="40.0" r="4.25" style="animation-delay:750ms"/>
+    <circle class="ambnav-dot" cx="45.0" cy="29.3" r="4.25" style="animation-delay:937ms"/>
+    <circle class="ambnav-dot" cx="49.4" cy="18.5" r="4.25" style="animation-delay:1125ms"/>
+    <circle class="ambnav-dot" cx="53.8" cy="26.2" r="4.25" style="animation-delay:1312ms"/>
+    <circle class="ambnav-dot" cx="58.2" cy="36.9" r="4.25" style="animation-delay:1500ms"/>
+    <circle class="ambnav-dot" cx="62.6" cy="47.7" r="4.25" style="animation-delay:1687ms"/>
+    <circle class="ambnav-dot" cx="66.9" cy="58.4" r="4.25" style="animation-delay:1875ms"/>
+    <circle class="ambnav-dot" cx="71.3" cy="69.2" r="4.25" style="animation-delay:2062ms"/>
+    <circle class="ambnav-dot" cx="75.7" cy="79.9" r="4.25" style="animation-delay:2250ms"/>
+    <circle class="ambnav-dot" cx="35.1" cy="59.0" r="4.25" style="animation-delay:2437ms"/>
+    <circle class="ambnav-dot" cx="46.7" cy="59.0" r="4.25" style="animation-delay:2625ms"/>
+    <circle class="ambnav-dot" cx="58.3" cy="59.0" r="4.25" style="animation-delay:2812ms"/>
   </g>
 </svg>
