@@ -1,0 +1,37 @@
+name: "❓ Question / Support"
+description: Ask a question about setup, hardware, or usage
+title: "[Question]: "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before asking, please check the [documentation](https://vergissberlin.github.io/ambientnav/)
+        and existing [issues](https://github.com/vergissberlin/ambientnav/issues?q=is%3Aissue).
+
+  - type: dropdown
+    id: topic
+    attributes:
+      label: Topic / Thema
+      options:
+        - "Hardware & Wiring / Verkabelung"
+        - "Firmware & Flashing"
+        - "iOS App"
+        - "LED Effects / LED-Effekte"
+        - "Configuration / Konfiguration"
+        - "Other / Sonstiges"
+    validations:
+      required: true
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question / Deine Frage
+    validations:
+      required: true
+
+  - type: textarea
+    id: tried
+    attributes:
+      label: What have you tried? / Was hast du bereits versucht?
+      placeholder: Links to docs you've read, things you've already attempted, etc.
