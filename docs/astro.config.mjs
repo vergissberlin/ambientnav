@@ -42,6 +42,9 @@ function buildVersionSidebar(tag) {
 }
 
 // Read all git tags, filter to ambientnav releases, sort descending.
+// Only include versions that have a corresponding content directory — starlight-versions
+// only allows one "new" (no content dir) version at a time, so skip any that aren't ready.
+const docsDir = join(__dirname, 'src/content/docs');
 const previousVersions = execSync('git tag --sort=-version:refname', { encoding: 'utf-8' })
   .trim()
   .split('\n')
@@ -51,6 +54,7 @@ const previousVersions = execSync('git tag --sort=-version:refname', { encoding:
     const label = `v${major}.${minor}.${patch}`;
     if (label === `v${version}`) return acc; // skip current version
     const slug = `${major}.${minor}`;
+    if (!existsSync(join(docsDir, slug))) return acc; // skip versions without content dir
     const jsonPath = join(__dirname, `src/content/versions/${slug}.json`);
     if (!existsSync(jsonPath)) {
       writeFileSync(jsonPath, JSON.stringify(buildVersionSidebar(tag), null, 2) + '\n');
@@ -61,10 +65,12 @@ const previousVersions = execSync('git tag --sort=-version:refname', { encoding:
 
 // Fallback: wenn keine Git-Tags vorhanden sind (z. B. in CI/Remote-Umgebungen),
 // werden vorhandene JSON-Dateien im versions/-Verzeichnis als Versionsquellen genutzt.
+// Auch hier werden nur Versionen mit vorhandenem Content-Verzeichnis berücksichtigt.
 if (previousVersions.length === 0) {
   const versionsDir = join(__dirname, 'src/content/versions');
   readdirSync(versionsDir)
     .filter(f => /^\d+\.\d+\.json$/.test(f))
+    .filter(f => existsSync(join(docsDir, f.replace('.json', '')))) // nur wenn Content-Verzeichnis existiert
     .sort((a, b) => b.localeCompare(a, undefined, { numeric: true }))
     .forEach(f => {
       const slug = f.replace('.json', '');

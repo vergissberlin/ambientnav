@@ -6,6 +6,10 @@ on:
     paths:
       - 'docs/**'
       - 'package.json'
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'package.json'
 
 permissions:
   contents: read
@@ -41,13 +45,16 @@ jobs:
         working-directory: docs
 
       - uses: actions/configure-pages@v4
+        if: github.event_name != 'pull_request'
 
       - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request'
         with:
           path: docs/dist
 
   deploy:
     needs: build
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
