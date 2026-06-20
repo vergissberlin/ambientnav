@@ -220,7 +220,7 @@ pre {
 
 /* --- Sidebar --- */
 .sidebar-pane {
-  border-right: 1px solid var(--amb-line);
+  border-right: 1px solid var(--sl-color-hairline);
 }
 
 /* Active link: cyan left-bar indicator */
@@ -244,7 +244,7 @@ pre {
 
 /* --- Header / top nav --- */
 header.header {
-  border-bottom: 1px solid var(--amb-line);
+  border-bottom: 1px solid var(--sl-color-hairline);
   backdrop-filter: blur(12px);
 }
 
@@ -263,7 +263,7 @@ header.header {
 
 /* Horizontal rules */
 .sl-markdown-content hr {
-  border-color: var(--amb-line);
+  border-color: var(--sl-color-hairline);
 }
 
 /* Blockquotes: violet left-bar (secondary signal) */
@@ -312,18 +312,18 @@ header.header {
   width: 100%;
 }
 .sl-markdown-content th {
-  background: var(--amb-surface-3);
+  background: var(--sl-color-gray-5);
   font-family: var(--font-mono);
   font-size: 0.75rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--amb-text-3);
+  color: var(--sl-color-gray-2);
   padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid var(--amb-line-strong);
+  border-bottom: 1px solid var(--sl-color-hairline-shade);
 }
 .sl-markdown-content td {
   padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid var(--amb-line);
+  border-bottom: 1px solid var(--sl-color-hairline);
 }
 .sl-markdown-content tr:hover td {
   background: rgba(255, 255, 255, .02);
@@ -367,11 +367,14 @@ header.header {
   color: var(--amb-magenta);
 }
 
-/* --- Pagination links --- */
+/* --- Pagination links ---
+   Theme-aware surface + hairline so the prev/next cards stay readable
+   in light mode (link titles use --sl-color-white, which flips to near
+   black — they must sit on a light surface there, not a dark one). */
 .pagination-links a {
-  border: 1px solid var(--amb-line-strong);
+  border: 1px solid var(--sl-color-hairline-shade);
   border-radius: var(--radius-md);
-  background: var(--amb-surface-2);
+  background: var(--sl-color-gray-6);
   transition:
     border-color var(--dur-base) var(--ease-glow),
     box-shadow var(--dur-base) var(--ease-glow);
@@ -383,15 +386,15 @@ header.header {
 
 /* --- Search dialog --- */
 site-search dialog {
-  background: var(--amb-surface);
-  border: 1px solid var(--amb-line-strong);
+  background: var(--sl-color-gray-7);
+  border: 1px solid var(--sl-color-hairline-shade);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-raised);
 }
 site-search input {
-  background: var(--amb-cockpit);
-  border-color: var(--amb-line-strong);
-  color: var(--amb-text);
+  background: var(--sl-color-black);
+  border-color: var(--sl-color-hairline-shade);
+  color: var(--sl-color-text);
   border-radius: var(--radius-sm);
 }
 site-search input:focus {
@@ -425,14 +428,15 @@ site-search input:focus {
   transform: translateY(-1px);
 }
 
-/* Ghost (secondary) hero button */
+/* Ghost (secondary) hero button — theme-aware so the label stays legible
+   on the light splash background (was a fixed pale grey on white). */
 .hero a[data-variant='minimal'] {
-  color: var(--amb-text-2);
-  border-color: var(--amb-line-strong);
+  color: var(--sl-color-text);
+  border-color: var(--sl-color-hairline-shade);
 }
 .hero a[data-variant='minimal']:hover {
-  color: var(--amb-text);
-  border-color: var(--amb-cyan);
+  color: var(--sl-color-white);
+  border-color: var(--sl-color-text-accent);
 }
 
 /* --- Table of contents --- */
@@ -507,4 +511,19 @@ starlight-toc nav a[aria-current='true'] {
 [data-theme='light'] site-search input:focus {
   outline-color: #0096B0;
   box-shadow: 0 0 0 3px rgba(0, 150, 176, .2);
+}
+
+/* Table row hover: the dark-mode white tint is invisible on light,
+   so use a faint dark tint instead. */
+[data-theme='light'] .sl-markdown-content tr:hover td {
+  background: rgba(0, 0, 0, .03);
+}
+
+/* Primary hero button: trade the cyan bloom for a soft drop shadow on
+   light backgrounds, where the glow reads as an unwanted halo. */
+[data-theme='light'] .hero a[data-variant='primary'] {
+  box-shadow: 0 4px 14px rgba(0, 150, 176, .25);
+}
+[data-theme='light'] .hero a[data-variant='primary']:hover {
+  box-shadow: 0 6px 20px rgba(0, 150, 176, .35);
 }
