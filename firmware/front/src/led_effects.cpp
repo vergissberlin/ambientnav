@@ -14,54 +14,47 @@ static void renderAmbient(uint32_t elapsed) {
 }
 
 static void renderNavWave(EffectType dir, uint32_t elapsed) {
-    const int   center     = FRONT_LED_COUNT / 2;
-    const float CYCLE_MS   = 1100.0f;
-    const float SWEEP_FRAC = 0.72f;  // 0–72 % sequential fill, rest = fade-out
+    const float CYCLE_MS  = 1050.0f;
+    const float SLIDE_END = 0.78f;   // 0–78 % slide, rest = fade-out
+    const float BAR_HALF  = 9.0f;    // soft half-width in LEDs (cosine window)
 
-    float phase   = fmodf((float)elapsed, CYCLE_MS) / CYCLE_MS;
-    int   halfLen = center;
+    float phase  = fmodf((float)elapsed, CYCLE_MS) / CYCLE_MS;
+    float fCenter = (float)(FRONT_LED_COUNT / 2);
+    float edge    = (dir == EFF_NAV_LEFT) ? 0.0f : (float)(FRONT_LED_COUNT - 1);
+
+    float barPos, masterFade;
+    if (phase < SLIDE_END) {
+        float t       = phase / SLIDE_END;
+        float smoothT = t * t * (3.0f - 2.0f * t);  // smoothstep ease-in-out
+        barPos     = fCenter + smoothT * (edge - fCenter);
+        masterFade = 1.0f;
+    } else {
+        float t    = (phase - SLIDE_END) / (1.0f - SLIDE_END);
+        barPos     = edge;
+        masterFade = (1.0f - t) * (1.0f - t);  // quadratic fade-out
+    }
 
     fill_solid(leds, FRONT_LED_COUNT, CRGB::Black);
 
-    // Paint one LED with position-based color and a master brightness factor.
-    // posNorm 0 = closest to center, 1 = outermost LED.
-    auto paint = [&](int idx, float posNorm, float masterFade) {
-        // Amber (255,160,0) → deep orange (255,90,0) toward the edge
-        float g      = 160.0f - 70.0f * posNorm;
-        // Subtle organic ripple so adjacent LEDs are never identically bright
-        float ripple = 0.88f + 0.12f * sinf(posNorm * M_PI * 4.0f + elapsed * 0.003f);
-        float bright = masterFade * ripple;
-        leds[idx] = CRGB(
-            (uint8_t)(255.0f * bright),
-            (uint8_t)(g      * bright),
-            0
+    for (int i = 0; i < FRONT_LED_COUNT; i++) {
+        float dist = fabsf((float)i - barPos);
+        if (dist >= BAR_HALF) continue;
+
+        // Cosine window: 1.0 at bar centre, 0.0 at bar edge
+        float cosT     = dist / BAR_HALF;           // 0 = centre, 1 = edge
+        float envelope = 0.5f * (1.0f + cosf(M_PI * cosT));
+
+        // Color: purple (120,0,220) at bar centre → pink (255,80,185) at bar edge
+        float r = 120.0f + 135.0f * cosT;
+        float g =           80.0f * cosT;
+        float b = 220.0f -  35.0f * cosT;
+
+        float bright = envelope * masterFade;
+        leds[i] = CRGB(
+            (uint8_t)(r * bright),
+            (uint8_t)(g * bright),
+            (uint8_t)(b * bright)
         );
-    };
-
-    if (phase < SWEEP_FRAC) {
-        // Sequential fill: LEDs light up one by one from center to edge
-        float sweepProgress = phase / SWEEP_FRAC;
-        int   litCount      = max(1, (int)(sweepProgress * halfLen));
-
-        for (int i = 0; i < litCount; i++) {
-            float posNorm = (float)i / (halfLen - 1);
-            // Trailing LEDs are slightly dimmer; wave-front LED is always full
-            float fade = (i == litCount - 1) ? 1.0f : (0.60f + 0.40f * (float)i / litCount);
-            int   idx  = (dir == EFF_NAV_LEFT) ? (center - 1 - i) : (center + i);
-            idx = constrain(idx, 0, FRONT_LED_COUNT - 1);
-            paint(idx, posNorm, fade);
-        }
-    } else {
-        // Whole active half fades out smoothly (quadratic ease-out)
-        float t          = (phase - SWEEP_FRAC) / (1.0f - SWEEP_FRAC);
-        float masterFade = (1.0f - t) * (1.0f - t);
-
-        for (int i = 0; i < halfLen; i++) {
-            float posNorm = (float)i / (halfLen - 1);
-            int   idx     = (dir == EFF_NAV_LEFT) ? (center - 1 - i) : (center + i);
-            idx = constrain(idx, 0, FRONT_LED_COUNT - 1);
-            paint(idx, posNorm, masterFade);
-        }
     }
 }
 
