@@ -64,10 +64,9 @@ export default defineConfig({
         replacesTitle: false,
       },
       plugins: [
-        starlightVersions({
-          versions: previousVersions,
-          current: { label: `v${version}` },
-        }),
+        ...(previousVersions.length > 0
+          ? [starlightVersions({ versions: previousVersions, current: { label: `v${version}` } })]
+          : []),
       ],
       social: [
         { icon: 'github', label: 'GitHub', href: 'https://github.com/vergissberlin/ambientnav' },
