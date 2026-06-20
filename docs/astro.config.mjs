@@ -11,22 +11,30 @@ import { unified } from '@astrojs/markdown-remark';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const { version } = JSON.parse(readFileSync(join(__dirname, '../package.json'), 'utf-8'));
 
-// Derive the default sidebar structure used as fallback for auto-generated version files.
-const defaultVersionSidebar = {
-  sidebar: [
-    { label: 'Getting Started', translations: { de: 'Erste Schritte' }, link: '/getting-started/' },
-    { label: 'Flash Firmware', translations: { de: 'Firmware flashen' }, link: '/flash/' },
-    { label: 'Hardware', translations: { de: 'Hardware' }, items: [
-      { label: 'Wiring', translations: { de: 'Verkabelung' }, link: '/wiring/' },
-    ]},
-    { label: 'Reference', translations: { de: 'Referenz' }, items: [
-      { label: 'Architecture', translations: { de: 'Architektur' }, link: '/architecture/' },
-      { label: 'Agents', translations: { de: 'Agenten' }, link: '/agents/' },
-      { label: 'Protocols', translations: { de: 'Protokolle' }, link: '/protocols/' },
-      { label: 'LED Effects', translations: { de: 'LED-Effekte' }, link: '/led-effects/' },
-    ]},
-  ],
-};
+// Build the default sidebar for a given version, including a GitHub release notes link.
+function buildVersionSidebar(tag) {
+  return {
+    sidebar: [
+      {
+        label: 'Release Notes',
+        translations: { de: 'Versionshinweise' },
+        link: `https://github.com/vergissberlin/ambientnav/releases/tag/${tag}`,
+        attrs: { target: '_blank', rel: 'noopener noreferrer' },
+      },
+      { label: 'Getting Started', translations: { de: 'Erste Schritte' }, link: '/getting-started/' },
+      { label: 'Flash Firmware', translations: { de: 'Firmware flashen' }, link: '/flash/' },
+      { label: 'Hardware', translations: { de: 'Hardware' }, items: [
+        { label: 'Wiring', translations: { de: 'Verkabelung' }, link: '/wiring/' },
+      ]},
+      { label: 'Reference', translations: { de: 'Referenz' }, items: [
+        { label: 'Architecture', translations: { de: 'Architektur' }, link: '/architecture/' },
+        { label: 'Agents', translations: { de: 'Agenten' }, link: '/agents/' },
+        { label: 'Protocols', translations: { de: 'Protokolle' }, link: '/protocols/' },
+        { label: 'LED Effects', translations: { de: 'LED-Effekte' }, link: '/led-effects/' },
+      ]},
+    ],
+  };
+}
 
 // Read all git tags, filter to ambientnav releases, sort descending.
 const previousVersions = execSync('git tag --sort=-version:refname', { encoding: 'utf-8' })
@@ -40,7 +48,7 @@ const previousVersions = execSync('git tag --sort=-version:refname', { encoding:
     const slug = `${major}.${minor}`;
     const jsonPath = join(__dirname, `src/content/versions/${slug}.json`);
     if (!existsSync(jsonPath)) {
-      writeFileSync(jsonPath, JSON.stringify(defaultVersionSidebar, null, 2) + '\n');
+      writeFileSync(jsonPath, JSON.stringify(buildVersionSidebar(tag), null, 2) + '\n');
     }
     acc.push({ slug, label });
     return acc;
@@ -64,10 +72,9 @@ export default defineConfig({
         replacesTitle: false,
       },
       plugins: [
-        starlightVersions({
-          versions: previousVersions,
-          current: { label: `v${version}` },
-        }),
+        ...(previousVersions.length > 0
+          ? [starlightVersions({ versions: previousVersions, current: { label: `v${version}` } })]
+          : []),
       ],
       social: [
         { icon: 'github', label: 'GitHub', href: 'https://github.com/vergissberlin/ambientnav' },
@@ -81,6 +88,12 @@ export default defineConfig({
         de: { label: 'Deutsch', lang: 'de' },
       },
       sidebar: [
+        {
+          label: 'Release Notes',
+          translations: { de: 'Versionshinweise' },
+          link: `https://github.com/vergissberlin/ambientnav/releases/tag/ambientnav-v${version}`,
+          attrs: { target: '_blank', rel: 'noopener noreferrer' },
+        },
         {
           label: 'Getting Started',
           translations: { de: 'Erste Schritte' },

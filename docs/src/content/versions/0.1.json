@@ -1,6 +1,17 @@
 {
   "sidebar": [
     {
+      "label": "Release Notes",
+      "translations": {
+        "de": "Versionshinweise"
+      },
+      "link": "https://github.com/vergissberlin/ambientnav/releases/tag/ambientnav-v0.1.0",
+      "attrs": {
+        "target": "_blank",
+        "rel": "noopener noreferrer"
+      }
+    },
+    {
       "label": "Getting Started",
       "translations": {
         "de": "Erste Schritte"
