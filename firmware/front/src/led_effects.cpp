@@ -13,27 +13,55 @@ static void renderAmbient(uint32_t elapsed) {
     fill_solid(leds, FRONT_LED_COUNT, CRGB(val, val, val));
 }
 
-static void renderNavSweep(EffectType dir, uint32_t elapsed) {
-    fill_solid(leds, FRONT_LED_COUNT, CRGB::Black);
-    float phase  = fmodf((float)elapsed, 600.0f) / 600.0f;  // 0.0–1.0 per cycle
-    int   center = FRONT_LED_COUNT / 2;
-    int   head;
-    if (dir == EFF_NAV_LEFT) {
-        head = center - (int)(phase * center);
-    } else {
-        head = center + (int)(phase * center);
-    }
-    head = constrain(head, 0, FRONT_LED_COUNT - 1);
+static void renderNavWave(EffectType dir, uint32_t elapsed) {
+    const int   center     = FRONT_LED_COUNT / 2;
+    const float CYCLE_MS   = 1100.0f;
+    const float SWEEP_FRAC = 0.72f;  // 0–72 % sequential fill, rest = fade-out
 
-    // 9-pixel dot with 5-pixel trailing fade
-    static const CRGB amber = CRGB(255, 160, 0);
-    for (int i = -4; i <= 4; i++) {
-        int idx = head + i;
-        if (idx < 0 || idx >= FRONT_LED_COUNT) continue;
-        uint8_t fade = 255 - (uint8_t)(abs(i) * 30);
-        leds[idx] = CRGB((uint8_t)(amber.r * fade / 255),
-                         (uint8_t)(amber.g * fade / 255),
-                         (uint8_t)(amber.b * fade / 255));
+    float phase   = fmodf((float)elapsed, CYCLE_MS) / CYCLE_MS;
+    int   halfLen = center;
+
+    fill_solid(leds, FRONT_LED_COUNT, CRGB::Black);
+
+    // Paint one LED with position-based color and a master brightness factor.
+    // posNorm 0 = closest to center, 1 = outermost LED.
+    auto paint = [&](int idx, float posNorm, float masterFade) {
+        // Amber (255,160,0) → deep orange (255,90,0) toward the edge
+        float g      = 160.0f - 70.0f * posNorm;
+        // Subtle organic ripple so adjacent LEDs are never identically bright
+        float ripple = 0.88f + 0.12f * sinf(posNorm * M_PI * 4.0f + elapsed * 0.003f);
+        float bright = masterFade * ripple;
+        leds[idx] = CRGB(
+            (uint8_t)(255.0f * bright),
+            (uint8_t)(g      * bright),
+            0
+        );
+    };
+
+    if (phase < SWEEP_FRAC) {
+        // Sequential fill: LEDs light up one by one from center to edge
+        float sweepProgress = phase / SWEEP_FRAC;
+        int   litCount      = max(1, (int)(sweepProgress * halfLen));
+
+        for (int i = 0; i < litCount; i++) {
+            float posNorm = (float)i / (halfLen - 1);
+            // Trailing LEDs are slightly dimmer; wave-front LED is always full
+            float fade = (i == litCount - 1) ? 1.0f : (0.60f + 0.40f * (float)i / litCount);
+            int   idx  = (dir == EFF_NAV_LEFT) ? (center - 1 - i) : (center + i);
+            idx = constrain(idx, 0, FRONT_LED_COUNT - 1);
+            paint(idx, posNorm, fade);
+        }
+    } else {
+        // Whole active half fades out smoothly (quadratic ease-out)
+        float t          = (phase - SWEEP_FRAC) / (1.0f - SWEEP_FRAC);
+        float masterFade = (1.0f - t) * (1.0f - t);
+
+        for (int i = 0; i < halfLen; i++) {
+            float posNorm = (float)i / (halfLen - 1);
+            int   idx     = (dir == EFF_NAV_LEFT) ? (center - 1 - i) : (center + i);
+            idx = constrain(idx, 0, FRONT_LED_COUNT - 1);
+            paint(idx, posNorm, masterFade);
+        }
     }
 }
 
@@ -91,8 +119,8 @@ void taskLEDFront(void* param) {
 
         switch (cmd.type) {
             case EFF_AMBIENT:       renderAmbient(elapsed);              break;
-            case EFF_NAV_LEFT:      renderNavSweep(EFF_NAV_LEFT,  elapsed); break;
-            case EFF_NAV_RIGHT:     renderNavSweep(EFF_NAV_RIGHT, elapsed); break;
+            case EFF_NAV_LEFT:      renderNavWave(EFF_NAV_LEFT,  elapsed); break;
+            case EFF_NAV_RIGHT:     renderNavWave(EFF_NAV_RIGHT, elapsed); break;
             case EFF_NAV_STRAIGHT:  renderNavStraight(elapsed);          break;
             case EFF_BLINKER_LEFT:  renderBlinker(EFF_BLINKER_LEFT,  elapsed); break;
             case EFF_BLINKER_RIGHT: renderBlinker(EFF_BLINKER_RIGHT, elapsed); break;
