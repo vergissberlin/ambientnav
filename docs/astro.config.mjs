@@ -146,6 +146,17 @@ export default defineConfig({
             },
           ],
         },
+        {
+          label: 'Community',
+          translations: { de: 'Community' },
+          items: [
+            {
+              label: 'Ideas & Feature Requests',
+              translations: { de: 'Ideen & Feature-Wünsche' },
+              link: '/ideas/',
+            },
+          ],
+        },
       ],
     }),
   ],
