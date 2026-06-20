@@ -1,0 +1,599 @@
+---
+// LED effects visualizer — CSS-animated previews for all front and rear strip effects.
+// Timings match the firmware exactly: front/src/led_effects.cpp, rear/src/led_effects.cpp
+---
+
+<section class="le" aria-label="LED Effects Visualizer">
+
+  <!-- ── Front strip ─────────────────────────────────────────── -->
+  <h3 class="le-heading">Front Strip — Navigation Effects</h3>
+
+  <div class="le-grid">
+
+    <!-- AMBIENT -->
+    <div class="le-card">
+      <div class="le-card-header">
+        <code class="le-id">AMBIENT</code>
+        <span class="le-badge le-badge-white">White · 3 s</span>
+      </div>
+      <div class="le-strip le-seg">
+        <div class="le-fill le-ambient"></div>
+      </div>
+      <p class="le-note">Slow sine-wave breathing · Idle / no navigation active</p>
+    </div>
+
+    <!-- NAV_LEFT -->
+    <div class="le-card">
+      <div class="le-card-header">
+        <code class="le-id">NAV_LEFT</code>
+        <span class="le-badge le-badge-amber">Amber · 600 ms</span>
+      </div>
+      <div class="le-strip le-seg le-clip">
+        <div class="le-fill le-sweep-base le-sweep-left-grad"></div>
+        <div class="le-fill le-sweep-left le-sweep-left-grad"></div>
+      </div>
+      <p class="le-note">Dot sweeps center → left edge · Turn left signal &lt; 200 m</p>
+    </div>
+
+    <!-- NAV_RIGHT -->
+    <div class="le-card">
+      <div class="le-card-header">
+        <code class="le-id">NAV_RIGHT</code>
+        <span class="le-badge le-badge-amber">Amber · 600 ms</span>
+      </div>
+      <div class="le-strip le-seg le-clip">
+        <div class="le-fill le-sweep-base le-sweep-right-grad"></div>
+        <div class="le-fill le-sweep-right le-sweep-right-grad"></div>
+      </div>
+      <p class="le-note">Dot sweeps center → right edge · Turn right signal &lt; 200 m</p>
+    </div>
+
+    <!-- NAV_STRAIGHT -->
+    <div class="le-card">
+      <div class="le-card-header">
+        <code class="le-id">NAV_STRAIGHT</code>
+        <span class="le-badge le-badge-white">White · 800 ms</span>
+      </div>
+      <div class="le-strip le-seg">
+        <div class="le-fill le-straight"></div>
+      </div>
+      <p class="le-note">Center pulse · Continue straight ahead</p>
+    </div>
+
+    <!-- BLINKER_LEFT -->
+    <div class="le-card">
+      <div class="le-card-header">
+        <code class="le-id">BLINKER_LEFT</code>
+        <span class="le-badge le-badge-amber">Amber · 400 ms</span>
+      </div>
+      <div class="le-strip le-seg le-clip">
+        <div class="le-fill le-half-left le-blink"></div>
+      </div>
+      <p class="le-note">Left half blinks · Left indicator active</p>
+    </div>
+
+    <!-- BLINKER_RIGHT -->
+    <div class="le-card">
+      <div class="le-card-header">
+        <code class="le-id">BLINKER_RIGHT</code>
+        <span class="le-badge le-badge-amber">Amber · 400 ms</span>
+      </div>
+      <div class="le-strip le-seg le-clip">
+        <div class="le-fill le-half-right le-blink"></div>
+      </div>
+      <p class="le-note">Right half blinks · Right indicator active</p>
+    </div>
+
+    <!-- HAZARD -->
+    <div class="le-card">
+      <div class="le-card-header">
+        <code class="le-id">HAZARD</code>
+        <span class="le-badge le-badge-amber">Amber · 400 ms</span>
+      </div>
+      <div class="le-strip le-seg">
+        <div class="le-fill le-hazard le-blink"></div>
+      </div>
+      <p class="le-note">Full strip blinks · Hazard lights active</p>
+    </div>
+
+  </div><!-- /le-grid -->
+
+  <!-- ── Rear strip ──────────────────────────────────────────── -->
+  <h3 class="le-heading le-heading-rear">Rear Strip — Parking Aid</h3>
+  <p class="le-intro">Three independent zones, one per HC-SR04 sensor. Fill and color react to obstacle distance in real time. Active only when reverse gear is engaged.</p>
+
+  <div class="le-rear-layout">
+
+    <div class="le-zones" id="leZones">
+      <div class="le-zone-row">
+        <span class="le-zone-tag">Left</span>
+        <div class="le-strip le-seg le-clip le-strip-rear">
+          <div class="le-zone-bar" id="leZone0"></div>
+        </div>
+        <span class="le-zone-dist" id="leDist0">—</span>
+      </div>
+      <div class="le-zone-row">
+        <span class="le-zone-tag">Center</span>
+        <div class="le-strip le-seg le-clip le-strip-rear">
+          <div class="le-zone-bar" id="leZone1"></div>
+        </div>
+        <span class="le-zone-dist" id="leDist1">—</span>
+      </div>
+      <div class="le-zone-row">
+        <span class="le-zone-tag">Right</span>
+        <div class="le-strip le-seg le-clip le-strip-rear">
+          <div class="le-zone-bar" id="leZone2"></div>
+        </div>
+        <span class="le-zone-dist" id="leDist2">—</span>
+      </div>
+    </div>
+
+    <div class="le-legend">
+      <div class="le-legend-title">Distance → Color</div>
+      <div class="le-legend-row">
+        <span class="le-swatch" style="background:#00FF00"></span>
+        <span class="le-legend-range">&gt; 150 cm</span>
+        <span class="le-legend-detail">Green · 100 % fill</span>
+      </div>
+      <div class="le-legend-row">
+        <span class="le-swatch" style="background:#AAFF00"></span>
+        <span class="le-legend-range">100–150 cm</span>
+        <span class="le-legend-detail">Yellow-green · 80 %</span>
+      </div>
+      <div class="le-legend-row">
+        <span class="le-swatch" style="background:#FFA500"></span>
+        <span class="le-legend-range">50–100 cm</span>
+        <span class="le-legend-detail">Amber · 50 %</span>
+      </div>
+      <div class="le-legend-row">
+        <span class="le-swatch" style="background:#FF4400"></span>
+        <span class="le-legend-range">20–50 cm</span>
+        <span class="le-legend-detail">Orange · 20 %</span>
+      </div>
+      <div class="le-legend-row">
+        <span class="le-swatch" style="background:#FF0000"></span>
+        <span class="le-legend-range">&lt; 20 cm</span>
+        <span class="le-legend-detail">Red · 10 % · blink 200 ms</span>
+      </div>
+    </div>
+
+  </div><!-- /le-rear-layout -->
+
+</section>
+
+<script>
+  const STATES = [
+    { label: '> 150 cm', color: '#00FF00', glow: 'rgba(0,255,0,.55)',   fill: 1.00, blink: false },
+    { label: '120 cm',   color: '#AAFF00', glow: 'rgba(170,255,0,.5)',  fill: 0.80, blink: false },
+    { label: '75 cm',    color: '#FFA500', glow: 'rgba(255,165,0,.5)',  fill: 0.50, blink: false },
+    { label: '35 cm',    color: '#FF4400', glow: 'rgba(255,68,0,.5)',   fill: 0.20, blink: false },
+    { label: '10 cm',    color: '#FF0000', glow: 'rgba(255,0,0,.6)',    fill: 0.10, blink: true  },
+  ];
+
+  // Each zone starts at a different state so all distances are visible simultaneously
+  const ZONE_OFFSETS = [0, 2, 4];
+  const HOLD_MS = 2800;
+
+  let step = 0;
+  let timer: ReturnType<typeof setTimeout> | null = null;
+
+  function renderZone(zoneIdx: number, stateIdx: number) {
+    const bar  = document.getElementById(`leZone${zoneIdx}`);
+    const dist = document.getElementById(`leDist${zoneIdx}`);
+    if (!bar || !dist) return;
+
+    const s = STATES[stateIdx % STATES.length];
+    bar.style.width      = `${s.fill * 100}%`;
+    bar.style.background = s.color;
+    bar.style.boxShadow  = `0 0 14px ${s.glow}`;
+    bar.style.opacity    = '1';
+
+    if (s.blink) {
+      bar.classList.add('le-zone-blink');
+    } else {
+      bar.classList.remove('le-zone-blink');
+    }
+
+    dist.textContent   = s.label;
+    (dist as HTMLElement).style.color = s.color;
+  }
+
+  function tick() {
+    for (let z = 0; z < 3; z++) {
+      renderZone(z, (step + ZONE_OFFSETS[z]) % STATES.length);
+    }
+    step = (step + 1) % STATES.length;
+    timer = setTimeout(tick, HOLD_MS);
+  }
+
+  function init() {
+    if (timer) clearTimeout(timer);
+    step = 0;
+    tick();
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+  document.addEventListener('astro:after-swap', init);
+  if (document.readyState !== 'loading') init();
+</script>
+
+<style>
+  /* ── Layout ──────────────────────────────────────────────────────── */
+  .le {
+    margin: 1.5rem 0 2.5rem;
+  }
+
+  .le-heading {
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    color: var(--sl-color-text-accent, var(--amb-text-2, #C7CEDC));
+    margin: 2rem 0 0.8rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--amb-line, rgba(255,255,255,.08));
+    text-transform: uppercase;
+  }
+  .le-heading-rear { margin-top: 2.5rem; }
+
+  .le-intro {
+    margin: 0 0 1rem;
+    font-size: 0.82rem;
+    color: var(--amb-text-4, #6B7488);
+    line-height: 1.55;
+  }
+
+  /* ── Card grid ───────────────────────────────────────────────────── */
+  .le-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 0.85rem;
+  }
+
+  .le-card {
+    background: var(--amb-surface, #0B0F18);
+    border: 1px solid var(--amb-line, rgba(255,255,255,.08));
+    border-radius: 12px;
+    padding: 1rem 1rem 0.85rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    transition: border-color 200ms;
+  }
+  .le-card:hover {
+    border-color: var(--amb-line-strong, rgba(255,255,255,.18));
+  }
+
+  .le-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.4rem;
+  }
+
+  .le-id {
+    font-family: var(--font-mono, "IBM Plex Mono", monospace);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--amb-cyan, #19E3FF);
+    background: rgba(25,227,255,.07);
+    border: 1px solid rgba(25,227,255,.18);
+    padding: 0.18em 0.55em;
+    border-radius: 5px;
+  }
+
+  .le-badge {
+    font-family: var(--font-mono, "IBM Plex Mono", monospace);
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    padding: 0.18em 0.6em;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .le-badge-amber {
+    color: #FFA000;
+    background: rgba(255,160,0,.10);
+    border: 1px solid rgba(255,160,0,.22);
+  }
+  .le-badge-white {
+    color: #b8c4d8;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.13);
+  }
+
+  .le-note {
+    margin: 0;
+    font-size: 0.76rem;
+    color: var(--amb-text-4, #6B7488);
+    line-height: 1.5;
+  }
+
+  /* ── LED strip ───────────────────────────────────────────────────── */
+  .le-strip {
+    height: 12px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.03);
+    border: 1px solid var(--amb-line, rgba(255,255,255,.08));
+    position: relative;
+  }
+
+  /* Segmented LED look — 60 LEDs with 1px gaps */
+  .le-seg {
+    mask-image: repeating-linear-gradient(
+      90deg,
+      #000 0px,
+      #000 calc(100% / 60 - 1px),
+      transparent calc(100% / 60 - 1px),
+      transparent calc(100% / 60)
+    );
+  }
+
+  .le-clip { overflow: hidden; }
+
+  .le-strip-rear { height: 14px; }
+
+  /* ── Fill layers (absolute, cover the strip) ─────────────────────── */
+  .le-fill {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+
+  /* AMBIENT: dim white breathing (sine-wave, 3 s period) */
+  .le-ambient {
+    background: rgba(210,240,255,.70);
+    animation: le-breathe 3000ms ease-in-out infinite;
+  }
+
+  /* NAV_STRAIGHT: white center pulse (800 ms sine) */
+  .le-straight {
+    background: radial-gradient(ellipse 38% 100% at 50% 50%,
+      rgba(255,255,255,.96) 0%,
+      rgba(200,248,255,.55) 45%,
+      transparent 72%);
+    animation: le-breathe 800ms ease-in-out infinite;
+  }
+
+  /* HAZARD: full amber bar (blink handled by le-blink) */
+  .le-hazard {
+    background: rgba(255,160,0,.92);
+    box-shadow: 0 0 18px rgba(255,160,0,.55);
+  }
+
+  /* ── Sweep (NAV_LEFT / NAV_RIGHT) ────────────────────────────────── */
+  /*
+   * Two layers: a faint base showing the "resting" dot at center,
+   * and an animated bright dot that sweeps toward the edge.
+   * The strip's overflow:hidden clips the dot at boundaries.
+   */
+  .le-sweep-left-grad {
+    background: linear-gradient(90deg,
+      rgba(255,160,0,.0) 0%,
+      rgba(255,160,0,.9) 12%,
+      rgba(255,160,0,.55) 35%,
+      rgba(255,160,0,.0) 60%
+    );
+  }
+  .le-sweep-right-grad {
+    background: linear-gradient(90deg,
+      rgba(255,160,0,.0) 40%,
+      rgba(255,160,0,.55) 65%,
+      rgba(255,160,0,.9) 88%,
+      rgba(255,160,0,.0) 100%
+    );
+  }
+
+  /* Base layer — dim, static hint at center */
+  .le-sweep-base {
+    opacity: 0.18;
+    background-position: center;
+  }
+
+  /* Animated layer — bright, moves from center toward edge */
+  .le-sweep-left {
+    animation: le-sweep-l 600ms linear infinite;
+  }
+  .le-sweep-right {
+    animation: le-sweep-r 600ms linear infinite;
+  }
+
+  /* ── Blinker halves ──────────────────────────────────────────────── */
+  .le-half-left {
+    left: 0;
+    right: 50%;
+    background: rgba(255,160,0,.92);
+    box-shadow: 0 0 14px rgba(255,160,0,.55);
+  }
+  .le-half-right {
+    left: 50%;
+    right: 0;
+    background: rgba(255,160,0,.92);
+    box-shadow: 0 0 14px rgba(255,160,0,.55);
+  }
+
+  /* Blink: step animation for exact on/off (400 ms period, 50 % duty) */
+  .le-blink {
+    animation: le-blink 400ms steps(1) infinite;
+  }
+
+  /* ── Rear zones ──────────────────────────────────────────────────── */
+  .le-rear-layout {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .le-zones {
+    flex: 1;
+    min-width: 220px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .le-zone-row {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
+  .le-zone-tag {
+    font-family: var(--font-mono, "IBM Plex Mono", monospace);
+    font-size: 0.66rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--amb-text-4, #6B7488);
+    width: 3.8rem;
+    flex-shrink: 0;
+  }
+
+  .le-zone-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    border-radius: inherit;
+    width: 0;
+    transition: width 600ms ease-in-out, background 600ms ease-in-out, box-shadow 600ms ease-in-out;
+  }
+
+  .le-zone-blink {
+    animation: le-blink 200ms steps(1) infinite;
+  }
+
+  .le-zone-dist {
+    font-family: var(--font-mono, "IBM Plex Mono", monospace);
+    font-size: 0.68rem;
+    font-weight: 500;
+    min-width: 4.5rem;
+    color: var(--amb-text-4, #6B7488);
+    transition: color 400ms;
+  }
+
+  /* ── Legend ──────────────────────────────────────────────────────── */
+  .le-legend {
+    background: var(--amb-surface, #0B0F18);
+    border: 1px solid var(--amb-line, rgba(255,255,255,.08));
+    border-radius: 12px;
+    padding: 0.85rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    flex-shrink: 0;
+  }
+
+  .le-legend-title {
+    font-family: var(--font-mono, "IBM Plex Mono", monospace);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--amb-text-4, #6B7488);
+    margin-bottom: 0.25rem;
+  }
+
+  .le-legend-row {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-family: var(--font-mono, "IBM Plex Mono", monospace);
+    font-size: 0.72rem;
+    color: var(--amb-text-2, #C7CEDC);
+  }
+
+  .le-swatch {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    box-shadow: 0 0 6px currentColor;
+  }
+
+  .le-legend-range {
+    width: 6rem;
+    flex-shrink: 0;
+  }
+
+  .le-legend-detail {
+    color: var(--amb-text-4, #6B7488);
+    font-size: 0.68rem;
+  }
+
+  /* ── Light-mode adjustments ──────────────────────────────────────── */
+  :global([data-theme='light']) .le-card,
+  :global([data-theme='light']) .le-legend {
+    background: #F0F3FA;
+    border-color: rgba(0,0,0,.09);
+  }
+  :global([data-theme='light']) .le-card:hover {
+    border-color: rgba(0,0,0,.2);
+  }
+  :global([data-theme='light']) .le-strip {
+    background: rgba(0,0,0,.05);
+    border-color: rgba(0,0,0,.1);
+  }
+  :global([data-theme='light']) .le-heading {
+    border-color: rgba(0,0,0,.09);
+    color: #3a4055;
+  }
+  :global([data-theme='light']) .le-id {
+    color: #006ba8;
+    background: rgba(0,107,168,.07);
+    border-color: rgba(0,107,168,.18);
+  }
+  :global([data-theme='light']) .le-note,
+  :global([data-theme='light']) .le-intro {
+    color: #5e6880;
+  }
+  :global([data-theme='light']) .le-ambient {
+    background: rgba(0,180,220,.55);
+  }
+  :global([data-theme='light']) .le-legend-title {
+    color: #7a8399;
+  }
+
+  /* ── Mobile ──────────────────────────────────────────────────────── */
+  @media (max-width: 540px) {
+    .le-grid { grid-template-columns: 1fr; }
+    .le-rear-layout { flex-direction: column; }
+    .le-legend { width: 100%; }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     KEYFRAMES
+  ═══════════════════════════════════════════════════════════════════ */
+
+  /* Sine-wave breathing — used by AMBIENT (3 s) and NAV_STRAIGHT (800 ms) */
+  @keyframes le-breathe {
+    0%, 100% { opacity: 0.10; }
+    50%       { opacity: 1;    }
+  }
+
+  /* Hard blink — used by BLINKER_* (400 ms) and HAZARD (400 ms) */
+  @keyframes le-blink {
+    0%, 49%   { opacity: 1; }
+    50%, 100% { opacity: 0; }
+  }
+
+  /*
+   * NAV_LEFT sweep: the gradient represents a dot at the right side of its
+   * bounding box. Sliding the box from 50% → -50% moves the dot's leading
+   * edge from strip center to strip left edge over 600 ms.
+   */
+  @keyframes le-sweep-l {
+    from { transform: translateX(0%);    }
+    to   { transform: translateX(-100%); }
+  }
+
+  /*
+   * NAV_RIGHT sweep: gradient dot at left side of box; slides right.
+   */
+  @keyframes le-sweep-r {
+    from { transform: translateX(0%);   }
+    to   { transform: translateX(100%); }
+  }
+</style>
