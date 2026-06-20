@@ -1,211 +1,321 @@
 ---
-title: Testing
-description: Tests für die AmbientNav Flutter-App und ESP32-Firmware ausführen und schreiben.
+title: "Testing"
+description: "Tests für die AmbientNav-App und Firmware ausführen und schreiben."
 ---
 
-AmbientNav verwendet zwei verschiedene Teststrategien: **Flutter Unit- und Widget-Tests** für den App-Layer sowie **Wokwi-Hardware-Simulation** für die Firmware-Validierung.
+## Test-Stack der App
 
----
+| Werkzeug | Rolle |
+|---|---|
+| `flutter test` | Test-Runner für alle Unit- und Widget-Tests |
+| `mocktail` | Mocking-Bibliothek — `when()`, `verify()`, `any()`-Matcher |
+| `MockControllerRepository` | Vollständiger BLE-Stub — ermöglicht alle Testszenarien ohne Hardware |
+| `flutter_riverpod` `ProviderScope` | Provider-Overrides in Widget-Tests |
+| Wokwi for VS Code | Firmware-Simulation mit echten GPIO- und UART-Interaktionen |
 
-## App-Tests (Flutter)
+:::note
+Das Testverzeichnis spiegelt das lib-Verzeichnis exakt wider. Eine Quelldatei unter `lib/features/parking/domain/sensor_config.dart` hat ihren Test unter `test/features/parking/domain/sensor_config_test.dart`. Wenn du eine Quelldatei hinzufügst, lege die entsprechende Testdatei im selben relativen Pfad an.
+:::
 
-### Tests ausführen
+## Tests ausführen
 
-Aus dem Verzeichnis `app/`:
+### Alle Tests
 
 ```bash
-# Alle Tests ausführen
+cd app
 flutter test
+```
 
-# Ein bestimmtes Verzeichnis ausführen
-flutter test test/features/controllers/
+Oder vom Repository-Wurzelverzeichnis aus über den Task-Runner:
 
-# Eine einzelne Datei ausführen
-flutter test test/features/controllers/ble/codecs/nav_codec_test.dart
+```bash
+just test
+```
 
-# Mit Coverage ausführen
+### Tests für ein bestimmtes Feature
+
+```bash
+cd app
+flutter test test/features/parking/
+flutter test test/features/nav/data/nav_codec_test.dart
+```
+
+### Mit Coverage-Bericht
+
+```bash
+cd app
 flutter test --coverage
+
+# Generate HTML report (requires lcov)
+genhtml coverage/lcov.info -o coverage/html
+
+# Open in browser
+open coverage/html/index.html
 ```
 
-Die Test-Suite läuft vollständig im Prozess — kein physisches Gerät oder BLE-Hardware erforderlich.
+Unter Linux installierst du lcov mit `sudo apt install lcov`, unter macOS mit `brew install lcov`.
 
-### Teststruktur
+Coverage wird in CI nicht als feste Mindestgrenze erzwungen, aber Reviewer werden PRs markieren, die die Abdeckung auf kritischen Pfaden (Codecs, Domain-Logik, Repository-Layer) reduzieren.
 
-```
-app/test/
-├── features/
-│   ├── controllers/
-│   │   ├── ble/
-│   │   │   └── codecs/          # Codec-Unit-Tests (nav, led, telemetry, sensor, ota)
-│   │   ├── data/
-│   │   │   └── mock/            # MockControllerRepository-Tests
-│   │   └── presentation/        # Widget-Tests für Formulare und Screens
-│   └── navigation/
-│       └── presentation/        # Widget-Tests für Nav-Screen und Abbiegepanel
-└── core/
-    └── widgets/                 # Atom- und Molecule-Widget-Tests
-```
+## Unit-Tests
 
-### MockControllerRepository
+Unit-Tests überprüfen reine Dart-Logik ohne Widget-Baum.
 
-Der gesamte BLE-Layer kann zur Compile-Zeit über das `USE_MOCK` dart-define-Flag durch einen Mock ersetzt werden. Der Mock implementiert dasselbe `ControllerRepository`-Interface und liefert deterministische Daten zurück.
+### BLE Codecs
 
-Verwende `MockControllerRepository` direkt in Tests:
+Die Codec-Tests sind die kritischsten Unit-Tests im Projekt. Sie verifizieren die Round-Trip-Korrektheit des Binärprotokolls zwischen App und Firmware.
 
 ```dart
-import 'package:ambientnav/features/controllers/data/mock/mock_controller_repository.dart';
-import 'package:mocktail/mocktail.dart';
-
-class MockRepo extends Mock implements ControllerRepository {}
+// test/features/nav/data/nav_codec_test.dart
+import 'package:flutter_test/flutter_test.dart';
+import 'package:ambientnav/features/nav/domain/nav_command.dart';
+import 'package:ambientnav/features/nav/data/nav_codec.dart';
 
 void main() {
-  late MockRepo repo;
+  group('NavCodec', () {
+    test('round-trips a TurnLeft command with 42 m distance', () {
+      const original = NavCommand(
+        maneuver: Maneuver.turnLeft,
+        distanceM: 42,
+        streetName: 'Hauptstraße',
+      );
 
-  setUp(() {
-    repo = MockRepo();
-    when(() => repo.connect(any())).thenAnswer((_) async {});
-  });
+      final encoded = NavCodec.encode(original);
+      final decoded = NavCodec.decode(encoded);
 
-  test('connects to controller', () async {
-    await repo.connect('device-id');
-    verify(() => repo.connect('device-id')).called(1);
+      expect(decoded.maneuver, equals(Maneuver.turnLeft));
+      expect(decoded.distanceM, equals(42));
+      expect(decoded.streetName, equals('Hauptstraße'));
+    });
+
+    test('handles maximum distance value (65535 m)', () {
+      const cmd = NavCommand(maneuver: Maneuver.straight, distanceM: 65535, streetName: '');
+      expect(NavCodec.decode(NavCodec.encode(cmd)).distanceM, equals(65535));
+    });
   });
 }
 ```
 
-Verwende `mocktail` (nicht `mockito`) für alle Mocks — es erfordert keine Code-Generierung.
+Entsprechend deckt `test/features/settings/data/led_config_codec_test.dart` die binäre Kodierung der LED-Konfiguration ab.
 
-### Codec-Unit-Tests
+### Riverpod Providers
 
-Die BLE-Codecs sind die wichtigsten unit-testbaren Komponenten. Jeder Codec hat einen entsprechenden Test, der Encode → Decode als Roundtrip prüft:
+Teste Provider-Logik, indem du einen `ProviderContainer` mit Overrides instanziierst:
 
 ```dart
+// test/core/di/providers_test.dart
+import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ambientnav/core/di/providers.dart';
+import 'package:ambientnav/core/ble/mock_controller_repository.dart';
+
 void main() {
-  test('NavCodec encodes direction and distance', () {
-    final bytes = NavCodec.encode(direction: Direction.left, distanceM: 120, indicator: Indicator.left);
-    expect(bytes, equals([0x01, 0x78, 0x01]));
-  });
-
-  test('NavCodec round-trips cleanly', () {
-    final original = NavCommand(direction: Direction.right, distanceM: 45, indicator: Indicator.right);
-    final decoded = NavCodec.decode(NavCodec.encode(original));
-    expect(decoded, equals(original));
-  });
-}
-```
-
-Wenn du eine neue Characteristic hinzufügst oder ein Codec-Format änderst, **aktualisiere zuerst den entsprechenden Test**.
-
-### Widget-Tests
-
-Widget-Tests verwenden `ProviderScope`-Overrides, um Mock-Daten zu injizieren:
-
-```dart
-testWidgets('LedConfigForm shows current LED count', (tester) async {
-  await tester.pumpWidget(
-    ProviderScope(
+  test('navCommandStreamProvider emits NavCommands from mock repo', () async {
+    final container = ProviderContainer(
       overrides: [
-        ledConfigProvider.overrideWith((_) => LedConfig(ledCount: 60, brightness: 128, effect: Effect.ambient)),
+        controllerRepositoryProvider.overrideWithValue(MockControllerRepository()),
       ],
-      child: const MaterialApp(home: LedConfigForm()),
-    ),
-  );
+    );
+    addTearDown(container.dispose);
 
-  expect(find.text('60'), findsOneWidget);
-});
+    final stream = container.read(navCommandStreamProvider.stream);
+    await expectLater(stream, emits(isA<NavCommand>()));
+  });
+}
 ```
 
-### App mit Mock-BLE ausführen
+## Widget-Tests
 
-Du kannst die vollständige App ohne Hardware über das `USE_MOCK` dart-define starten:
+Widget-Tests rendern einen Teil des Widget-Baums und überprüfen das Verhalten, ohne die vollständige App zu starten.
+
+### Mock-Provider in Widget-Tests bereitstellen
+
+Überschreibe Provider mit `ProviderScope` an der Wurzel des zu testenden Widgets:
+
+```dart
+// test/features/parking/presentation/parking_screen_test.dart
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:ambientnav/core/di/providers.dart';
+import 'package:ambientnav/features/parking/presentation/parking_screen.dart';
+
+class MockRepo extends Mock implements IControllerRepository {}
+
+void main() {
+  testWidgets('ParkingScreen renders ParkingRadar organism', (tester) async {
+    final mockRepo = MockRepo();
+
+    when(() => mockRepo.sensorConfigStream).thenAnswer(
+      (_) => Stream.value(const SensorConfig(
+        distances: [42, 87, 210, 255],
+        thresholdCm: 100,
+        alertEnabled: true,
+      )),
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          controllerRepositoryProvider.overrideWithValue(mockRepo),
+        ],
+        child: const MaterialApp(home: ParkingScreen()),
+      ),
+    );
+
+    await tester.pump();
+    expect(find.byType(ParkingRadar), findsOneWidget);
+  });
+}
+```
+
+Verwende `tester.pump()`, um nach dem Einrichten asynchroner Daten einen Frame voranzurücken, und `tester.pumpAndSettle()`, um alle laufenden Animationen abzuschließen.
+
+## MockControllerRepository
+
+`MockControllerRepository` ist in `app/lib/core/ble/mock_controller_repository.dart` definiert. Es implementiert das vollständige `IControllerRepository`-Interface und liefert realistische Fake-Daten-Streams:
+
+```dart
+class MockControllerRepository implements IControllerRepository {
+  @override
+  Stream<NavCommand> get navCommandStream => Stream.periodic(
+        const Duration(seconds: 3),
+        (i) => NavCommand(
+          maneuver: Maneuver.values[i % Maneuver.values.length],
+          distanceM: 80 + (i * 17 % 400),
+          streetName: _fakeStreets[i % _fakeStreets.length],
+        ),
+      );
+
+  @override
+  Stream<Telemetry> get telemetryStream => Stream.periodic(
+        const Duration(milliseconds: 500),
+        (i) => Telemetry(
+          speedKmh: 30.0 + (i % 20),
+          headingDeg: (i * 7) % 360,
+          batteryPct: 85 - (i % 15),
+          firmwareVersion: '1.2.0',
+        ),
+      );
+
+  @override
+  Stream<SensorConfig> get sensorConfigStream => Stream.periodic(
+        const Duration(milliseconds: 200),
+        (i) => SensorConfig(
+          distances: [
+            (42 + i * 3) % 255,
+            (87 + i * 5) % 255,
+            210,
+            255,
+          ],
+          thresholdCm: 100,
+          alertEnabled: true,
+        ),
+      );
+
+  @override
+  Future<void> sendLedConfig(LedConfig config) async {
+    debugPrint('[MockRepo] sendLedConfig: $config');
+  }
+
+  @override
+  Future<void> connect(String deviceId) async {}
+
+  @override
+  Future<void> disconnect() async {}
+}
+```
+
+Da `MockControllerRepository` über `controllerRepositoryProvider` injiziert wird, läuft die gesamte App ohne Bluetooth-Hardware — praktisch für CI, Simulatoren und UI-Entwicklung.
+
+## Integrationstests
+
+Integrationstests starten die vollständige App auf einem verbundenen Gerät oder Emulator und steuern sie über den `flutter_test`-Treiber.
+
+```bash
+cd app
+flutter test integration_test/
+```
+
+:::caution
+Integrationstests werden **standardmäßig nicht in CI ausgeführt**, da sie ein verbundenes Gerät oder einen Emulator benötigen. Sie werden manuell vor größeren Releases oder dann ausgeführt, wenn ein PR die GoRouter-Konfiguration oder den Screen-Flow ändert. Falls deine Organisation einen selbst gehosteten GitHub Actions Runner mit verbundenem Gerät hat, kannst du den `integration_test`-Job in `build-app.yml` aktivieren, indem du seine `if: false`-Bedingung entfernst.
+:::
+
+Integrationstestdateien liegen in `app/integration_test/` und verwenden dieselbe `flutter_test`-API wie Widget-Tests, haben aber über `IntegrationTestWidgetsFlutterBinding` Zugriff auf die vollständig laufende App.
+
+## Die vollständige App mit Mock-BLE ausführen
+
+Für manuelle UI-Tests ohne Hardware:
 
 ```bash
 flutter run --dart-define=USE_MOCK=true
 ```
 
-Oder über den Justfile-Shortcut:
+Dieser Befehl startet das release-äquivalente App-Binary mit injiziertem `MockControllerRepository`. Alle Navigationsabläufe, Einparkradar-Animationen, LED-Konfigurationsscreens und BLE-Gerätescans verwenden Fake-Daten. Dies ist der empfohlene Weg, um UI-Änderungen vor dem Öffnen eines Pull Requests zu überprüfen.
 
-```bash
-just run
+## Firmware-Tests mit Wokwi
+
+Wokwi simuliert die ESP32-Hardware einschließlich GPIO, UART, SPI und I2C-Peripherie.
+
+1. Öffne die Datei `wokwi/rear/diagram.json` in VS Code.
+2. Die Wokwi for VS Code-Erweiterung erkennt das PlatformIO-Projekt und bietet an, die **Simulation zu starten**.
+3. Simuliere HC-SR04-Echopulse über das Wokwi GPIO-Panel, indem du den Echo-Pin hoch/niedrig schaltest.
+4. Beobachte die serielle Monitorausgabe:
+   ```
+   [PROXIMITY][I] s0=42 s1=87 s2=210 s3=255
+   [BT][I] Sent: {"s0":42,"s1":87,"s2":210,"s3":255}
+   ```
+5. Passe das Trigger-Timing an, um ein schnell herannahendes Hindernis zu simulieren, und überprüfe, ob der LED-Gradienteneffekt unterhalb der Schwellenentfernung aktiviert wird.
+
+Wokwi führt dieselbe `.pio/build/esp32dev/firmware.bin` aus, die von `pio run` erzeugt wurde — keine Neukompilierung. Führe zuerst `pio run` aus, dann starte die Simulation.
+
+## Einen neuen Test schreiben
+
+### Namenskonvention
+
+Alle Testdateien enden auf `_test.dart`. Der Test-Runner erkennt sie automatisch.
+
+### Arrange / Act / Assert
+
+Strukturiere jeden Testfall in drei beschriftete Abschnitte:
+
+```dart
+test('LedConfigCodec encodes brightness=128 correctly', () {
+  // Arrange
+  const config = LedConfig(
+    effectId: 2,
+    brightness: 128,
+    colorOverride: null,
+    animationSpeed: 50,
+  );
+
+  // Act
+  final bytes = LedConfigCodec.encode(config);
+
+  // Assert
+  expect(bytes[0], equals(2));    // effect ID byte
+  expect(bytes[1], equals(128));  // brightness byte
+});
 ```
 
-Damit wird der echte `flutter_blue_plus` BLE-Layer durch deterministische Mock-Daten ersetzt — Navigationsscreen, Abbiegepanel, LED-Konfigurationsformulare und Telemetrieanzeigen funktionieren vollständig.
+### Mocktail-Muster
 
----
+```dart
+// Stub a method to return a value
+when(() => mockRepo.connect(any())).thenAnswer((_) async {});
 
-## Firmware-Tests (Wokwi)
+// Stub a stream
+when(() => mockRepo.navCommandStream).thenAnswer(
+  (_) => Stream.value(fakeNavCommand),
+);
 
-Hardware-unabhängige Firmware-Tests nutzen **Wokwi**, einen browserbasierten Mikrocontroller-Simulator. Diagramme für beide Platinen sind im Verzeichnis `wokwi/` vorkonfiguriert.
+// Verify a method was called exactly once
+verify(() => mockRepo.sendLedConfig(captureAny())).called(1);
 
-### Einrichtung
-
-1. Installiere die **Wokwi for VS Code**-Erweiterung.
-2. Öffne `wokwi/front/diagram.json` oder `wokwi/rear/diagram.json` in VS Code.
-3. Drücke **F1 → Wokwi: Start Simulator**.
-
-Der Simulator liest die kompilierte Firmware aus PlatformIO's Build-Output — baue zuerst:
-
-```bash
-cd firmware/front
-pio run
-# oder
-cd firmware/rear
-pio run
+// Capture the argument for deeper assertion
+final captured = verify(() => mockRepo.sendLedConfig(captureAny())).captured;
+expect((captured.first as LedConfig).brightness, equals(200));
 ```
 
-### Was Wokwi abdeckt
-
-| Szenario | Wokwi-Unterstützung |
-|---|---|
-| BLE GATT Advertising und Characteristic Writes | Teilweise (simulierter BLE-Host) |
-| FastLED Pixel-Ausgabe auf GPIO | Ja — LED-Streifen wird visualisiert |
-| HC-SR04 Echo-Timing | Ja — einstellbarer Slider im Diagramm |
-| FreeRTOS-Task-Scheduling | Ja |
-| Serielle Ausgabe (`Serial.println`) | Ja — Serial-Monitor-Tab |
-| Bluetooth Classic SPP zwischen zwei Platinen | Nicht unterstützt (Einzelplatinen-Simulation) |
-
-Für vollständige Zwei-Platinen-Integrationstests: echte Hardware verwenden.
-
-### Sensoreingabe simulieren
-
-Im Hinterplatinen-Diagramm werden HC-SR04-Sensoren als interaktive Slider dargestellt. Ziehe den Slider, um die simulierte Distanz anzupassen. Die Hinter-LED-Streifen-Visualisierung aktualisiert sich in Echtzeit und bestätigt, dass die Distanz → Füllprozent-Formel in `led_effects.cpp` korrekt ist.
-
----
-
-## CI-Integration
-
-Der Workflow `build-app.yml` führt die vollständige Test-Suite bei jedem Push aus:
-
-```yaml
-- run: flutter analyze
-- run: flutter test
-```
-
-Tests laufen gegen den Mock-BLE-Layer — kein Gerät in CI erforderlich. Ein fehlgeschlagener Test oder eine Analyzer-Warnung blockiert den Build.
-
-:::tip
-Führe `flutter analyze` lokal vor dem Push aus. Es findet Typfehler und Lint-Verstöße, die die Test-Suite nicht abdeckt.
-:::
-
----
-
-## Neue Tests schreiben
-
-### Checkliste
-
-- Eine Test-Datei pro Quelldatei: `nav_codec.dart` → `nav_codec_test.dart`
-- **Arrange / Act / Assert**-Struktur verwenden
-- Den öffentlichen Vertrag testen, nicht interne Implementierungsdetails
-- Randfälle abdecken: Null-Distanz, maximale Distanz (255 m), außerhalb des Bereichs liegende Sensorwerte (999)
-- Kein Framework-Verhalten testen (z. B. nicht testen, dass `Riverpod` State speichert)
-
-### Was einen Test erfordert
-
-| Änderung | Test erforderlich |
-|---|---|
-| Neuer BLE-Codec oder Codec-Format-Änderung | Ja — Unit-Test mit Encode + Decode |
-| Neues Widget mit Business-Logik | Ja — Widget-Test |
-| Neuer Riverpod-Provider | Ja — Unit-Test mit Mock-Abhängigkeiten |
-| Neuer LED-Effekt (Firmware) | Ja — Wokwi-Simulation validiert die visuelle Ausgabe |
-| UI-Texte oder Styling-Änderung | Nein |
-| Config-Konstanten-Änderung | Nein |
+Die vollständige API-Referenz findest du in der [mocktail-Dokumentation](https://pub.dev/packages/mocktail).
