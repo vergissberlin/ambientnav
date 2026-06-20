@@ -25,26 +25,24 @@
     <div class="le-card">
       <div class="le-card-header">
         <span class="le-label">Turn Left</span>
-        <span class="le-badge le-badge-cyan">Cyan</span>
+        <span class="le-badge le-badge-violet">Purple · Pink</span>
       </div>
       <div class="le-strip le-seg le-clip">
-        <div class="le-fill le-sweep-base le-sweep-left-grad"></div>
-        <div class="le-fill le-sweep-left le-sweep-left-grad"></div>
+        <div class="le-fill le-wave-grad le-wave-left"></div>
       </div>
-      <p class="le-note">Light sweeps left · Next left turn within 200 m</p>
+      <p class="le-note">Soft bar glides left · Next left turn within 200 m</p>
     </div>
 
     <!-- NAV_RIGHT -->
     <div class="le-card">
       <div class="le-card-header">
         <span class="le-label">Turn Right</span>
-        <span class="le-badge le-badge-cyan">Cyan</span>
+        <span class="le-badge le-badge-violet">Purple · Pink</span>
       </div>
       <div class="le-strip le-seg le-clip">
-        <div class="le-fill le-sweep-base le-sweep-right-grad"></div>
-        <div class="le-fill le-sweep-right le-sweep-right-grad"></div>
+        <div class="le-fill le-wave-grad le-wave-right"></div>
       </div>
-      <p class="le-note">Light sweeps right · Next right turn within 200 m</p>
+      <p class="le-note">Soft bar glides right · Next right turn within 200 m</p>
     </div>
 
     <!-- NAV_STRAIGHT -->
@@ -371,36 +369,31 @@
     box-shadow: 0 0 18px rgba(255,45,156,.55);
   }
 
-  /* ── Sweep (NAV_LEFT / NAV_RIGHT) — cyan ─────────────────────────── */
-  .le-sweep-left-grad {
+  /* ── Wave bar (NAV_LEFT / NAV_RIGHT) — purple → pink ───────────────── */
+
+  /* Soft cosine-window bar: purple centre, pink edges, transparent outside.
+     The gradient is centred at 50 % so translateX moves it cleanly left/right. */
+  .le-wave-grad {
     background: linear-gradient(90deg,
-      rgba(25,227,255,.0)  0%,
-      rgba(25,227,255,.9) 12%,
-      rgba(25,227,255,.55) 35%,
-      rgba(25,227,255,.0) 60%
+      transparent           0%,
+      transparent          34%,
+      rgba(255, 80,185,.40) 40%,
+      rgba(120,  0,220,.95) 50%,
+      rgba(255, 80,185,.40) 60%,
+      transparent          66%,
+      transparent         100%
     );
-  }
-  .le-sweep-right-grad {
-    background: linear-gradient(90deg,
-      rgba(25,227,255,.0)  40%,
-      rgba(25,227,255,.55) 65%,
-      rgba(25,227,255,.9) 88%,
-      rgba(25,227,255,.0) 100%
-    );
+    box-shadow: 0 0 22px rgba(120,0,220,.45);
   }
 
-  /* Base layer — dim, static hint at center */
-  .le-sweep-base {
-    opacity: 0.18;
-    background-position: center;
+  /* Slide from centre to left edge (translateX 0 → −50 %), then fade out */
+  .le-wave-left {
+    animation: le-wave-l 1050ms cubic-bezier(0.37,0,0.63,1) infinite;
   }
 
-  /* Animated layer — moves from center toward edge */
-  .le-sweep-left {
-    animation: le-sweep-l 600ms linear infinite;
-  }
-  .le-sweep-right {
-    animation: le-sweep-r 600ms linear infinite;
+  /* Slide from centre to right edge (translateX 0 → +50 %), then fade out */
+  .le-wave-right {
+    animation: le-wave-r 1050ms cubic-bezier(0.37,0,0.63,1) infinite;
   }
 
   /* ── Blinker halves — violet ─────────────────────────────────────── */
@@ -588,13 +581,17 @@
     50%, 100% { opacity: 0; }
   }
 
-  @keyframes le-sweep-l {
-    from { transform: translateX(0%);    }
-    to   { transform: translateX(-100%); }
+  @keyframes le-wave-l {
+    0%   { transform: translateX(  0%); opacity: 1; }
+    78%  { transform: translateX(-50%); opacity: 1; }
+    90%  { transform: translateX(-50%); opacity: 0; }
+    100% { transform: translateX(-50%); opacity: 0; }
   }
 
-  @keyframes le-sweep-r {
-    from { transform: translateX(0%);   }
-    to   { transform: translateX(100%); }
+  @keyframes le-wave-r {
+    0%   { transform: translateX( 0%); opacity: 1; }
+    78%  { transform: translateX(50%); opacity: 1; }
+    90%  { transform: translateX(50%); opacity: 0; }
+    100% { transform: translateX(50%); opacity: 0; }
   }
 </style>
