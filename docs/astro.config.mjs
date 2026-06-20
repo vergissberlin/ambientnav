@@ -1,6 +1,6 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
-import { readFileSync, existsSync, writeFileSync } from 'fs';
+import { readFileSync, existsSync, writeFileSync, readdirSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { join, dirname } from 'path';
 import { execSync } from 'child_process';
@@ -58,6 +58,24 @@ const previousVersions = execSync('git tag --sort=-version:refname', { encoding:
     acc.push({ slug, label });
     return acc;
   }, []);
+
+// Fallback: wenn keine Git-Tags vorhanden sind (z. B. in CI/Remote-Umgebungen),
+// werden vorhandene JSON-Dateien im versions/-Verzeichnis als Versionsquellen genutzt.
+if (previousVersions.length === 0) {
+  const versionsDir = join(__dirname, 'src/content/versions');
+  readdirSync(versionsDir)
+    .filter(f => /^\d+\.\d+\.json$/.test(f))
+    .sort((a, b) => b.localeCompare(a, undefined, { numeric: true }))
+    .forEach(f => {
+      const slug = f.replace('.json', '');
+      const data = JSON.parse(readFileSync(join(versionsDir, f), 'utf-8'));
+      const releaseLink = data.sidebar?.find(item => item.label === 'Release Notes')?.link ?? '';
+      const match = releaseLink.match(/ambientnav-v(\d+\.\d+\.\d+)/);
+      const label = match ? `v${match[1]}` : `v${slug}`;
+      if (label === `v${version}`) return; // aktuelle Version überspringen
+      previousVersions.push({ slug, label });
+    });
+}
 
 export default defineConfig({
   site: 'https://vergissberlin.github.io',
