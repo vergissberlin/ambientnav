@@ -16,6 +16,10 @@ hero:
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
+import HeroVisual from '../../../components/HeroVisual.astro';
+import SystemDiagram from '../../../components/SystemDiagram.astro';
+
+<HeroVisual lang="de" />
 
 ## Was ist AmbientNav?
 
@@ -38,13 +42,7 @@ AmbientNav verwandelt adressierbare LED-Streifen in ein Echtzeit-Navigationssyst
 
 ## Systemübersicht
 
-```
-📱 iPhone App  ──BLE──▶  ESP32 Vorne (Master)  ──BT Classic──▶  ESP32 Hinten (Slave)
-                              │                                         │
-                          LED Streifen                             LED Streifen
-                          (vorne)                                  (hinten)
-                                                                ◀── 3× HC-SR04
-```
+<SystemDiagram lang="de" />
 
 | Szenario | LED-Effekt |
 |---|---|
