@@ -1,0 +1,66 @@
+name: "🐛 Bug Report"
+description: Report a reproducible bug in firmware, iOS app, or documentation
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please fill in as much detail as possible so we can reproduce and fix the issue quickly.
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Affected component / Betroffene Komponente
+      options:
+        - "Firmware — Front ESP32"
+        - "Firmware — Rear ESP32"
+        - "iOS App"
+        - "Documentation / Dokumentation"
+        - "Other / Sonstiges"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened? / Was ist passiert?
+      placeholder: A clear description of the bug.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce / Schritte zur Reproduktion
+      placeholder: |
+        1. ...
+        2. ...
+        3. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour / Erwartetes Verhalten
+      placeholder: What should have happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment / Umgebung
+      placeholder: |
+        - Firmware version:
+        - iOS version (if applicable):
+        - ESP32 board model:
+        - LED strip model:
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / Serial output (optional)
+      render: text
+      placeholder: Paste any relevant serial monitor output or crash logs here.

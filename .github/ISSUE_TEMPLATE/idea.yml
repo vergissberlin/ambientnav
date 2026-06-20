@@ -1,0 +1,47 @@
+name: "💡 Idea / Feature Request"
+description: Suggest a new feature, module, or sensor for AmbientNav
+title: "[Idea]: "
+labels: ["enhancement", "idea"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to share your idea!
+        Ideas with the most 👍 reactions get prioritised for upcoming releases.
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category / Kategorie
+      options:
+        - "Safety Warning / Sicherheitswarnung"
+        - "Feature / Funktion"
+        - "Hardware / Sensor"
+        - "Integration (Siri, App, …)"
+        - "Other / Sonstiges"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe your idea / Beschreibe deine Idee
+      placeholder: What should AmbientNav do? / Was soll AmbientNav tun?
+    validations:
+      required: true
+
+  - type: textarea
+    id: usecase
+    attributes:
+      label: Use case & motivation / Anwendungsfall & Motivation
+      placeholder: |
+        When would this be useful? What problem does it solve?
+        Wann wäre das nützlich? Welches Problem löst es?
+
+  - type: textarea
+    id: implementation
+    attributes:
+      label: Possible implementation (optional) / Mögliche Umsetzung (optional)
+      placeholder: |
+        Any ideas on how this could be built? Additional hardware needed?
+        Ideen zur technischen Umsetzung? Wird zusätzliche Hardware benötigt?
