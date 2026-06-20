@@ -1,5 +1,38 @@
 # Changelog
 
+## [0.6.0](https://github.com/vergissberlin/ambientnav/compare/ambientnav-v0.5.0...ambientnav-v0.6.0) (2026-06-20)
+
+
+### Features
+
+* **docs:** add CSS LED effects visualizer to led-effects page ([6b78e03](https://github.com/vergissberlin/ambientnav/commit/6b78e039326acbc2516612ff7ac52ad8bc2b5587))
+* **front-led:** nav wave as soft colour bar sliding centre→edge ([e61d01e](https://github.com/vergissberlin/ambientnav/commit/e61d01e6111cbd56a82b9cfbab588c18c0cf6651))
+* **front-led:** replace nav sweep dot with sequential ambient wave ([dc98912](https://github.com/vergissberlin/ambientnav/commit/dc98912347d7b13e0ce5601b4133f6eff5e1a2e8))
+
+
+### Bug Fixes
+
+* **ci:** attach app builds (APK + iOS) to GitHub Releases ([6c1f273](https://github.com/vergissberlin/ambientnav/commit/6c1f273906e84094d17f939e47da6b30002ccd2d))
+* **ci:** use heredoc syntax for multi-line GITHUB_OUTPUT value ([40c9e08](https://github.com/vergissberlin/ambientnav/commit/40c9e08af1b62b7f0ed5edf8458aea3d59390943))
+* **docs:** filter versions without content dir and add PR build check ([#40](https://github.com/vergissberlin/ambientnav/issues/40)) ([f4d50fb](https://github.com/vergissberlin/ambientnav/commit/f4d50fbcaa6d846f094bfd7fea54180fb491d49e))
+* **docs:** make theme surfaces and hairlines theme-aware for light mode ([01a558e](https://github.com/vergissberlin/ambientnav/commit/01a558efd66d0220542a099240cb146899629ed7))
+* **docs:** make theme surfaces and hairlines theme-aware for light mode ([9843361](https://github.com/vergissberlin/ambientnav/commit/98433611e110e0f2990a9583cc3db0e1c5dde125))
+* **docs:** restore version selector when git tags are unavailable ([9c50df2](https://github.com/vergissberlin/ambientnav/commit/9c50df2e73a1456215024cbc8d38870361a1772f))
+
+
+### Documentation
+
+* add CLAUDE.md and sync nav-wave CSS animation to firmware ([1972455](https://github.com/vergissberlin/ambientnav/commit/1972455ad08c44419b95d36920a7051a3a2fdf42))
+* add complete dual-audience documentation structure ([f75d76d](https://github.com/vergissberlin/ambientnav/commit/f75d76dc712e46eafb666dfcb40dc940a5093dd7))
+* add comprehensive contributing guides and app user documentation ([507226b](https://github.com/vergissberlin/ambientnav/commit/507226b346cafe2a28ed322f8f79f0421788150c))
+* add remaining German translations for contributing section ([e2f72cf](https://github.com/vergissberlin/ambientnav/commit/e2f72cf2a8630b869c1ef01476a49c72fc518e71))
+* add versioned content dirs for v0.2.0 and v0.3.0 ([48359b5](https://github.com/vergissberlin/ambientnav/commit/48359b5648c6cf0341cf4f6ea962b4500ceea24c))
+* add versioned documentation for 0.2 and 0.3 releases ([ff1427a](https://github.com/vergissberlin/ambientnav/commit/ff1427ad90fd2492d19d46a06b07f23dcde8afbe))
+* improve DE translations for design-system, testing, ci-cd ([19e0d90](https://github.com/vergissberlin/ambientnav/commit/19e0d902e629f2af27bb0ed28d6a3e594265ff6a))
+* update ci-cd page and add DE firmware translation ([ba35ed5](https://github.com/vergissberlin/ambientnav/commit/ba35ed5a4bbfe3ee5752b9d4d1b82d1d927e1a54))
+* use animated logo in documentation header ([8cd7319](https://github.com/vergissberlin/ambientnav/commit/8cd731983ffcb5cd9de10149151f398f8d416c25))
+* use animated logo in documentation header ([97a482e](https://github.com/vergissberlin/ambientnav/commit/97a482eea84221ef21232d412f37124c62c89092))
+
 ## [0.5.0](https://github.com/vergissberlin/ambientnav/compare/ambientnav-v0.4.0...ambientnav-v0.5.0) (2026-06-20)
 
 
