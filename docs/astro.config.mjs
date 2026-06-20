@@ -23,6 +23,11 @@ function buildVersionSidebar(tag) {
       },
       { label: 'Getting Started', translations: { de: 'Erste Schritte' }, link: '/getting-started/' },
       { label: 'Flash Firmware', translations: { de: 'Firmware flashen' }, link: '/flash/' },
+      { label: 'Modules', translations: { de: 'Module' }, items: [
+        { label: 'Front Navigation Strip', translations: { de: 'Vorderes Navigationsband' }, link: '/modules/front-led-strip/' },
+        { label: 'Rear Distance Sensor', translations: { de: 'Hinterer Abstandssensor' }, link: '/modules/rear-distance-sensor/' },
+        { label: 'Rear Parking Aid Strip', translations: { de: 'Hinteres Einparkhilfe-Band' }, link: '/modules/rear-led-strip/' },
+      ]},
       { label: 'Hardware', translations: { de: 'Hardware' }, items: [
         { label: 'Wiring', translations: { de: 'Verkabelung' }, link: '/wiring/' },
       ]},
@@ -108,6 +113,27 @@ export default defineConfig({
           label: 'Flash Firmware (Manual)',
           translations: { de: 'Firmware flashen (manuell)' },
           link: '/flash-firmware/',
+        },
+        {
+          label: 'Modules',
+          translations: { de: 'Module' },
+          items: [
+            {
+              label: 'Front Navigation Strip',
+              translations: { de: 'Vorderes Navigationsband' },
+              link: '/modules/front-led-strip/',
+            },
+            {
+              label: 'Rear Distance Sensor',
+              translations: { de: 'Hinterer Abstandssensor' },
+              link: '/modules/rear-distance-sensor/',
+            },
+            {
+              label: 'Rear Parking Aid Strip',
+              translations: { de: 'Hinteres Einparkhilfe-Band' },
+              link: '/modules/rear-led-strip/',
+            },
+          ],
         },
         {
           label: 'Hardware',
