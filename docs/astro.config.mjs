@@ -20,6 +20,7 @@ export default defineConfig({
     starlight({
       title: 'AmbientNav',
       description: 'Ambient LED navigation and parking assistance for vehicles',
+      customCss: ['./src/styles/theme.css'],
       plugins: [
         starlightVersions({
           versions: [{ slug: '0.1', label: 'v0.1.0' }],

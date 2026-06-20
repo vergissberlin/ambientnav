@@ -1,0 +1,510 @@
+/* ============================================================
+   AmbientNav — Starlight Theme
+   Automotive cockpit aesthetic: deep blacks, cyan primary,
+   violet secondary, magenta alert.
+   Maps the AmbientNav design system to Starlight's --sl-* variables.
+   ============================================================ */
+
+/* =============================================================
+   1. FONTS
+   Same Google Fonts URL as design-system/styles.css.
+   Tokens are inlined below — docs has its own isolated build.
+   ============================================================= */
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap");
+
+/* =============================================================
+   2. AMBIENTNAV DESIGN TOKENS (inlined — isolated docs build)
+   Source: design-system/tokens/{colors,typography,spacing}.css
+   ============================================================= */
+:root {
+  /* Signal accents */
+  --amb-cyan:          #19E3FF;
+  --amb-cyan-soft:     #5CEFFF;
+  --amb-cyan-deep:     #05323A;
+  --amb-violet:        #7C5CFF;
+  --amb-violet-soft:   #A38CFF;
+  --amb-magenta:       #FF2D9C;
+  --amb-magenta-soft:  #FF6FC2;
+  --amb-magenta-deep:  #3A0A24;
+
+  /* Brand gradients */
+  --amb-gradient:   linear-gradient(120deg, #19E3FF 0%, #7C5CFF 50%, #FF2D9C 100%);
+  --amb-gradient-h: linear-gradient(90deg,  #19E3FF 0%, #7C5CFF 50%, #FF2D9C 100%);
+
+  /* Cockpit surfaces */
+  --amb-cockpit:     #06080E;
+  --amb-surface:     #0B0F18;
+  --amb-surface-2:   #0E121C;
+  --amb-surface-3:   #151A26;
+  --amb-line:        rgba(255, 255, 255, .08);
+  --amb-line-strong: rgba(255, 255, 255, .14);
+
+  /* Text hierarchy */
+  --amb-text:    #EEF2FA;
+  --amb-text-2:  #C7CEDC;
+  --amb-text-3:  #9AA4B8;
+  --amb-text-4:  #6B7488;
+  --amb-daylight: #F4F6FB;
+
+  /* Glow blooms (never grey shadows on dark) */
+  --amb-glow-cyan:    0 0 24px rgba(25, 227, 255, .55);
+  --amb-glow-violet:  0 0 24px rgba(124, 92, 255, .55);
+  --amb-glow-magenta: 0 0 24px rgba(255, 45, 156, .55);
+
+  /* Typography */
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font-body:    "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono:    "IBM Plex Mono", ui-monospace, monospace;
+
+  /* Spacing (4px base grid) */
+  --space-1: 4px;  --space-2: 8px;  --space-3: 12px;
+  --space-4: 16px; --space-5: 24px; --space-6: 32px;
+  --space-7: 48px; --space-8: 64px;
+
+  /* Radii */
+  --radius-xs: 4px; --radius-sm: 8px; --radius-md: 12px;
+  --radius-lg: 16px; --radius-xl: 24px;
+
+  /* Shadows */
+  --shadow-card:   0 1px 0 rgba(255, 255, 255, .04) inset, 0 8px 30px rgba(0, 0, 0, .4);
+  --shadow-raised: 0 12px 44px rgba(0, 0, 0, .5);
+
+  /* Motion */
+  --ease-glow: cubic-bezier(.4, 0, .2, 1);
+  --dur-fast:  140ms;
+  --dur-base:  240ms;
+}
+
+/* =============================================================
+   3. STARLIGHT DARK THEME OVERRIDES
+   :root is the dark-first default in Starlight 0.40.
+   ============================================================= */
+:root {
+  /* Accent — Cyan is the primary signal color */
+  --sl-color-accent-low:  #05323A;
+  --sl-color-accent:      #19E3FF;
+  --sl-color-accent-high: #5CEFFF;
+
+  /* Grayscale staircase: gray-1 = lightest → gray-7 = darkest */
+  --sl-color-white:  #EEF2FA;
+  --sl-color-gray-1: #C7CEDC;
+  --sl-color-gray-2: #9AA4B8;
+  --sl-color-gray-3: #6B7488;
+  --sl-color-gray-4: #2A3040;
+  --sl-color-gray-5: #151A26;
+  --sl-color-gray-6: #0E121C;
+  --sl-color-gray-7: #0B0F18;
+  --sl-color-black:  #06080E;
+
+  /* Text */
+  --sl-color-text:        #C7CEDC;
+  --sl-color-text-accent: #19E3FF;
+  --sl-color-text-invert: #06080E;
+
+  /* Backgrounds */
+  --sl-color-bg:             #0B0F18;
+  --sl-color-bg-nav:         #06080E;
+  --sl-color-bg-sidebar:     #06080E;
+  --sl-color-bg-inline-code: #0E121C;
+  --sl-color-bg-accent:      #05323A;
+
+  /* Hairlines */
+  --sl-color-hairline-light: rgba(255, 255, 255, .06);
+  --sl-color-hairline:       rgba(255, 255, 255, .08);
+  --sl-color-hairline-shade: rgba(255, 255, 255, .14);
+
+  /* Typography */
+  --sl-font-system:          "IBM Plex Sans", system-ui, sans-serif;
+  --sl-font-system-mono:     "IBM Plex Mono", ui-monospace, monospace;
+  --sl-text-body:            1rem;
+  --sl-text-body-sm:         0.875rem;
+  --sl-line-height:          1.6;
+  --sl-line-height-headings: 1.12;
+
+  /* Shadows */
+  --sl-shadow-sm: 0 1px 3px rgba(0, 0, 0, .5);
+  --sl-shadow-md: 0 4px 14px rgba(0, 0, 0, .55);
+  --sl-shadow-lg: 0 12px 44px rgba(0, 0, 0, .6);
+}
+
+/* =============================================================
+   4. STARLIGHT LIGHT THEME OVERRIDES
+   [data-theme='light'] is toggled by Starlight's theme switch.
+   Cyan accent darkened to meet WCAG AA contrast on pale bg.
+   ============================================================= */
+[data-theme='light'] {
+  /* Accent — deep teal for readability on white (#0096B0 ≈ 5.3:1 on #F4F6FB) */
+  --sl-color-accent-low:  #B5F7FF;
+  --sl-color-accent:      #0096B0;
+  --sl-color-accent-high: #05323A;
+
+  /* Grayscale (inverted for light) */
+  --sl-color-white:  #06080E;
+  --sl-color-gray-1: #151A26;
+  --sl-color-gray-2: #2A3040;
+  --sl-color-gray-3: #6B7488;
+  --sl-color-gray-4: #9AA4B8;
+  --sl-color-gray-5: #DDE2EC;
+  --sl-color-gray-6: #EEF2FA;
+  --sl-color-gray-7: #F4F6FB;
+  --sl-color-black:  #FFFFFF;
+
+  /* Text */
+  --sl-color-text:        #151A26;
+  --sl-color-text-accent: #0096B0;
+  --sl-color-text-invert: #F4F6FB;
+
+  /* Backgrounds */
+  --sl-color-bg:             #F4F6FB;
+  --sl-color-bg-nav:         #FFFFFF;
+  --sl-color-bg-sidebar:     #EEF2FA;
+  --sl-color-bg-inline-code: #E4E9F4;
+  --sl-color-bg-accent:      #B5F7FF;
+
+  /* Hairlines */
+  --sl-color-hairline-light: rgba(0, 0, 0, .06);
+  --sl-color-hairline:       rgba(0, 0, 0, .10);
+  --sl-color-hairline-shade: rgba(0, 0, 0, .16);
+
+  /* Shadows — subtle on light surfaces */
+  --sl-shadow-sm: 0 1px 3px rgba(0, 0, 0, .08);
+  --sl-shadow-md: 0 4px 14px rgba(0, 0, 0, .10);
+  --sl-shadow-lg: 0 12px 44px rgba(0, 0, 0, .12);
+}
+
+/* =============================================================
+   5. TYPOGRAPHY — element-level overrides
+   --sl-font-system covers body; headings need explicit rules
+   since Starlight has no --sl-font-headings variable.
+   ============================================================= */
+
+/* Headings: Space Grotesk (geometric display) */
+.sl-markdown-content h1,
+.sl-markdown-content h2,
+.sl-markdown-content h3,
+.sl-markdown-content h4,
+.sl-markdown-content h5,
+.sl-markdown-content h6,
+.page-title {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+/* Page title: larger, tighter */
+.page-title {
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+}
+
+/* Body copy: IBM Plex Sans */
+body,
+.sl-markdown-content {
+  font-family: var(--font-body);
+  line-height: 1.6;
+}
+
+/* Code */
+code,
+kbd,
+samp,
+pre {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+}
+
+/* =============================================================
+   6. COMPONENT OVERRIDES
+   ============================================================= */
+
+/* --- Sidebar --- */
+.sidebar-pane {
+  border-right: 1px solid var(--amb-line);
+}
+
+/* Active link: cyan left-bar indicator */
+.sidebar-content a[aria-current='page'],
+.sidebar-content a[aria-current='page']:hover {
+  color: var(--amb-cyan);
+  background: rgba(25, 227, 255, .07);
+  border-left: 2px solid var(--amb-cyan);
+  padding-left: calc(var(--space-4) - 2px);
+}
+
+/* Group labels: mono eyebrow style */
+.group-label span {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--amb-text-4);
+}
+
+/* --- Header / top nav --- */
+header.header {
+  border-bottom: 1px solid var(--amb-line);
+  backdrop-filter: blur(12px);
+}
+
+/* Site title: gradient brand treatment */
+.site-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  background: var(--amb-gradient-h);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* --- Content area --- */
+
+/* Horizontal rules */
+.sl-markdown-content hr {
+  border-color: var(--amb-line);
+}
+
+/* Blockquotes: violet left-bar (secondary signal) */
+.sl-markdown-content blockquote {
+  border-left: 3px solid var(--amb-violet);
+  background: rgba(124, 92, 255, .06);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: var(--space-4) var(--space-5);
+}
+
+/* --- Links --- */
+.sl-markdown-content a {
+  color: var(--amb-cyan);
+  text-decoration-color: rgba(25, 227, 255, .35);
+  transition:
+    color var(--dur-fast) var(--ease-glow),
+    text-decoration-color var(--dur-fast) var(--ease-glow);
+}
+.sl-markdown-content a:hover {
+  color: var(--amb-cyan-soft);
+  text-decoration-color: rgba(92, 239, 255, .6);
+}
+
+/* --- Code blocks --- */
+
+/* Fenced code blocks: cockpit surface */
+.expressive-code .frame {
+  border: 1px solid var(--amb-line-strong) !important;
+  border-radius: var(--radius-md) !important;
+  background: var(--amb-cockpit) !important;
+  box-shadow: var(--shadow-card) !important;
+}
+
+/* Inline code: pill style with cyan tint */
+.sl-markdown-content code:not(pre code) {
+  background: var(--amb-surface-2);
+  border: 1px solid var(--amb-line);
+  border-radius: var(--radius-xs);
+  padding: 0.1em 0.45em;
+  color: var(--amb-cyan-soft);
+}
+
+/* --- Tables --- */
+.sl-markdown-content table {
+  border-collapse: collapse;
+  width: 100%;
+}
+.sl-markdown-content th {
+  background: var(--amb-surface-3);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--amb-text-3);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--amb-line-strong);
+}
+.sl-markdown-content td {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--amb-line);
+}
+.sl-markdown-content tr:hover td {
+  background: rgba(255, 255, 255, .02);
+}
+
+/* --- Asides (admonitions) — signal color language ---
+   note    = cyan   (direction/info)
+   tip     = violet (positive guide)
+   caution = magenta (proximity warning)
+   danger  = magenta with stronger glow                 */
+.starlight-aside--note {
+  border-color: var(--amb-cyan);
+  background: rgba(25, 227, 255, .06);
+}
+.starlight-aside--note .starlight-aside__title {
+  color: var(--amb-cyan);
+}
+
+.starlight-aside--tip {
+  border-color: var(--amb-violet);
+  background: rgba(124, 92, 255, .06);
+}
+.starlight-aside--tip .starlight-aside__title {
+  color: var(--amb-violet-soft);
+}
+
+.starlight-aside--caution {
+  border-color: var(--amb-magenta);
+  background: rgba(255, 45, 156, .06);
+}
+.starlight-aside--caution .starlight-aside__title {
+  color: var(--amb-magenta-soft);
+}
+
+.starlight-aside--danger {
+  border-color: var(--amb-magenta);
+  background: rgba(58, 10, 36, .5);
+  box-shadow: var(--amb-glow-magenta);
+}
+.starlight-aside--danger .starlight-aside__title {
+  color: var(--amb-magenta);
+}
+
+/* --- Pagination links --- */
+.pagination-links a {
+  border: 1px solid var(--amb-line-strong);
+  border-radius: var(--radius-md);
+  background: var(--amb-surface-2);
+  transition:
+    border-color var(--dur-base) var(--ease-glow),
+    box-shadow var(--dur-base) var(--ease-glow);
+}
+.pagination-links a:hover {
+  border-color: var(--amb-cyan);
+  box-shadow: var(--amb-glow-cyan);
+}
+
+/* --- Search dialog --- */
+site-search dialog {
+  background: var(--amb-surface);
+  border: 1px solid var(--amb-line-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-raised);
+}
+site-search input {
+  background: var(--amb-cockpit);
+  border-color: var(--amb-line-strong);
+  color: var(--amb-text);
+  border-radius: var(--radius-sm);
+}
+site-search input:focus {
+  outline: 2px solid var(--amb-cyan);
+  outline-offset: 0;
+  box-shadow: var(--amb-glow-cyan);
+}
+
+/* --- Hero section (splash template) --- */
+.hero h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+}
+
+/* Primary hero button: cyan with glow */
+.hero a[data-variant='primary'] {
+  background: var(--amb-cyan);
+  color: var(--amb-cyan-deep);
+  font-family: var(--font-display);
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--amb-glow-cyan);
+  transition:
+    box-shadow var(--dur-base) var(--ease-glow),
+    transform var(--dur-fast) var(--ease-glow);
+}
+.hero a[data-variant='primary']:hover {
+  box-shadow: 0 0 36px rgba(25, 227, 255, .75);
+  transform: translateY(-1px);
+}
+
+/* Ghost (secondary) hero button */
+.hero a[data-variant='minimal'] {
+  color: var(--amb-text-2);
+  border-color: var(--amb-line-strong);
+}
+.hero a[data-variant='minimal']:hover {
+  color: var(--amb-text);
+  border-color: var(--amb-cyan);
+}
+
+/* --- Table of contents --- */
+starlight-toc nav a {
+  font-size: 0.8rem;
+  color: var(--amb-text-3);
+  transition: color var(--dur-fast) var(--ease-glow);
+}
+starlight-toc nav a:hover,
+starlight-toc nav a[aria-current='true'] {
+  color: var(--amb-cyan);
+}
+starlight-toc nav a[aria-current='true'] {
+  font-weight: 600;
+}
+
+/* =============================================================
+   7. LIGHT MODE COMPONENT ADJUSTMENTS
+   Glows removed (invisible on light bg); accents shifted to teal.
+   ============================================================= */
+
+/* Site title: darker gradient for light nav */
+[data-theme='light'] .site-title {
+  background: linear-gradient(90deg, #0096B0 0%, #7C5CFF 50%, #CC006B 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Inline code on light */
+[data-theme='light'] .sl-markdown-content code:not(pre code) {
+  background: #E4E9F4;
+  border-color: rgba(0, 0, 0, .1);
+  color: #0096B0;
+}
+
+/* Expressive code blocks stay dark even in light mode (intentional) */
+[data-theme='light'] .expressive-code .frame {
+  background: #F4F6FB !important;
+  border-color: rgba(0, 0, 0, .12) !important;
+}
+
+/* Blockquote on light */
+[data-theme='light'] .sl-markdown-content blockquote {
+  background: rgba(124, 92, 255, .04);
+}
+
+/* Pagination: no glow on light */
+[data-theme='light'] .pagination-links a:hover {
+  box-shadow: none;
+  border-color: #0096B0;
+}
+
+/* Asides on light: reduce tint opacity */
+[data-theme='light'] .starlight-aside--caution {
+  background: rgba(255, 45, 156, .04);
+}
+[data-theme='light'] .starlight-aside--danger {
+  background: rgba(255, 45, 156, .07);
+  box-shadow: none;
+}
+
+/* Active sidebar link on light */
+[data-theme='light'] .sidebar-content a[aria-current='page'],
+[data-theme='light'] .sidebar-content a[aria-current='page']:hover {
+  color: #0096B0;
+  background: rgba(0, 150, 176, .08);
+  border-left-color: #0096B0;
+}
+
+/* Search on light */
+[data-theme='light'] site-search input:focus {
+  outline-color: #0096B0;
+  box-shadow: 0 0 0 3px rgba(0, 150, 176, .2);
+}
