@@ -1,0 +1,62 @@
+---
+title: AmbientNav
+description: Umgebungsbeleuchtung für Navigation und Einparkhilfe in Fahrzeugen,
+  inspiriert vom VW ID.3 Ambiente-Licht.
+template: splash
+hero:
+  tagline: Navigationsgesteuerte Umgebungsbeleuchtung und Einparkhilfe für dein
+    Fahrzeug.
+  actions:
+    - text: Erste Schritte
+      link: /0.3/ambientnav/de/getting-started/
+      icon: right-arrow
+      variant: primary
+    - text: GitHub
+      link: https://github.com/vergissberlin/ambientnav
+      icon: external
+      variant: minimal
+slug: de/0.3
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Was ist AmbientNav?
+
+AmbientNav verwandelt adressierbare LED-Streifen in ein Echtzeit-Navigationssystem und eine Näherungswarnung. Zwei ESP32-Mikrocontroller arbeiten gemeinsam mit einer iOS-App und bringen Licht in deine Fahrt.
+
+<CardGrid stagger>
+  <Card title="Navigationsbeleuchtung">
+    Der vordere LED-Streifen spiegelt die iPhone-Navigation wider — Sweep nach links vor einer Linkskurve, nach rechts vor einer Rechtskurve, Puls vorwärts bei geradeaus.
+  </Card>
+
+  <Card title="Einparkhilfe">
+    Drei Ultraschallsensoren hinten liefern einen Live-Abstandsbalken. Der Balken wird schmaler und wechselt von Grün nach Rot, je näher du einem Hindernis kommst.
+  </Card>
+
+  <Card title="Offen & Offline">
+    Basiert auf OpenStreetMap und dem Valhalla-Routing-Engine — kein Abo, kein Anbieter-Lock-in, und offline nutzbar sobald die Kartenkacheln gecacht sind.
+  </Card>
+
+  <Card title="Drahtlose Architektur">
+    Das iPhone kommuniziert über Bluetooth LE mit dem vorderen ESP32. Vorderer und hinterer ESP32 kommunizieren über Bluetooth Classic — keine Kabelverbindung zwischen den beiden Boards.
+  </Card>
+</CardGrid>
+
+## Systemübersicht
+
+```
+📱 iPhone App  ──BLE──▶  ESP32 Vorne (Master)  ──BT Classic──▶  ESP32 Hinten (Slave)
+                              │                                         │
+                          LED Streifen                             LED Streifen
+                          (vorne)                                  (hinten)
+                                                                ◀── 3× HC-SR04
+```
+
+| Szenario | LED-Effekt |
+|---|---|
+| Abbiegen links | Vorderer Streifen sweept links, Amber |
+| Abbiegen rechts | Vorderer Streifen sweept rechts, Amber |
+| Geradeaus weiterfahren | Vorderer Streifen pulsiert vorwärts, Weiß |
+| Rückwärts — Hindernis weit | Hinterer Balken voll, Grün |
+| Rückwärts — Hindernis nah | Hinterer Balken wird schmaler, Amber → Rot |
+| Leerlauf | Langsames Atmen, konfigurierbarer Farbwert |

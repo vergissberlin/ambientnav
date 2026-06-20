@@ -1,0 +1,61 @@
+---
+title: AmbientNav
+description: Ambient LED navigation and parking assistance for vehicles,
+  inspired by the VW ID.3 ambient lighting.
+template: splash
+hero:
+  tagline: Navigation-guided ambient lighting and parking assistance for your vehicle.
+  actions:
+    - text: Get Started
+      link: /0.3/ambientnav/getting-started/
+      icon: right-arrow
+      variant: primary
+    - text: View on GitHub
+      link: https://github.com/vergissberlin/ambientnav
+      icon: external
+      variant: minimal
+slug: "0.3"
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## What is AmbientNav?
+
+AmbientNav turns addressable LED strips into a real-time navigation guide and proximity warning system. Two ESP32 microcontrollers work together with a custom iOS app to light up your drive.
+
+<CardGrid stagger>
+  <Card title="Navigation Lighting">
+    The front LED strip mirrors your iPhone navigation — sweep left before a left turn, sweep right for a right turn, pulse forward when continuing straight.
+  </Card>
+
+  <Card title="Parking Aid">
+    Three ultrasonic sensors at the rear feed a live distance bar. The bar narrows and shifts from green to red as you approach an obstacle.
+  </Card>
+
+  <Card title="Open & Offline">
+    Built on OpenStreetMap and the Valhalla routing engine — no subscription, no cloud lock-in, and works offline once map tiles are cached.
+  </Card>
+
+  <Card title="Wireless Architecture">
+    The iPhone talks to the front ESP32 over Bluetooth LE. The front and rear ESP32s communicate via Bluetooth Classic — no wiring between the two boards.
+  </Card>
+</CardGrid>
+
+## System Overview
+
+```
+📱 iPhone App  ──BLE──▶  ESP32 Front (Master)  ──BT Classic──▶  ESP32 Rear (Slave)
+                              │                                        │
+                          LED Strip                               LED Strip
+                          (front)                                  (rear)
+                                                               ◀── 3× HC-SR04
+```
+
+| Scenario | LED Effect |
+|---|---|
+| Turn left | Front strip sweeps left, amber |
+| Turn right | Front strip sweeps right, amber |
+| Continue straight | Front strip pulses forward, white |
+| Reversing — obstacle far | Full rear bar, green |
+| Reversing — obstacle close | Rear bar narrows, amber → red |
+| Idle | Slow breathing, configurable color |
