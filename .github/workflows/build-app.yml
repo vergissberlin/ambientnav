@@ -85,9 +85,16 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      # permission_handler requires Android SDK platform 37 (compileSdk 37 in app/build.gradle).
+      # permission_handler_android 14 requires compileSdk 37 (see compileSdk in
+      # app/build.gradle). The runner's bundled cmdline-tools is older than that
+      # platform and does not list it in the SDK index, so refresh the tools
+      # first and only then install the platform.
       - name: Install Android SDK 37
-        run: yes | "${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager" "platforms;android-37"
+        run: |
+          SDKMANAGER="${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager"
+          yes | "${SDKMANAGER}" --install "cmdline-tools;latest"
+          yes | "${SDKMANAGER}" --update
+          yes | "${SDKMANAGER}" "platforms;android-37"
         env:
           ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
           ANDROID_HOME: /usr/local/lib/android/sdk
