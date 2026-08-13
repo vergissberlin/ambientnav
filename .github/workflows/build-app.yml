@@ -21,8 +21,10 @@ permissions:
   contents: write
 
 # Pin the Flutter version used across all jobs.
+# Keep in sync with app/.fvmrc, .github/workflows/build-widgetbook.yml and the
+# prerequisites table in CONTRIBUTING.md.
 env:
-  FLUTTER_VERSION: '3.27.1'
+  FLUTTER_VERSION: '3.44.9'
 
 jobs:
   analyze-test:

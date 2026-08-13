@@ -5,8 +5,11 @@ publish_to: 'none'
 # Keep in sync with the monorepo release (managed by release-please).
 version: 0.5.0 # x-release-please-version
 
+# Dart 3.12 ships with Flutter 3.44. The floor is set by flutter_riverpod 3.x
+# (sdk ^3.12.0); cupertino_icons 1.0.9 and flutter_lints 6 would each be happy
+# with less. See CONTRIBUTING.md for the pinned toolchain.
 environment:
-  sdk: ^3.6.0
+  sdk: ^3.12.0
 
 dependencies:
   flutter:
