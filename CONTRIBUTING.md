@@ -187,7 +187,7 @@ For interactive simulation, use the Wokwi diagrams in `wokwi/front/` and `wokwi/
 ### Flutter / Dart
 
 - Follow [`package:flutter_lints`](https://pub.dev/packages/flutter_lints) (configured in `app/analysis_options.yaml`).
-- Run `flutter analyze` and `dart format lib test` before committing. CI enforces both.
+- Run `flutter analyze` and `dart format lib test integration_test` before committing. CI enforces both.
 - Do not hard-code colors. Use `AppTheme` and the design tokens from `design-system/tokens/`.
 - Prefer `const` constructors wherever possible.
 - State management: Riverpod providers only — no `setState` outside of leaf widgets.

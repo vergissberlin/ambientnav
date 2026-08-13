@@ -5,14 +5,21 @@ allprojects {
     }
 }
 
-rootProject.buildDir = "../build"
+// Redirect build output to app/build/<module> so it sits next to the Flutter
+// build directory rather than under android/. The workflows reference
+// app/build/app/outputs/flutter-apk/, so the layout must stay as it is.
+//
+// Uses the layout.buildDirectory provider API: the `buildDir` setters this
+// previously used are deprecated on Gradle 8.x and removed in Gradle 9.
+rootProject.layout.buildDirectory.set(file("../build"))
+
 subprojects {
-    project.buildDir = "${rootProject.buildDir}/${project.name}"
-}
-subprojects {
+    project.layout.buildDirectory.set(
+        rootProject.layout.buildDirectory.dir(project.name)
+    )
     project.evaluationDependsOn(":app")
 }
 
 tasks.register("clean", Delete) {
-    delete rootProject.buildDir
+    delete rootProject.layout.buildDirectory
 }
