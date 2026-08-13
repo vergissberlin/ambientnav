@@ -24,7 +24,7 @@ dependencies:
 
   # Routing & navigation UI.
   maplibre_gl: ^0.26.2          # OSS map rendering + offline regions (OSM tiles)
-  geolocator: ^13.0.1           # device GPS position
+  geolocator: ^14.0.3           # device GPS position
   flutter_tts: ^4.2.0           # multi-language voice guidance
 
   # BLE — central role, RSSI exposed natively, bonding/pairing, MTU.
@@ -44,8 +44,8 @@ dependencies:
   hive_ce: ^2.7.0
   hive_ce_flutter: ^2.2.0
 
-  permission_handler: ^11.3.1   # BLE scan/connect + location runtime permissions
-  file_picker: ^8.1.4           # select firmware .bin for OTA
+  permission_handler: ^13.0.1   # BLE scan/connect + location runtime permissions
+  file_picker: ^11.0.3           # select firmware .bin for OTA
   intl: any                     # localization formatting (pinned by flutter_localizations)
 
 dev_dependencies:
