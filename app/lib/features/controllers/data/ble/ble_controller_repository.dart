@@ -90,6 +90,7 @@ class BleControllerRepository implements ControllerRepository {
     String deviceId,
     String characteristicId,
     Uint8List value,
+    int? timestamp,
   ) {
     final controller =
         _notifications[_notificationKey(deviceId, characteristicId)];

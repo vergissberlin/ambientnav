@@ -13,10 +13,8 @@ import 'car_session_state.dart';
 class CarBridge {
   CarBridge(
     this._container, {
-    MethodChannel channel = const MethodChannel(
-      'digital.thinkport.ambientnav/car',
-    ),
-  }) : _channel = channel;
+    this._channel = const MethodChannel('digital.thinkport.ambientnav/car'),
+  });
 
   final ProviderContainer _container;
   final MethodChannel _channel;

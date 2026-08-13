@@ -3,6 +3,8 @@ import 'package:ambientnav/core/theme/theme_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:ambientnav/core/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+// Override moved behind misc.dart in Riverpod 3.
+import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Pumps [child] inside a MaterialApp with localizations and a ProviderScope.

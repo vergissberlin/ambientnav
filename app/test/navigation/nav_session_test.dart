@@ -10,6 +10,8 @@ import 'package:ambientnav/features/navigation/presentation/nav_controller.dart'
 import 'package:ambientnav/features/navigation/presentation/nav_session.dart';
 import 'package:ambientnav/features/navigation/presentation/navigation_location_runner.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+// Override moved behind misc.dart in Riverpod 3.
+import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class _FakeLocationService extends LocationService {
