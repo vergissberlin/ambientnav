@@ -23,7 +23,7 @@ dependencies:
   flutter_riverpod: ^3.4.2
 
   # Routing & navigation UI.
-  maplibre_gl: ^0.20.0          # OSS map rendering + offline regions (OSM tiles)
+  maplibre_gl: ^0.26.2          # OSS map rendering + offline regions (OSM tiles)
   geolocator: ^13.0.1           # device GPS position
   flutter_tts: ^4.2.0           # multi-language voice guidance
 
