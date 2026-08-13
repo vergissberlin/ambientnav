@@ -8,8 +8,10 @@ import '../theme/theme_controller.dart';
 
 /// Compile-time default for the route simulation mode
 /// (`--dart-define=SIMULATE=true`).
-const bool kSimulateRouteDefault =
-    bool.fromEnvironment('SIMULATE', defaultValue: false);
+const bool kSimulateRouteDefault = bool.fromEnvironment(
+  'SIMULATE',
+  defaultValue: false,
+);
 
 /// Persists the developer "route simulation" toggle. When enabled, planning a
 /// route drives a virtual vehicle along it instead of relying on real GPS.
@@ -33,5 +35,5 @@ class SimulationController extends StateNotifier<bool> {
 
 final simulationEnabledProvider =
     StateNotifierProvider<SimulationController, bool>((ref) {
-  return SimulationController(ref.watch(localStoreProvider));
-});
+      return SimulationController(ref.watch(localStoreProvider));
+    });

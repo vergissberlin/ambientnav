@@ -68,8 +68,9 @@ class NavController extends StateNotifier<NavigationState> {
       phase: NavPhase.navigating,
       route: route,
       nextManeuverIndex: 0,
-      distanceToManeuverMeters:
-          route.maneuvers.isNotEmpty ? route.maneuvers.first.distanceMeters : 0,
+      distanceToManeuverMeters: route.maneuvers.isNotEmpty
+          ? route.maneuvers.first.distanceMeters
+          : 0,
     );
   }
 
@@ -100,4 +101,5 @@ class NavController extends StateNotifier<NavigationState> {
 
 final navControllerProvider =
     StateNotifierProvider<NavController, NavigationState>(
-        (ref) => NavController());
+      (ref) => NavController(),
+    );

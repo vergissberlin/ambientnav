@@ -51,11 +51,11 @@ class _SensorCalibrationFormState extends ConsumerState<SensorCalibrationForm> {
   }
 
   String _sensorLabel(AppLocalizations l10n, SensorType t) => switch (t) {
-        SensorType.left => l10n.sensorLeft,
-        SensorType.center => l10n.sensorCenter,
-        SensorType.right => l10n.sensorRight,
-        SensorType.fused => l10n.sensorFused,
-      };
+    SensorType.left => l10n.sensorLeft,
+    SensorType.center => l10n.sensorCenter,
+    SensorType.right => l10n.sensorRight,
+    SensorType.fused => l10n.sensorFused,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -76,8 +76,9 @@ class _SensorCalibrationFormState extends ConsumerState<SensorCalibrationForm> {
             for (final t in SensorType.values)
               DropdownMenuItem(value: t, child: Text(_sensorLabel(l10n, t))),
           ],
-          onChanged: (t) => setState(() =>
-              _config = cfg.copyWith(activeSensor: t ?? cfg.activeSensor)),
+          onChanged: (t) => setState(
+            () => _config = cfg.copyWith(activeSensor: t ?? cfg.activeSensor),
+          ),
         ),
         const SizedBox(height: 16),
         Text('${l10n.calibration}: ${cfg.calibrationOffsetCm} cm'),
@@ -88,7 +89,8 @@ class _SensorCalibrationFormState extends ConsumerState<SensorCalibrationForm> {
           divisions: 100,
           value: cfg.calibrationOffsetCm.toDouble().clamp(-50, 50),
           onChanged: (v) => setState(
-              () => _config = cfg.copyWith(calibrationOffsetCm: v.round())),
+            () => _config = cfg.copyWith(calibrationOffsetCm: v.round()),
+          ),
         ),
         const SizedBox(height: 16),
         Text('${l10n.maxRange}: ${cfg.maxRangeCm} cm'),

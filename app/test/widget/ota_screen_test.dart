@@ -5,8 +5,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'pump_app.dart';
 
 void main() {
-  testWidgets('install is disabled until a firmware file is picked',
-      (tester) async {
+  testWidgets('install is disabled until a firmware file is picked', (
+    tester,
+  ) async {
     await pumpApp(
       tester,
       const Scaffold(body: OtaScreen(deviceId: 'mock-front')),

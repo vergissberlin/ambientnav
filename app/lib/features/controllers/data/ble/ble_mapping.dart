@@ -14,8 +14,9 @@ class BleMapping {
     required String navServiceUuid,
   }) {
     final lowerNav = navServiceUuid.toLowerCase();
-    final advertises =
-        advertisedServiceUuids.any((u) => u.toLowerCase() == lowerNav);
+    final advertises = advertisedServiceUuids.any(
+      (u) => u.toLowerCase() == lowerNav,
+    );
     return advertises || name.toLowerCase().startsWith('ambientnav');
   }
 

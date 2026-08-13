@@ -8,7 +8,7 @@ enum ManeuverType {
   straight,
   uturn,
   roundabout,
-  arrive;
+  arrive,
 }
 
 /// A single instruction along a route.

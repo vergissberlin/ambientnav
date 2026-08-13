@@ -11,10 +11,12 @@ import 'car_session_state.dart';
 /// sides (CarPlay `CPMapTemplate`, Android Auto `NavigationTemplate`) render the
 /// forwarded snapshot — see `app/docs/car-integration.md` for enabling them.
 class CarBridge {
-  CarBridge(this._container,
-      {MethodChannel channel =
-          const MethodChannel('digital.thinkport.ambientnav/car')})
-      : _channel = channel;
+  CarBridge(
+    this._container, {
+    MethodChannel channel = const MethodChannel(
+      'digital.thinkport.ambientnav/car',
+    ),
+  }) : _channel = channel;
 
   final ProviderContainer _container;
   final MethodChannel _channel;
@@ -36,11 +38,11 @@ class CarBridge {
 
   /// Serialize a snapshot to the wire map sent to native.
   static Map<String, dynamic> encode(CarSessionState s) => {
-        'isNavigating': s.isNavigating,
-        'maneuver': s.nextManeuver?.type.name,
-        'instruction': s.nextManeuver?.instruction ?? '',
-        'distanceMeters': s.distanceToManeuverMeters,
-      };
+    'isNavigating': s.isNavigating,
+    'maneuver': s.nextManeuver?.type.name,
+    'instruction': s.nextManeuver?.instruction ?? '',
+    'distanceMeters': s.distanceToManeuverMeters,
+  };
 
   Future<void> _send(CarSessionState state) async {
     try {

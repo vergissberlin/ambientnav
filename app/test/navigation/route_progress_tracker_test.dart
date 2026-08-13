@@ -57,8 +57,10 @@ void main() {
     final nearStart = tracker.update(const GeoPoint(52.0001, 13.001));
     final further = tracker.update(const GeoPoint(52.0001, 13.008));
     expect(nearStart.nextManeuverIndex, 0);
-    expect(further.distanceToManeuverMeters,
-        lessThan(nearStart.distanceToManeuverMeters));
+    expect(
+      further.distanceToManeuverMeters,
+      lessThan(nearStart.distanceToManeuverMeters),
+    );
   });
 
   test('tracker advances maneuver index along the route', () {

@@ -10,11 +10,7 @@ void main() {
           'lat': '52.5251',
           'lon': '13.3694',
         },
-        {
-          'display_name': 'Berlin, Germany',
-          'lat': '52.5200',
-          'lon': '13.4050',
-        },
+        {'display_name': 'Berlin, Germany', 'lat': '52.5200', 'lon': '13.4050'},
       ];
       final results = GeocodingService.parse(json);
       expect(results.length, 2);

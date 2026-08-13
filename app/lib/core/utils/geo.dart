@@ -14,7 +14,8 @@ class Geo {
     final lat2 = _rad(b.latitude);
     final dLat = _rad(b.latitude - a.latitude);
     final dLon = _rad(b.longitude - a.longitude);
-    final h = math.sin(dLat / 2) * math.sin(dLat / 2) +
+    final h =
+        math.sin(dLat / 2) * math.sin(dLat / 2) +
         math.cos(lat1) *
             math.cos(lat2) *
             math.sin(dLon / 2) *
@@ -59,9 +60,9 @@ class Geo {
   }
 
   static GeoPoint _lerp(GeoPoint a, GeoPoint b, double t) => GeoPoint(
-        a.latitude + (b.latitude - a.latitude) * t,
-        a.longitude + (b.longitude - a.longitude) * t,
-      );
+    a.latitude + (b.latitude - a.latitude) * t,
+    a.longitude + (b.longitude - a.longitude) * t,
+  );
 
   /// Initial bearing from [a] to [b] in degrees, 0–360 clockwise from north.
   static double initialBearing(GeoPoint a, GeoPoint b) {
@@ -69,7 +70,8 @@ class Geo {
     final lat2 = _rad(b.latitude);
     final dLon = _rad(b.longitude - a.longitude);
     final y = math.sin(dLon) * math.cos(lat2);
-    final x = math.cos(lat1) * math.sin(lat2) -
+    final x =
+        math.cos(lat1) * math.sin(lat2) -
         math.sin(lat1) * math.cos(lat2) * math.cos(dLon);
     final deg = math.atan2(y, x) * 180.0 / math.pi;
     return (deg + 360.0) % 360.0;
@@ -153,8 +155,9 @@ class Geo {
     final py = (p.latitude - a.latitude) * scaleLat;
 
     final segLen2 = bx * bx + by * by;
-    final t =
-        segLen2 == 0 ? 0.0 : ((px * bx + py * by) / segLen2).clamp(0.0, 1.0);
+    final t = segLen2 == 0
+        ? 0.0
+        : ((px * bx + py * by) / segLen2).clamp(0.0, 1.0);
     return (point: _lerp(a, b, t), t: t);
   }
 }

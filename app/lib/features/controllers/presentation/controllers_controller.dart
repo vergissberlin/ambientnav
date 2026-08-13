@@ -46,11 +46,11 @@ class ControllersController extends StateNotifier<ControllersState> {
     state = state.copyWith(isScanning: true, error: null);
     await _scanSub?.cancel();
     _scanSub = _repository.scan().listen(
-          (devices) => state = state.copyWith(devices: devices),
-          onError: (Object e) =>
-              state = state.copyWith(isScanning: false, error: e.toString()),
-          onDone: () => state = state.copyWith(isScanning: false),
-        );
+      (devices) => state = state.copyWith(devices: devices),
+      onError: (Object e) =>
+          state = state.copyWith(isScanning: false, error: e.toString()),
+      onDone: () => state = state.copyWith(isScanning: false),
+    );
   }
 
   Future<void> stopScan() async {
@@ -64,10 +64,7 @@ class ControllersController extends StateNotifier<ControllersState> {
     await _repository.connect(id);
     _patch(id, (d) => d.copyWith(isConnected: true));
     _telemetrySubs[id] = _repository.telemetry(id).listen((t) {
-      _patch(
-        id,
-        (d) => d.copyWith(voltage: t.voltageVolts, rssi: t.rssi),
-      );
+      _patch(id, (d) => d.copyWith(voltage: t.voltageVolts, rssi: t.rssi));
     });
   }
 
@@ -79,9 +76,7 @@ class ControllersController extends StateNotifier<ControllersState> {
 
   void _patch(String id, ControllerInfo Function(ControllerInfo) update) {
     state = state.copyWith(
-      devices: [
-        for (final d in state.devices) d.id == id ? update(d) : d,
-      ],
+      devices: [for (final d in state.devices) d.id == id ? update(d) : d],
     );
   }
 
@@ -102,5 +97,5 @@ class ControllersController extends StateNotifier<ControllersState> {
 /// provider is a plain [Provider] that does not rebuild today; keep it that way.
 final controllersControllerProvider =
     StateNotifierProvider<ControllersController, ControllersState>((ref) {
-  return ControllersController(ref.watch(controllerRepositoryProvider));
-});
+      return ControllersController(ref.watch(controllerRepositoryProvider));
+    });

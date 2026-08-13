@@ -48,5 +48,5 @@ final localStoreProvider = Provider<LocalStore>((ref) {
 
 final themeControllerProvider =
     StateNotifierProvider<ThemeController, ThemeMode>((ref) {
-  return ThemeController(ref.watch(localStoreProvider));
-});
+      return ThemeController(ref.watch(localStoreProvider));
+    });

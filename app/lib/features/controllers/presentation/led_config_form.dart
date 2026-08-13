@@ -64,8 +64,11 @@ class _LedConfigFormState extends ConsumerState<LedConfigForm> {
           key: const Key('ledCountField'),
           initialValue: cfg.ledCount.toString(),
           keyboardType: TextInputType.number,
-          onChanged: (v) => setState(() => _config =
-              cfg.copyWith(ledCount: int.tryParse(v) ?? cfg.ledCount)),
+          onChanged: (v) => setState(
+            () => _config = cfg.copyWith(
+              ledCount: int.tryParse(v) ?? cfg.ledCount,
+            ),
+          ),
         ),
         const SizedBox(height: 16),
         Text('${l10n.brightness}: ${cfg.brightness}'),

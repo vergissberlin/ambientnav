@@ -21,16 +21,20 @@ class RouteResponseDto {
         final s = step as Map<String, dynamic>;
         final man = s['maneuver'] as Map<String, dynamic>;
         final loc = (man['location'] as List).cast<num>();
-        maneuvers.add(Maneuver(
-          type:
-              _osrmManeuver(man['type'] as String?, man['modifier'] as String?),
-          instruction: (s['name'] as String?)?.trim().isNotEmpty == true
-              ? s['name'] as String
-              : (man['type'] as String? ?? 'continue'),
-          distanceMeters: (s['distance'] as num?)?.toDouble() ?? 0,
-          latitude: loc[1].toDouble(),
-          longitude: loc[0].toDouble(),
-        ));
+        maneuvers.add(
+          Maneuver(
+            type: _osrmManeuver(
+              man['type'] as String?,
+              man['modifier'] as String?,
+            ),
+            instruction: (s['name'] as String?)?.trim().isNotEmpty == true
+                ? s['name'] as String
+                : (man['type'] as String? ?? 'continue'),
+            distanceMeters: (s['distance'] as num?)?.toDouble() ?? 0,
+            latitude: loc[1].toDouble(),
+            longitude: loc[0].toDouble(),
+          ),
+        );
       }
     }
     return Routes(
@@ -60,13 +64,15 @@ class RouteResponseDto {
         final point = beginIndex < shape.length
             ? shape[beginIndex]
             : (shape.isNotEmpty ? shape.last : const GeoPoint(0, 0));
-        maneuvers.add(Maneuver(
-          type: _valhallaManeuver((m['type'] as num?)?.toInt() ?? 0),
-          instruction: m['instruction'] as String? ?? '',
-          distanceMeters: ((m['length'] as num?)?.toDouble() ?? 0) * 1000,
-          latitude: point.latitude,
-          longitude: point.longitude,
-        ));
+        maneuvers.add(
+          Maneuver(
+            type: _valhallaManeuver((m['type'] as num?)?.toInt() ?? 0),
+            instruction: m['instruction'] as String? ?? '',
+            distanceMeters: ((m['length'] as num?)?.toDouble() ?? 0) * 1000,
+            latitude: point.latitude,
+            longitude: point.longitude,
+          ),
+        );
       }
     }
     final summary = trip['summary'] as Map<String, dynamic>?;
@@ -84,10 +90,9 @@ class RouteResponseDto {
     }
     if (geometry is Map && geometry['coordinates'] is List) {
       return (geometry['coordinates'] as List)
-          .map((c) => GeoPoint(
-                (c[1] as num).toDouble(),
-                (c[0] as num).toDouble(),
-              ))
+          .map(
+            (c) => GeoPoint((c[1] as num).toDouble(), (c[0] as num).toDouble()),
+          )
           .toList();
     }
     return const [];

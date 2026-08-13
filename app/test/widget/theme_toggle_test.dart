@@ -9,8 +9,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'pump_app.dart';
 
 void main() {
-  testWidgets('selecting dark mode switches the active theme brightness',
-      (tester) async {
+  testWidgets('selecting dark mode switches the active theme brightness', (
+    tester,
+  ) async {
     // Use a Consumer so we can read the live ThemeMode from the app.
     await pumpApp(
       tester,

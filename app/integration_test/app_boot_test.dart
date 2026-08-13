@@ -12,9 +12,7 @@ void main() {
   testWidgets('app boots and navigates between the main tabs', (tester) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [
-          localStoreProvider.overrideWithValue(InMemoryLocalStore()),
-        ],
+        overrides: [localStoreProvider.overrideWithValue(InMemoryLocalStore())],
         child: const AmbientNavApp(),
       ),
     );

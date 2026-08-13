@@ -12,15 +12,19 @@ void main() {
 
   test('scan discovers the front and rear devices', () async {
     final emissions = await repo.scan().toList();
-    expect(emissions.last.map((d) => d.name),
-        containsAll(['AmbientNav-Front', 'AmbientNav-Rear']));
+    expect(
+      emissions.last.map((d) => d.name),
+      containsAll(['AmbientNav-Front', 'AmbientNav-Rear']),
+    );
   });
 
   test('writing config is blocked until paired (least privilege)', () async {
     await repo.connect(MockControllerRepository.frontId);
     expect(
-      () => repo.writeLedConfig(MockControllerRepository.frontId,
-          const LedConfig(ledCount: 30, brightness: 100)),
+      () => repo.writeLedConfig(
+        MockControllerRepository.frontId,
+        const LedConfig(ledCount: 30, brightness: 100),
+      ),
       throwsA(isA<NotPairedException>()),
     );
   });

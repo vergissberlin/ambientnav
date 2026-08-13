@@ -26,5 +26,6 @@ enum CameraMode {
 }
 
 /// Current camera mode while navigating. Defaults to [CameraMode.follow].
-final cameraModeProvider =
-    StateProvider<CameraMode>((ref) => CameraMode.follow);
+final cameraModeProvider = StateProvider<CameraMode>(
+  (ref) => CameraMode.follow,
+);

@@ -45,7 +45,9 @@ class _OtaScreenState extends ConsumerState<OtaScreen> {
     if (firmware == null) return;
     final repo = ref.read(controllerRepositoryProvider);
     await _sub?.cancel();
-    _sub = repo.startOta(widget.deviceId, firmware).listen(
+    _sub = repo
+        .startOta(widget.deviceId, firmware)
+        .listen(
           (p) => setState(() => _progress = p),
           onError: (Object e) => setState(() {
             _progress = OtaProgress(
@@ -65,19 +67,19 @@ class _OtaScreenState extends ConsumerState<OtaScreen> {
   }
 
   String _statusLabel(AppLocalizations l10n) => switch (_progress.state) {
-        OtaState.idle => '',
-        OtaState.transferring ||
-        OtaState.verifying ||
-        OtaState.applying =>
-          l10n.updating,
-        OtaState.done => l10n.updateDone,
-        OtaState.failed => l10n.updateFailed,
-      };
+    OtaState.idle => '',
+    OtaState.transferring ||
+    OtaState.verifying ||
+    OtaState.applying => l10n.updating,
+    OtaState.done => l10n.updateDone,
+    OtaState.failed => l10n.updateFailed,
+  };
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final active = _progress.state == OtaState.transferring ||
+    final active =
+        _progress.state == OtaState.transferring ||
         _progress.state == OtaState.verifying ||
         _progress.state == OtaState.applying;
     return ListView(
@@ -100,11 +102,15 @@ class _OtaScreenState extends ConsumerState<OtaScreen> {
         if (_progress.state != OtaState.idle) ...[
           LinearProgressIndicator(value: _progress.fraction),
           const SizedBox(height: 8),
-          Text('${_statusLabel(l10n)} '
-              '(${(_progress.fraction * 100).toStringAsFixed(0)}%)'),
+          Text(
+            '${_statusLabel(l10n)} '
+            '(${(_progress.fraction * 100).toStringAsFixed(0)}%)',
+          ),
           if (_progress.error != null)
-            Text(_progress.error!,
-                style: TextStyle(color: Theme.of(context).colorScheme.error)),
+            Text(
+              _progress.error!,
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
         ],
       ],
     );

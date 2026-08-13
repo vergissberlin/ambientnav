@@ -9,7 +9,9 @@ class GeoPoint {
   Map<String, double> toJson() => {'lat': latitude, 'lon': longitude};
 
   factory GeoPoint.fromJson(Map<String, dynamic> json) => GeoPoint(
-      (json['lat'] as num).toDouble(), (json['lon'] as num).toDouble());
+    (json['lat'] as num).toDouble(),
+    (json['lon'] as num).toDouble(),
+  );
 
   @override
   bool operator ==(Object other) =>
@@ -56,19 +58,21 @@ class Routes {
   }
 
   Map<String, dynamic> toJson() => {
-        'geometry': geometry.map((p) => p.toJson()).toList(),
-        'maneuvers': maneuvers
-            .map((m) => {
-                  'type': m.type.name,
-                  'instruction': m.instruction,
-                  'distance': m.distanceMeters,
-                  'lat': m.latitude,
-                  'lon': m.longitude,
-                })
-            .toList(),
-        'distance': distanceMeters,
-        'duration': durationSeconds,
-      };
+    'geometry': geometry.map((p) => p.toJson()).toList(),
+    'maneuvers': maneuvers
+        .map(
+          (m) => {
+            'type': m.type.name,
+            'instruction': m.instruction,
+            'distance': m.distanceMeters,
+            'lat': m.latitude,
+            'lon': m.longitude,
+          },
+        )
+        .toList(),
+    'distance': distanceMeters,
+    'duration': durationSeconds,
+  };
 
   factory Routes.fromJson(Map<String, dynamic> json) {
     return Routes(

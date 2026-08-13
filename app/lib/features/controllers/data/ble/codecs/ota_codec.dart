@@ -43,13 +43,16 @@ class OtaCodec {
   }
 
   /// Splits [firmware] into sequenced chunks of at most [chunkSize] bytes.
-  static List<Uint8List> chunk(List<int> firmware,
-      {int chunkSize = defaultChunkSize}) {
+  static List<Uint8List> chunk(
+    List<int> firmware, {
+    int chunkSize = defaultChunkSize,
+  }) {
     final chunks = <Uint8List>[];
     var seq = 0;
     for (var i = 0; i < firmware.length; i += chunkSize) {
-      final end =
-          (i + chunkSize < firmware.length) ? i + chunkSize : firmware.length;
+      final end = (i + chunkSize < firmware.length)
+          ? i + chunkSize
+          : firmware.length;
       chunks.add(encodeDataChunk(seq, firmware.sublist(i, end)));
       seq++;
     }

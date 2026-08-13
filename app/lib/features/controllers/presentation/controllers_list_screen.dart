@@ -23,8 +23,9 @@ class ControllersListScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: Text(l10n.controllersTab)),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed:
-            state.isScanning ? controller.stopScan : controller.startScan,
+        onPressed: state.isScanning
+            ? controller.stopScan
+            : controller.startScan,
         icon: Icon(state.isScanning ? Icons.stop : Icons.bluetooth_searching),
         label: Text(state.isScanning ? l10n.scanning : l10n.scanForControllers),
       ),
@@ -50,14 +51,16 @@ class _ControllerTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final controller = ref.read(controllersControllerProvider.notifier);
-    final roleLabel =
-        device.role == ControllerRole.front ? l10n.roleFront : l10n.roleRear;
+    final roleLabel = device.role == ControllerRole.front
+        ? l10n.roleFront
+        : l10n.roleRear;
 
     return ListTile(
       leading: Icon(
         device.isConnected ? Icons.bluetooth_connected : Icons.bluetooth,
-        color:
-            device.isConnected ? Theme.of(context).colorScheme.primary : null,
+        color: device.isConnected
+            ? Theme.of(context).colorScheme.primary
+            : null,
       ),
       title: Text('${device.name} · $roleLabel'),
       subtitle: Row(

@@ -91,10 +91,8 @@ class BleControllerRepository implements ControllerRepository {
     String characteristicId,
     Uint8List value,
   ) {
-    final controller = _notifications[_notificationKey(
-      deviceId,
-      characteristicId,
-    )];
+    final controller =
+        _notifications[_notificationKey(deviceId, characteristicId)];
     if (controller != null && !controller.isClosed) {
       controller.add(value);
     }

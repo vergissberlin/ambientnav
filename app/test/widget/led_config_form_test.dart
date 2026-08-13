@@ -7,8 +7,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'pump_app.dart';
 
 void main() {
-  testWidgets('auto-populates from the controller, edits and writes back',
-      (tester) async {
+  testWidgets('auto-populates from the controller, edits and writes back', (
+    tester,
+  ) async {
     final repo = MockControllerRepository();
     await repo.connect(MockControllerRepository.frontId);
     await repo.pair(MockControllerRepository.frontId, '123456');
@@ -16,7 +17,8 @@ void main() {
     await pumpApp(
       tester,
       const Scaffold(
-          body: LedConfigForm(deviceId: MockControllerRepository.frontId)),
+        body: LedConfigForm(deviceId: MockControllerRepository.frontId),
+      ),
       overrides: [controllerRepositoryProvider.overrideWithValue(repo)],
     );
     await tester.pumpAndSettle();

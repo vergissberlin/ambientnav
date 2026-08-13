@@ -40,8 +40,10 @@ class RouteSimulationRunner {
     final sim = _sim;
     if (sim == null) return;
     final step = sim.step(_dt);
-    _ref.read(simulatedPositionProvider.notifier).state =
-        SimPose(position: step.position, bearingDeg: step.bearingDeg);
+    _ref.read(simulatedPositionProvider.notifier).state = SimPose(
+      position: step.position,
+      bearingDeg: step.bearingDeg,
+    );
 
     final nav = _ref.read(navControllerProvider.notifier);
 
@@ -68,5 +70,6 @@ class RouteSimulationRunner {
   }
 }
 
-final routeSimulationRunnerProvider =
-    Provider<RouteSimulationRunner>((ref) => RouteSimulationRunner(ref));
+final routeSimulationRunnerProvider = Provider<RouteSimulationRunner>(
+  (ref) => RouteSimulationRunner(ref),
+);

@@ -56,7 +56,8 @@ class NavigationLocationRunner {
   }
 }
 
-final navigationLocationRunnerProvider =
-    Provider<NavigationLocationRunner>((ref) {
+final navigationLocationRunnerProvider = Provider<NavigationLocationRunner>((
+  ref,
+) {
   return NavigationLocationRunner(ref);
 });

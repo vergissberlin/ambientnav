@@ -22,10 +22,11 @@ class GeoResult {
 /// Nominatim usage policy. For production, host your own Nominatim and swap the
 /// base URL.
 class GeocodingService {
-  GeocodingService(
-      {Dio? dio, this.baseUrl = 'https://nominatim.openstreetmap.org'})
-      : assert(baseUrl.startsWith('https://'), 'Geocoding must use HTTPS'),
-        _dio = dio ?? Dio();
+  GeocodingService({
+    Dio? dio,
+    this.baseUrl = 'https://nominatim.openstreetmap.org',
+  }) : assert(baseUrl.startsWith('https://'), 'Geocoding must use HTTPS'),
+       _dio = dio ?? Dio();
 
   final Dio _dio;
   final String baseUrl;

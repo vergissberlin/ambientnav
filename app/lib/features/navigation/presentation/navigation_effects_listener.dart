@@ -27,8 +27,10 @@ class NavigationEffectsListener extends ConsumerWidget {
         ref.read(voiceGuidanceServiceProvider).speak(maneuver.instruction);
       } catch (_) {}
 
-      final command =
-          _maneuverToCommand(maneuver, next.distanceToManeuverMeters);
+      final command = _maneuverToCommand(
+        maneuver,
+        next.distanceToManeuverMeters,
+      );
       final controllers = ref.read(controllersControllerProvider).devices;
       for (final c in controllers) {
         if (c.isConnected && c.role == ControllerRole.front) {

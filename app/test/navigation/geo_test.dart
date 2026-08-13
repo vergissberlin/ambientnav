@@ -12,31 +12,33 @@ void main() {
     });
 
     test('is zero for identical points', () {
-      expect(Geo.haversineMeters(const GeoPoint(1, 2), const GeoPoint(1, 2)),
-          closeTo(0, 1e-6));
+      expect(
+        Geo.haversineMeters(const GeoPoint(1, 2), const GeoPoint(1, 2)),
+        closeTo(0, 1e-6),
+      );
     });
   });
 
   group('Geo.initialBearing', () {
     test('points north for a due-north step', () {
       final b = Geo.initialBearing(
-          const GeoPoint(52.0, 13.0), const GeoPoint(52.01, 13.0));
+        const GeoPoint(52.0, 13.0),
+        const GeoPoint(52.01, 13.0),
+      );
       expect(b, closeTo(0, 1));
     });
 
     test('points east for a due-east step', () {
       final b = Geo.initialBearing(
-          const GeoPoint(52.0, 13.0), const GeoPoint(52.0, 13.01));
+        const GeoPoint(52.0, 13.0),
+        const GeoPoint(52.0, 13.01),
+      );
       expect(b, closeTo(90, 1));
     });
   });
 
   group('Geo.interpolateAlong', () {
-    final line = const [
-      GeoPoint(0, 0),
-      GeoPoint(0, 0.001),
-      GeoPoint(0, 0.002),
-    ];
+    final line = const [GeoPoint(0, 0), GeoPoint(0, 0.001), GeoPoint(0, 0.002)];
 
     test('clamps to endpoints', () {
       expect(Geo.interpolateAlong(line, -10), line.first);

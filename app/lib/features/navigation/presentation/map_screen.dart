@@ -118,26 +118,32 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     }
     final latLng = LatLng(pose.position.latitude, pose.position.longitude);
     if (_simCircle == null) {
-      _simCircle = await controller.addCircle(CircleOptions(
-        geometry: latLng,
-        circleRadius: 8,
-        circleColor: '#1E88E5',
-        circleStrokeColor: '#FFFFFF',
-        circleStrokeWidth: 2,
-      ));
+      _simCircle = await controller.addCircle(
+        CircleOptions(
+          geometry: latLng,
+          circleRadius: 8,
+          circleColor: '#1E88E5',
+          circleStrokeColor: '#FFFFFF',
+          circleStrokeWidth: 2,
+        ),
+      );
     } else {
       await controller.updateCircle(
-          _simCircle!, CircleOptions(geometry: latLng));
+        _simCircle!,
+        CircleOptions(geometry: latLng),
+      );
     }
     if (ref.read(cameraModeProvider) == CameraMode.follow) {
       final dist = ref.read(navControllerProvider).distanceToManeuverMeters;
       await controller.animateCamera(
-        CameraUpdate.newCameraPosition(CameraPosition(
-          target: latLng,
-          bearing: pose.bearingDeg,
-          tilt: 50,
-          zoom: _followZoom(dist),
-        )),
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: latLng,
+            bearing: pose.bearingDeg,
+            tilt: 50,
+            zoom: _followZoom(dist),
+          ),
+        ),
       );
     }
   }
@@ -149,9 +155,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final error = ref.read(navControllerProvider).error;
     if (error != null && mounted) {
       final l10n = AppLocalizations.of(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(_navErrorMessage(l10n, error))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(_navErrorMessage(l10n, error))));
     }
   }
 

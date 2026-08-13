@@ -109,8 +109,10 @@ class _TelemetryTab extends StatelessWidget {
       children: [
         ListTile(
           title: Text(l10n.signalStrength),
-          trailing:
-              RssiIndicator(quality: device.signalQuality, rssi: device.rssi),
+          trailing: RssiIndicator(
+            quality: device.signalQuality,
+            rssi: device.rssi,
+          ),
         ),
         ListTile(
           title: Text(l10n.battery),

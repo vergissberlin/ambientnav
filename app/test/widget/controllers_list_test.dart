@@ -7,8 +7,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'pump_app.dart';
 
 void main() {
-  testWidgets('scan shows the mock controllers with RSSI and battery',
-      (tester) async {
+  testWidgets('scan shows the mock controllers with RSSI and battery', (
+    tester,
+  ) async {
     await pumpApp(tester, const ControllersListScreen());
     await tester.pumpAndSettle();
 

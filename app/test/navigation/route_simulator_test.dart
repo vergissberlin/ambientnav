@@ -14,23 +14,26 @@ Routes _route() {
     ],
     maneuvers: [
       Maneuver(
-          type: ManeuverType.turnLeft,
-          instruction: 'a',
-          distanceMeters: 1000,
-          latitude: 52.0,
-          longitude: 13.0147),
+        type: ManeuverType.turnLeft,
+        instruction: 'a',
+        distanceMeters: 1000,
+        latitude: 52.0,
+        longitude: 13.0147,
+      ),
       Maneuver(
-          type: ManeuverType.turnRight,
-          instruction: 'b',
-          distanceMeters: 1000,
-          latitude: 52.0,
-          longitude: 13.0294),
+        type: ManeuverType.turnRight,
+        instruction: 'b',
+        distanceMeters: 1000,
+        latitude: 52.0,
+        longitude: 13.0294,
+      ),
       Maneuver(
-          type: ManeuverType.arrive,
-          instruction: 'c',
-          distanceMeters: 1000,
-          latitude: 52.0,
-          longitude: 13.0441),
+        type: ManeuverType.arrive,
+        instruction: 'c',
+        distanceMeters: 1000,
+        latitude: 52.0,
+        longitude: 13.0441,
+      ),
     ],
     distanceMeters: 3000,
     durationSeconds: 300,
@@ -56,8 +59,10 @@ void main() {
     final sim = RouteSimulator(_route(), speedMps: 100);
     final first = sim.step(1.0);
     final second = sim.step(1.0);
-    expect(second.distanceToManeuverMeters,
-        lessThan(first.distanceToManeuverMeters));
+    expect(
+      second.distanceToManeuverMeters,
+      lessThan(first.distanceToManeuverMeters),
+    );
   });
 
   test('reports the travel heading (~east) along the east-bound route', () {

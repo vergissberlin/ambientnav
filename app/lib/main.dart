@@ -22,9 +22,7 @@ Future<void> main() async {
   // Own the container so the CarPlay / Android Auto bridge can share the same
   // navigation state as the phone UI.
   final container = ProviderContainer(
-    overrides: [
-      localStoreProvider.overrideWithValue(store),
-    ],
+    overrides: [localStoreProvider.overrideWithValue(store)],
   );
   CarBridge(container).start();
 
