@@ -4,6 +4,7 @@ import 'foundations/foundations.dart';
 import 'use_cases/app_use_cases.dart';
 import 'use_cases/atom_use_cases.dart';
 import 'use_cases/molecule_use_cases.dart';
+import 'use_cases/screen_use_cases.dart';
 
 /// The catalogue tree.
 ///
@@ -33,5 +34,9 @@ final List<WidgetbookNode> kDirectories = [
     name: 'Molecules',
     children: [...extractedMolecules(), ...appMolecules()],
   ),
-  WidgetbookFolder(name: 'Organisms', children: extractedOrganisms()),
+  WidgetbookFolder(
+    name: 'Organisms',
+    children: [...extractedOrganisms(), ...providerBoundOrganisms()],
+  ),
+  WidgetbookFolder(name: 'Screens', children: screens()),
 ];
