@@ -5,10 +5,14 @@ on:
     branches: [main]
     paths:
       - 'app/**'
+      - 'packages/**'
+      - 'design-system/tokens/**'
       - '.github/workflows/build-app.yml'
   pull_request:
     paths:
       - 'app/**'
+      - 'packages/**'
+      - 'design-system/tokens/**'
       - '.github/workflows/build-app.yml'
   workflow_call:
     inputs:
@@ -27,6 +31,36 @@ env:
   FLUTTER_VERSION: '3.44.9'
 
 jobs:
+  analyze-test-ui:
+    name: Analyze & Test (ambientnav_ui)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/ambientnav_ui
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Verify formatting
+        run: dart format --set-exit-if-changed lib test
+
+      - name: Analyze
+        run: flutter analyze
+
+      # Includes tokens_match_css_test.dart, which reads design-system/tokens/
+      # and fails when the Dart mirror drifts from the CSS.
+      - name: Run tests
+        run: flutter test
+
   analyze-test:
     name: Analyze & Test
     runs-on: ubuntu-latest

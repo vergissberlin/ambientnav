@@ -6,13 +6,25 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```
 ambientnav/
-├── app/                  # Flutter iOS/Android app
-├── firmware/front/       # ESP32 master — BLE + front LED strip
-├── firmware/rear/        # ESP32 slave  — ultrasonic sensors + rear LED strip
-├── docs/                 # Astro/Starlight documentation site
-├── wokwi/                # ESP32 circuit simulations
-└── Justfile              # Top-level dev shortcuts
+├── app/                     # Flutter iOS/Android app
+├── packages/ambientnav_ui/  # Brand layer: design tokens, theming, An* atoms
+├── widgetbook/              # Component catalogue (dev tool, not shipped)
+├── design-system/           # Web design system — the token source of truth
+├── firmware/front/          # ESP32 master — BLE + front LED strip
+├── firmware/rear/           # ESP32 slave  — ultrasonic sensors + rear LED strip
+├── docs/                    # Astro/Starlight documentation site
+├── wokwi/                   # ESP32 circuit simulations
+└── Justfile                 # Top-level dev shortcuts
 ```
+
+**Package dependency direction:** `widgetbook` → `app` → `packages/ambientnav_ui` → (nothing).
+
+`ambientnav_ui` is deliberately localisation-free and app-agnostic so it can
+carry no dependency on the app — `AppLocalizations` lives in
+`package:ambientnav`, so anything needing app copy belongs in `app/lib`
+instead. `design-system/tokens/*.css` is the source of truth for the Dart
+mirror in `packages/ambientnav_ui/lib/tokens/`, and
+`tokens_match_css_test.dart` fails the build when they drift.
 
 ## Build & Test Commands
 
@@ -32,6 +44,15 @@ cd firmware/front && pio run                    # build
 cd firmware/front && pio run --target upload    # flash
 cd firmware/rear  && pio run
 cd firmware/rear  && pio run --target upload
+```
+
+### Design system & component catalogue
+```bash
+just prepare-all          # pub get for app + ui package + widgetbook
+just widgetbook           # run the catalogue in Chrome
+just widgetbook-test      # pump every registered use case
+just ui-test              # tokens + brand atoms
+just check                # everything CI runs, across all three packages
 ```
 
 ### Docs (Astro/Starlight — pnpm)
