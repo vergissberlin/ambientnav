@@ -17,7 +17,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-  cupertino_icons: ^1.0.8
+  cupertino_icons: ^1.0.9
 
   # State management — testable via provider overrides, no BuildContext coupling.
   flutter_riverpod: ^3.4.2
@@ -25,7 +25,7 @@ dependencies:
   # Routing & navigation UI.
   maplibre_gl: ^0.26.2          # OSS map rendering + offline regions (OSM tiles)
   geolocator: ^14.0.3           # device GPS position
-  flutter_tts: ^4.2.0           # multi-language voice guidance
+  flutter_tts: ^4.2.5           # multi-language voice guidance
 
   # BLE — central role, RSSI exposed natively, bonding/pairing, MTU.
   #
@@ -38,11 +38,11 @@ dependencies:
   universal_ble: ^2.1.1
 
   # Networking (routing) — HTTPS-only.
-  dio: ^5.7.0
+  dio: ^5.11.0
 
   # Local persistence (route cache, configs, theme) behind LocalStore abstraction.
-  hive_ce: ^2.7.0
-  hive_ce_flutter: ^2.2.0
+  hive_ce: ^2.19.3
+  hive_ce_flutter: ^2.3.4
 
   permission_handler: ^13.0.1   # BLE scan/connect + location runtime permissions
   file_picker: ^11.0.3           # select firmware .bin for OTA
@@ -54,7 +54,7 @@ dev_dependencies:
   integration_test:
     sdk: flutter
   flutter_lints: ^5.0.0
-  mocktail: ^1.0.4
+  mocktail: ^1.0.5
 
 flutter:
   uses-material-design: true
