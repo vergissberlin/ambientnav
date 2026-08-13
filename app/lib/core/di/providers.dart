@@ -20,7 +20,7 @@ import '../theme/theme_controller.dart';
 const bool kUseMock = bool.fromEnvironment('USE_MOCK', defaultValue: true);
 
 /// The controller repository. Overridden in tests with the mock; in production
-/// the real `flutter_blue_plus` implementation is used when [kUseMock] is false.
+/// the real `universal_ble` implementation is used when [kUseMock] is false.
 final controllerRepositoryProvider = Provider<ControllerRepository>((ref) {
   return kUseMock ? MockControllerRepository() : BleControllerRepository();
 });

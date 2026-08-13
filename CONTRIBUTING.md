@@ -191,6 +191,11 @@ For interactive simulation, use the Wokwi diagrams in `wokwi/front/` and `wokwi/
 - Do not hard-code colors. Use `AppTheme` and the design tokens from `design-system/tokens/`.
 - Prefer `const` constructors wherever possible.
 - State management: Riverpod providers only — no `setState` outside of leaf widgets.
+- **Check the licence before adding or bumping a dependency.** The BLE stack is
+  `universal_ble` (MIT) rather than `flutter_blue_plus`, whose 2.0.0 release
+  moved to a proprietary dual licence requiring a paid commercial licence for
+  for-profit organisations — including for development and testing. Do not
+  switch back without a legal decision.
 
 ### C++ (ESP32 firmware)
 

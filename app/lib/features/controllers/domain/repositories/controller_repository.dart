@@ -6,7 +6,7 @@ import '../entities/sensor_config.dart';
 import '../entities/telemetry.dart';
 
 /// The contract the UI and use-cases depend on. Implemented by the real BLE
-/// repository (`flutter_blue_plus`) and the in-memory mock used in dev and CI.
+/// repository (`universal_ble`) and the in-memory mock used in dev and CI.
 ///
 /// Security: [pair] must succeed (bonded, encrypted link) before
 /// [writeLedConfig], [writeSensorConfig] or [startOta] are permitted. Reading

@@ -39,8 +39,8 @@ lib/
 ```
 
 The BLE layer sits behind a `ControllerRepository` interface with a real
-`flutter_blue_plus` implementation (follow-up) and a `MockControllerRepository`
-used in development and **every test**, so the whole app runs without hardware.
+`universal_ble` implementation and a `MockControllerRepository` used in
+development and **every test**, so the whole app runs without hardware.
 
 ## Develop
 

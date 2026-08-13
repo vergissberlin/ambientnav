@@ -69,7 +69,9 @@ Flutter App  ──BLE GATT──►  ESP32 Front (master)  ──SPP──►  
 
 "Fresh nav" = BLE command received within `BLE_FADE_TIMEOUT_MS` (5 000 ms).
 
-**App features** — Riverpod state, MapLibre GL maps, Valhalla/OSRM routing, flutter_tts voice, Hive persistence, flutter_blue_plus BLE.
+**App features** — Riverpod state, MapLibre GL maps, Valhalla/OSRM routing, flutter_tts voice, Hive persistence, universal_ble BLE.
+
+> `flutter_blue_plus` 2.x is deliberately **not** used: it relicensed from BSD-3 to a proprietary dual licence requiring a paid commercial licence for for-profit organisations, covering development and testing too. See the comment in `app/pubspec.yaml`.
 
 ## Invariant: Firmware ↔ Documentation Animation Parity
 

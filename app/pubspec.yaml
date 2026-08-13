@@ -28,7 +28,14 @@ dependencies:
   flutter_tts: ^4.2.0           # multi-language voice guidance
 
   # BLE — central role, RSSI exposed natively, bonding/pairing, MTU.
-  flutter_blue_plus: ^1.34.5
+  #
+  # NOT flutter_blue_plus: its 2.0.0 release relicensed from BSD-3-Clause to a
+  # proprietary dual licence under which any for-profit organisation needs a
+  # paid commercial licence — explicitly covering development, testing and
+  # evaluation, with no open-source exemption. universal_ble is MIT and covers
+  # everything this app needs: pair/isPaired (bonding), requestMtu, RSSI while
+  # connected, and write-without-response.
+  universal_ble: ^2.1.1
 
   # Networking (routing) — HTTPS-only.
   dio: ^5.7.0
