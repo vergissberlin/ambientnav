@@ -7,9 +7,10 @@ plugins {
 
 android {
     namespace = "digital.thinkport.ambientnav"
-    // permission_handler_android requires compileSdk 37; flutter_tts and
-    // permission_handler both require minSdk 24.
-    compileSdk = 37
+    // flutter_tts requires compileSdk 36; flutter_tts and permission_handler
+    // both require minSdk 24. Cannot go to 37 yet — permission_handler 13 wants
+    // it, but Google has not published that SDK platform (see pubspec.yaml).
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     // Java 17: permission_handler_android compiles at 17 and AGP 8.13 rejects

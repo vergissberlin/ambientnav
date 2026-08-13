@@ -64,7 +64,7 @@ Drop `--dart-define=USE_MOCK=true` to connect to a real ESP32 over BLE on a phys
 | Flutter | 3.44.9 (Dart 3.12+) | Pinned — see `app/.fvmrc` and `FLUTTER_VERSION` in the workflows |
 | JDK | 21 | Required by AGP 8.13+ and the MapLibre Android module |
 | Xcode | 15+ | iOS builds only |
-| Android SDK | API 37+ | Android builds (`permission_handler` requires compileSdk 37) |
+| Android SDK | API 36+ | Android builds |
 | PlatformIO | latest | VS Code extension or `pip install platformio` |
 | just | any | Optional task runner: `brew install just` / `cargo install just` |
 | Node.js + pnpm | 20+ / 10+ | Docs site only |
