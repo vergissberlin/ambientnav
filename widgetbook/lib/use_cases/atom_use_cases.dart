@@ -2,12 +2,13 @@ import 'package:ambientnav_ui/ambientnav_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
 
-/// Use cases for the brand atoms in `packages/ambientnav_ui/lib/atoms/`.
-List<WidgetbookNode> atomsFolder() => [
-  WidgetbookFolder(
-    name: 'Atoms',
-    children: [_anButton, _anBadge, _anCard, _anLightStrip],
-  ),
+/// The brand primitives from `packages/ambientnav_ui/lib/atoms/`, ported from
+/// `design-system/components/`.
+List<WidgetbookNode> brandAtoms() => [
+  _anButton,
+  _anBadge,
+  _anCard,
+  _anLightStrip,
 ];
 
 /// Centres a use case on the cockpit ground so glows read correctly — brand

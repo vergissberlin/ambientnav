@@ -1,24 +1,24 @@
-import 'package:ambientnav/features/controllers/presentation/widgets/battery_gauge.dart';
-import 'package:ambientnav/features/controllers/presentation/widgets/rssi_indicator.dart';
 import 'package:ambientnav/features/navigation/domain/entities/maneuver.dart';
-import 'package:ambientnav/features/navigation/presentation/turn_by_turn_panel.dart';
+import 'package:ambientnav/ui/atoms/battery_gauge.dart';
+import 'package:ambientnav/ui/atoms/rssi_indicator.dart';
+import 'package:ambientnav/ui/molecules/turn_by_turn_panel.dart';
 import 'package:ambientnav_ui/ambientnav_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
 
-/// Use cases for the app's own presentation widgets.
+/// The app's own presentation widgets, grouped by atomic tier rather than by
+/// where they came from.
 ///
-/// Limited to the ones that render from plain values with no Riverpod or
-/// platform dependency. The provider-bound screens (LedConfigForm,
-/// ControllersListScreen, …) need a ProviderScope wrapper with an overridden
-/// localStoreProvider and a connected MockControllerRepository — that comes
-/// with the component extraction work, not here.
-List<WidgetbookNode> appFolder() => [
-  WidgetbookFolder(
-    name: 'App',
-    children: [_batteryGauge, _rssiIndicator, _turnByTurnPanel],
-  ),
-];
+/// Limited to widgets that render from plain values. The provider-bound screens
+/// (LedConfigForm, ControllersListScreen, …) need a ProviderScope with an
+/// overridden localStoreProvider and a connected MockControllerRepository —
+/// still to come.
+
+/// App-domain atoms: scalar in, pixels out.
+List<WidgetbookNode> appAtoms() => [_batteryGauge, _rssiIndicator];
+
+/// App-domain molecules composed from those atoms and a domain entity.
+List<WidgetbookNode> appMolecules() => [_turnByTurnPanel];
 
 Widget _stage(BuildContext context, Widget child) {
   return Center(
