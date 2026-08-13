@@ -8,7 +8,7 @@ import 'nav_controller.dart';
 import 'nav_session.dart';
 import 'search_screen.dart';
 import 'simulated_position.dart';
-import 'turn_by_turn_panel.dart';
+import '../../../ui/molecules/turn_by_turn_panel.dart';
 
 /// The main navigation screen: a MapLibre street map with the next-maneuver
 /// banner and the planned route overlaid. While navigating the camera follows
