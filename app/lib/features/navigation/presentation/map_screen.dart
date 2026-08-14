@@ -1,4 +1,5 @@
 import 'package:ambientnav/core/l10n/app_localizations.dart';
+import 'package:ambientnav_ui/ambientnav_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -78,7 +79,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         geometry: [
           for (final p in route.geometry) LatLng(p.latitude, p.longitude),
         ],
-        lineColor: '#FFB300',
+        lineColor: AnColors.cyanHex,
         lineWidth: 5,
       ),
     );
@@ -122,8 +123,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         CircleOptions(
           geometry: latLng,
           circleRadius: 8,
-          circleColor: '#1E88E5',
-          circleStrokeColor: '#FFFFFF',
+          circleColor: AnColors.violetHex,
+          circleStrokeColor: AnColors.whiteHex,
           circleStrokeWidth: 2,
         ),
       );

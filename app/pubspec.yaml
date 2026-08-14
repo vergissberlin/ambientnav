@@ -19,6 +19,11 @@ dependencies:
 
   cupertino_icons: ^1.0.9
 
+  # Brand layer: design tokens, theming and the An* atoms. Mirrors
+  # design-system/ and carries no dependency back on this package.
+  ambientnav_ui:
+    path: ../packages/ambientnav_ui
+
   # State management — testable via provider overrides, no BuildContext coupling.
   flutter_riverpod: ^3.4.2
 
