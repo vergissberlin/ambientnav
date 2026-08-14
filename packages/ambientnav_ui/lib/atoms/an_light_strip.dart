@@ -13,7 +13,13 @@ enum AnLightStripMode {
   /// Cyan flow brightening toward [AnLightStrip.direction].
   guide,
 
-  /// Magenta filling inward from both ends by [AnLightStrip.intensity].
+  /// Magenta lighting a band that grows outward from the centre as
+  /// [AnLightStrip.intensity] rises, reaching the ends at 1.0.
+  ///
+  /// Note this is the opposite of what the design system's prose claims
+  /// ("fills inward from both ends") — see the comment in
+  /// [AnLightStrip._colorFor]. The behaviour here matches the reference
+  /// implementation, not the prose.
   alert,
 }
 
@@ -59,7 +65,19 @@ class AnLightStrip extends StatelessWidget {
         return AnColors.cyan.withValues(alpha: 0.12 + pos * 0.88);
 
       case AnLightStripMode.alert:
-        // 0 at the centre, 1 at the edges.
+        // Faithful port of LightStrip.jsx, including a naming quirk worth
+        // knowing about: despite the upstream comment ("0 center .. 1 edges")
+        // and the prose ("fills inward from both ends"), `edge` is 0 at the
+        // *ends* and 1 at the *centre*. The lit band therefore grows outward
+        // from the middle as intensity rises:
+        //
+        //   0.2  ...........######...........
+        //   0.6  ......################......
+        //   1.0  ############################
+        //
+        // Kept as-is deliberately — the design system is the source of truth
+        // and this is what its reference implementation does. If the prose is
+        // the real intent, fix it there first and this port follows.
         final edge = math.min(t, 1 - t) * 2;
         final on = edge >= 1 - intensity;
         return AnColors.magenta.withValues(

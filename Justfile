@@ -85,6 +85,12 @@ widgetbook-build:
 ui-test:
     cd {{ui_dir}} && flutter test
 
+# Regenerate the brand-atom golden images.
+# Ubuntu is authoritative — CI verifies these on ubuntu-latest, and macOS
+# antialiasing differs. Run this on Linux or let CI report the diff.
+goldens:
+    cd {{ui_dir}} && flutter test --update-goldens test/golden
+
 # Format every Dart package the way CI checks it
 fmt:
     cd {{app_dir}} && dart format lib test integration_test
