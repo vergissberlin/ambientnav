@@ -25,9 +25,9 @@ class SimStep {
 /// driver (e.g. a Timer) advances it in the app; tests call [step] directly.
 class RouteSimulator {
   RouteSimulator(this.route, {this.speedMps = 13.9})
-      : _geometry = route.geometry,
-        _geometryLength = Geo.polylineLength(route.geometry),
-        _cumManeuver = _cumulativeManeuverDistances(route);
+    : _geometry = route.geometry,
+      _geometryLength = Geo.polylineLength(route.geometry),
+      _cumManeuver = _cumulativeManeuverDistances(route);
 
   /// ~50 km/h default.
   final Routes route;
@@ -62,8 +62,9 @@ class RouteSimulator {
     final position = _geometry.isEmpty
         ? const GeoPoint(0, 0)
         : Geo.interpolateAlong(_geometry, _traveled);
-    final bearing =
-        _geometry.length < 2 ? 0.0 : Geo.bearingAlong(_geometry, _traveled);
+    final bearing = _geometry.length < 2
+        ? 0.0
+        : Geo.bearingAlong(_geometry, _traveled);
 
     // Next maneuver: the first whose cumulative distance is still ahead.
     var nextIndex = _cumManeuver.length;
@@ -74,7 +75,8 @@ class RouteSimulator {
       }
     }
 
-    final arrived = nextIndex >= _cumManeuver.length &&
+    final arrived =
+        nextIndex >= _cumManeuver.length &&
         _traveled >= (_geometryLength == 0 ? 0 : _geometryLength - 0.5);
 
     final distanceToManeuver = nextIndex < _cumManeuver.length

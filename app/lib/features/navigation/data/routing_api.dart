@@ -14,8 +14,8 @@ class RoutingApi {
     required this.baseUrl,
     this.engine = RoutingEngine.osrm,
     Dio? dio,
-  })  : assert(baseUrl.startsWith('https://'), 'Routing must use HTTPS'),
-        _dio = dio ?? Dio();
+  }) : assert(baseUrl.startsWith('https://'), 'Routing must use HTTPS'),
+       _dio = dio ?? Dio();
 
   final String baseUrl;
   final RoutingEngine engine;

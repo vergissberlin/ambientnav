@@ -32,6 +32,7 @@ class BleUuids {
   // OTA firmware update.
   static final String otaService = _u('f9');
   static final String otaControlCharacteristic = _u('fa'); // Write/Notify
-  static final String otaDataCharacteristic =
-      _u('fb'); // Write Without Response
+  static final String otaDataCharacteristic = _u(
+    'fb',
+  ); // Write Without Response
 }

@@ -1,4 +1,5 @@
 import 'package:ambientnav/core/l10n/app_localizations.dart';
+import 'package:ambientnav_ui/ambientnav_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -8,7 +9,7 @@ import 'nav_controller.dart';
 import 'nav_session.dart';
 import 'search_screen.dart';
 import 'simulated_position.dart';
-import 'turn_by_turn_panel.dart';
+import '../../../ui/molecules/turn_by_turn_panel.dart';
 
 /// The main navigation screen: a MapLibre street map with the next-maneuver
 /// banner and the planned route overlaid. While navigating the camera follows
@@ -24,6 +25,29 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   MapLibreMapController? _mapController;
   Line? _routeLine;
   Circle? _simCircle;
+
+  /// Annotations may only be added once the style has loaded — since
+  /// maplibre_gl 0.24.1 the annotation managers are initialised explicitly and
+  /// `addLine`/`addCircle` throw before that, where they used to no-op. The
+  /// provider listeners below can fire between `onMapCreated` and
+  /// `onStyleLoadedCallback`, so every annotation call is gated on this.
+  bool _styleLoaded = false;
+
+  /// The map widget is keyed on the style URL, so switching theme rebuilds it
+  /// from scratch. Drop the controller and the now-dangling annotation handles
+  /// so they are recreated against the new style rather than removed by id.
+  void _onMapCreated(MapLibreMapController controller) {
+    _mapController = controller;
+    _styleLoaded = false;
+    _routeLine = null;
+    _simCircle = null;
+  }
+
+  Future<void> _onStyleLoaded() async {
+    _styleLoaded = true;
+    await _drawRouteLine();
+    await _updateSimPosition(ref.read(simulatedPositionProvider));
+  }
 
   String _navErrorMessage(AppLocalizations l10n, String? error) {
     switch (error) {
@@ -44,7 +68,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   Future<void> _drawRouteLine() async {
     final controller = _mapController;
     final route = ref.read(navControllerProvider).route;
-    if (controller == null) return;
+    if (controller == null || !_styleLoaded) return;
     if (_routeLine != null) {
       await controller.removeLine(_routeLine!);
       _routeLine = null;
@@ -55,7 +79,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         geometry: [
           for (final p in route.geometry) LatLng(p.latitude, p.longitude),
         ],
-        lineColor: '#FFB300',
+        lineColor: AnColors.cyanHex,
         lineWidth: 5,
       ),
     );
@@ -85,7 +109,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   /// camera centred + oriented in the travel direction.
   Future<void> _updateSimPosition(SimPose? pose) async {
     final controller = _mapController;
-    if (controller == null) return;
+    if (controller == null || !_styleLoaded) return;
     if (pose == null) {
       if (_simCircle != null) {
         await controller.removeCircle(_simCircle!);
@@ -95,26 +119,32 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     }
     final latLng = LatLng(pose.position.latitude, pose.position.longitude);
     if (_simCircle == null) {
-      _simCircle = await controller.addCircle(CircleOptions(
-        geometry: latLng,
-        circleRadius: 8,
-        circleColor: '#1E88E5',
-        circleStrokeColor: '#FFFFFF',
-        circleStrokeWidth: 2,
-      ));
+      _simCircle = await controller.addCircle(
+        CircleOptions(
+          geometry: latLng,
+          circleRadius: 8,
+          circleColor: AnColors.violetHex,
+          circleStrokeColor: AnColors.whiteHex,
+          circleStrokeWidth: 2,
+        ),
+      );
     } else {
       await controller.updateCircle(
-          _simCircle!, CircleOptions(geometry: latLng));
+        _simCircle!,
+        CircleOptions(geometry: latLng),
+      );
     }
     if (ref.read(cameraModeProvider) == CameraMode.follow) {
       final dist = ref.read(navControllerProvider).distanceToManeuverMeters;
       await controller.animateCamera(
-        CameraUpdate.newCameraPosition(CameraPosition(
-          target: latLng,
-          bearing: pose.bearingDeg,
-          tilt: 50,
-          zoom: _followZoom(dist),
-        )),
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: latLng,
+            bearing: pose.bearingDeg,
+            tilt: 50,
+            zoom: _followZoom(dist),
+          ),
+        ),
       );
     }
   }
@@ -126,9 +156,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final error = ref.read(navControllerProvider).error;
     if (error != null && mounted) {
       final l10n = AppLocalizations.of(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(_navErrorMessage(l10n, error))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(_navErrorMessage(l10n, error))));
     }
   }
 
@@ -155,7 +185,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final cameraMode = ref.watch(cameraModeProvider);
     final following = cameraMode == CameraMode.follow;
 
-    ref.listen(navControllerProvider, (_, __) => _drawRouteLine());
+    ref.listen(navControllerProvider, (_, _) => _drawRouteLine());
     ref.listen(simulatedPositionProvider, (_, p) => _updateSimPosition(p));
 
     // Real-GPS heading-up follow is handled natively by MapLibre; the simulator
@@ -215,8 +245,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               target: LatLng(52.52, 13.405), // Berlin
               zoom: 12,
             ),
-            onMapCreated: (c) => _mapController = c,
-            onStyleLoadedCallback: _drawRouteLine,
+            onMapCreated: _onMapCreated,
+            onStyleLoadedCallback: _onStyleLoaded,
             myLocationEnabled: true,
             myLocationTrackingMode: trackingMode,
             myLocationRenderMode: trackingMode == MyLocationTrackingMode.none

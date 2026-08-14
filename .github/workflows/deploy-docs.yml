@@ -6,6 +6,14 @@ on:
     paths:
       - 'docs/**'
       - 'package.json'
+      # The component catalogue is published alongside the docs, so changes to
+      # it (or to anything it renders) have to trigger a deployment too.
+      - 'app/**'
+      - 'packages/**'
+      - 'widgetbook/**'
+      - 'design-system/tokens/**'
+  # PRs only verify the docs build. The catalogue is already verified per-PR by
+  # build-widgetbook.yml, so widening this would just build it twice.
   pull_request:
     paths:
       - 'docs/**'
@@ -20,8 +28,13 @@ concurrency:
   group: pages
   cancel-in-progress: false
 
+# Keep in sync with build-app.yml and app/.fvmrc.
+env:
+  FLUTTER_VERSION: '3.44.9'
+
 jobs:
-  build:
+  build-docs:
+    name: Build the docs site
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -44,21 +57,86 @@ jobs:
         run: pnpm run build
         working-directory: docs
 
-      - uses: actions/configure-pages@v4
-        if: github.event_name != 'pull_request'
-
-      - uses: actions/upload-pages-artifact@v3
-        if: github.event_name != 'pull_request'
+      - uses: actions/upload-artifact@v4
         with:
+          name: site-docs
           path: docs/dist
+          retention-days: 1
+
+  build-catalogue:
+    name: Build the component catalogue
+    runs-on: ubuntu-latest
+    # Only for deployments — build-widgetbook.yml covers PR verification.
+    if: github.event_name != 'pull_request'
+    # A broken catalogue must not stop the docs from deploying. The assemble
+    # job below tolerates a missing artifact and ships docs-only instead.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      # The catalogue imports the app's generated localizations.
+      - name: Prepare the app package
+        working-directory: app
+        run: |
+          flutter pub get
+          flutter gen-l10n
+
+      - name: Build web
+        working-directory: widgetbook
+        run: |
+          flutter pub get
+          flutter build web --base-href /ambientnav/widgetbook/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site-widgetbook
+          path: widgetbook/build/web
+          retention-days: 1
 
   deploy:
-    needs: build
-    if: github.event_name != 'pull_request'
+    name: Assemble and deploy
+    needs: [build-docs, build-catalogue]
+    # `always()` so a failed catalogue build still reaches this job; the docs
+    # artifact is what actually gates the deployment.
+    if: always() && github.event_name != 'pull_request' && needs.build-docs.result == 'success'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Download the docs site
+        uses: actions/download-artifact@v4
+        with:
+          name: site-docs
+          path: site
+
+      # GitHub Pages accepts exactly one artifact per deployment, so the
+      # catalogue is nested inside the docs site rather than deployed
+      # separately — a second deploy-pages call would replace the docs.
+      - name: Download the component catalogue
+        id: catalogue
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: site-widgetbook
+          path: site/widgetbook
+
+      - name: Report a missing catalogue
+        if: steps.catalogue.outcome != 'success'
+        run: echo "::warning::Catalogue build failed or produced no artifact — deploying the docs without /widgetbook/."
+
+      - uses: actions/configure-pages@v4
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
       - id: deployment
         uses: actions/deploy-pages@v4

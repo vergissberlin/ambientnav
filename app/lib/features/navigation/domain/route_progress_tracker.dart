@@ -21,12 +21,10 @@ class RouteProgress {
 /// Map-matches GPS positions onto a planned [Routes] geometry and reports
 /// maneuver progress. Pure and unit-testable.
 class RouteProgressTracker {
-  RouteProgressTracker(
-    this.route, {
-    this.maneuverAdvanceThresholdMeters = 30,
-  })  : _geometry = route.geometry,
-        _geometryLength = Geo.polylineLength(route.geometry),
-        _cumManeuver = _cumulativeManeuverDistances(route);
+  RouteProgressTracker(this.route, {this.maneuverAdvanceThresholdMeters = 30})
+    : _geometry = route.geometry,
+      _geometryLength = Geo.polylineLength(route.geometry),
+      _cumManeuver = _cumulativeManeuverDistances(route);
 
   final Routes route;
   final double maneuverAdvanceThresholdMeters;
@@ -57,7 +55,8 @@ class RouteProgressTracker {
       }
     }
 
-    final arrived = nextIndex >= _cumManeuver.length &&
+    final arrived =
+        nextIndex >= _cumManeuver.length &&
         _geometryLength > 0 &&
         traveled >= _geometryLength - maneuverAdvanceThresholdMeters;
 

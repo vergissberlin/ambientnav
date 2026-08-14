@@ -7,17 +7,22 @@ plugins {
 
 android {
     namespace = "digital.thinkport.ambientnav"
-    // flutter_tts requires compileSdk 36 and minSdk 24.
+    // flutter_tts requires compileSdk 36; flutter_tts and permission_handler
+    // both require minSdk 24. Cannot go to 37 yet — permission_handler 13 wants
+    // it, but Google has not published that SDK platform (see pubspec.yaml).
     compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
+    // Java 17: permission_handler_android compiles at 17 and AGP 8.13 rejects
+    // Java 8 targets. The MapLibre Android module needs a JDK 21 toolchain to
+    // build — see the prerequisites table in CONTRIBUTING.md.
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
+        jvmTarget = JavaVersion.VERSION_17
     }
 
     defaultConfig {

@@ -1,12 +1,5 @@
 /// Lifecycle of an over-the-air firmware update.
-enum OtaState {
-  idle,
-  transferring,
-  verifying,
-  applying,
-  done,
-  failed,
-}
+enum OtaState { idle, transferring, verifying, applying, done, failed }
 
 /// Progress of an OTA transfer, streamed by `ControllerRepository.startOta`.
 class OtaProgress {
@@ -18,10 +11,10 @@ class OtaProgress {
   });
 
   const OtaProgress.idle()
-      : state = OtaState.idle,
-        bytesSent = 0,
-        totalBytes = 0,
-        error = null;
+    : state = OtaState.idle,
+      bytesSent = 0,
+      totalBytes = 0,
+      error = null;
 
   final OtaState state;
   final int bytesSent;

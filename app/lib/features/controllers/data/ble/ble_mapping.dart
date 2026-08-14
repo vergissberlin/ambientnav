@@ -2,7 +2,7 @@ import '../../domain/entities/controller_info.dart';
 import '../../domain/entities/controller_role.dart';
 
 /// Pure helpers used by [BleControllerRepository], split out so they can be
-/// unit-tested without BLE hardware or the flutter_blue_plus types.
+/// unit-tested without BLE hardware or the universal_ble types.
 class BleMapping {
   const BleMapping._();
 
@@ -14,8 +14,9 @@ class BleMapping {
     required String navServiceUuid,
   }) {
     final lowerNav = navServiceUuid.toLowerCase();
-    final advertises =
-        advertisedServiceUuids.any((u) => u.toLowerCase() == lowerNav);
+    final advertises = advertisedServiceUuids.any(
+      (u) => u.toLowerCase() == lowerNav,
+    );
     return advertises || name.toLowerCase().startsWith('ambientnav');
   }
 

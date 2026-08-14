@@ -7,28 +7,31 @@ void main() {
     test('encodes the documented 3-byte packets', () {
       // left, 120 m, left blinker
       expect(
-        NavCodec.encode(const NavCommand(
-          direction: NavDirection.left,
-          distanceM: 120,
-          blinker: Blinker.left,
-        )),
+        NavCodec.encode(
+          const NavCommand(
+            direction: NavDirection.left,
+            distanceM: 120,
+            blinker: Blinker.left,
+          ),
+        ),
         [0x01, 0x78, 0x01],
       );
       // right, 45 m, right blinker
       expect(
-        NavCodec.encode(const NavCommand(
-          direction: NavDirection.right,
-          distanceM: 45,
-          blinker: Blinker.right,
-        )),
+        NavCodec.encode(
+          const NavCommand(
+            direction: NavDirection.right,
+            distanceM: 45,
+            blinker: Blinker.right,
+          ),
+        ),
         [0x02, 0x2D, 0x02],
       );
       // straight, 255 m, off
       expect(
-        NavCodec.encode(const NavCommand(
-          direction: NavDirection.straight,
-          distanceM: 255,
-        )),
+        NavCodec.encode(
+          const NavCommand(direction: NavDirection.straight, distanceM: 255),
+        ),
         [0x03, 0xFF, 0x00],
       );
     });

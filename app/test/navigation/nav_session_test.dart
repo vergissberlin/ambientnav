@@ -10,6 +10,8 @@ import 'package:ambientnav/features/navigation/presentation/nav_controller.dart'
 import 'package:ambientnav/features/navigation/presentation/nav_session.dart';
 import 'package:ambientnav/features/navigation/presentation/navigation_location_runner.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+// Override moved behind misc.dart in Riverpod 3.
+import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class _FakeLocationService extends LocationService {
@@ -70,25 +72,24 @@ final _route = Routes(
 const _dest = GeoResult(label: 'Dest', point: GeoPoint(52.50, 13.45));
 
 List<Override> _testOverrides(RoutingRepository routing) => [
-      localStoreProvider.overrideWithValue(InMemoryLocalStore()),
-      routingRepositoryProvider.overrideWithValue(routing),
-      locationServiceProvider.overrideWithValue(_FakeLocationService()),
-      navigationLocationRunnerProvider.overrideWith(
-        (ref) => _FakeNavigationLocationRunner(ref),
-      ),
-    ];
+  localStoreProvider.overrideWithValue(InMemoryLocalStore()),
+  routingRepositoryProvider.overrideWithValue(routing),
+  locationServiceProvider.overrideWithValue(_FakeLocationService()),
+  navigationLocationRunnerProvider.overrideWith(
+    (ref) => _FakeNavigationLocationRunner(ref),
+  ),
+];
 
 void main() {
   test('planTo sets the route and enters navigating', () async {
-    final container = ProviderContainer(overrides: [
-      ..._testOverrides(_FakeRouting(_route)),
-    ]);
+    final container = ProviderContainer(
+      overrides: [..._testOverrides(_FakeRouting(_route))],
+    );
     addTearDown(container.dispose);
 
-    await container.read(navSessionProvider).planTo(
-          _dest,
-          originOverride: const GeoPoint(52.52, 13.405),
-        );
+    await container
+        .read(navSessionProvider)
+        .planTo(_dest, originOverride: const GeoPoint(52.52, 13.405));
 
     final state = container.read(navControllerProvider);
     expect(state.phase, NavPhase.navigating);
@@ -97,15 +98,14 @@ void main() {
   });
 
   test('planTo reports an error when routing fails', () async {
-    final container = ProviderContainer(overrides: [
-      ..._testOverrides(_FakeRouting(_route, fail: true)),
-    ]);
+    final container = ProviderContainer(
+      overrides: [..._testOverrides(_FakeRouting(_route, fail: true))],
+    );
     addTearDown(container.dispose);
 
-    await container.read(navSessionProvider).planTo(
-          _dest,
-          originOverride: const GeoPoint(52.52, 13.405),
-        );
+    await container
+        .read(navSessionProvider)
+        .planTo(_dest, originOverride: const GeoPoint(52.52, 13.405));
 
     final state = container.read(navControllerProvider);
     expect(state.phase, NavPhase.idle);
@@ -113,9 +113,9 @@ void main() {
   });
 
   test('stop clears the navigation state', () async {
-    final container = ProviderContainer(overrides: [
-      ..._testOverrides(_FakeRouting(_route)),
-    ]);
+    final container = ProviderContainer(
+      overrides: [..._testOverrides(_FakeRouting(_route))],
+    );
     addTearDown(container.dispose);
 
     final session = container.read(navSessionProvider);

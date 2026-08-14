@@ -18,20 +18,26 @@ void main() {
     });
 
     test('rejects malformed passkey without contacting the device', () async {
-      final result =
-          await service.pair(MockControllerRepository.frontId, 'abc');
+      final result = await service.pair(
+        MockControllerRepository.frontId,
+        'abc',
+      );
       expect(result, PairingResult.invalidFormat);
     });
 
     test('succeeds with the correct passkey', () async {
-      final result =
-          await service.pair(MockControllerRepository.frontId, '123456');
+      final result = await service.pair(
+        MockControllerRepository.frontId,
+        '123456',
+      );
       expect(result, PairingResult.success);
     });
 
     test('reports wrong passkey', () async {
-      final result =
-          await service.pair(MockControllerRepository.frontId, '999999');
+      final result = await service.pair(
+        MockControllerRepository.frontId,
+        '999999',
+      );
       expect(result, PairingResult.wrongPasskey);
     });
   });

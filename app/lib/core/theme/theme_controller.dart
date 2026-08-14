@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+// StateNotifier / StateNotifierProvider / StateProvider moved to
+// legacy.dart in Riverpod 3. Tracked for migration to Notifier.
+import 'package:flutter_riverpod/legacy.dart';
 
 import '../persistence/local_store.dart';
 
@@ -45,5 +48,5 @@ final localStoreProvider = Provider<LocalStore>((ref) {
 
 final themeControllerProvider =
     StateNotifierProvider<ThemeController, ThemeMode>((ref) {
-  return ThemeController(ref.watch(localStoreProvider));
-});
+      return ThemeController(ref.watch(localStoreProvider));
+    });

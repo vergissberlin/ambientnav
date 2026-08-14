@@ -154,6 +154,15 @@ export default defineConfig({
           translations: { de: 'App' },
           items: [
             {
+              // Deployed alongside these docs by deploy-docs.yml. Absolute and
+              // external because it is a separate Flutter web build, not an
+              // Astro route.
+              label: 'Component Catalogue',
+              translations: { de: 'Komponenten-Katalog' },
+              link: '/ambientnav/widgetbook/',
+              attrs: { target: '_blank', rel: 'noopener noreferrer' },
+            },
+            {
               label: 'Navigation',
               translations: { de: 'Navigation' },
               link: '/app/navigation/',

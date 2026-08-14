@@ -1,4 +1,6 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+// StateNotifier / StateNotifierProvider / StateProvider moved to
+// legacy.dart in Riverpod 3. Tracked for migration to Notifier.
+import 'package:flutter_riverpod/legacy.dart';
 
 import '../domain/entities/route.dart';
 
@@ -23,5 +25,6 @@ enum CameraMode {
 }
 
 /// Current camera mode while navigating. Defaults to [CameraMode.follow].
-final cameraModeProvider =
-    StateProvider<CameraMode>((ref) => CameraMode.follow);
+final cameraModeProvider = StateProvider<CameraMode>(
+  (ref) => CameraMode.follow,
+);

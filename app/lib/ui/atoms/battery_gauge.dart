@@ -21,8 +21,8 @@ class BatteryGauge extends StatelessWidget {
     final color = soc > 0.5
         ? Colors.green
         : soc > 0.2
-            ? Colors.orange
-            : Colors.red;
+        ? Colors.orange
+        : Colors.red;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -30,8 +30,8 @@ class BatteryGauge extends StatelessWidget {
           soc > 0.66
               ? Icons.battery_full
               : soc > 0.33
-                  ? Icons.battery_5_bar
-                  : Icons.battery_2_bar,
+              ? Icons.battery_5_bar
+              : Icons.battery_2_bar,
           color: voltage == null ? Theme.of(context).disabledColor : color,
           size: 18,
         ),

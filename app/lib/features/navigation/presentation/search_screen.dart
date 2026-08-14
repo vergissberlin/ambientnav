@@ -84,9 +84,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   ? const Padding(
                       padding: EdgeInsets.all(12),
                       child: SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2)),
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
                     )
                   : null,
             ),
@@ -95,8 +96,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           ),
           const SizedBox(height: 8),
           if (_error != null)
-            Text(_error!,
-                style: TextStyle(color: Theme.of(context).colorScheme.error)),
+            Text(
+              _error!,
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
           Flexible(
             child: ListView.builder(
               shrinkWrap: true,
@@ -106,8 +109,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 return ListTile(
                   key: ValueKey('result_$i'),
                   leading: const Icon(Icons.place_outlined),
-                  title: Text(r.label,
-                      maxLines: 2, overflow: TextOverflow.ellipsis),
+                  title: Text(
+                    r.label,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                   onTap: () => Navigator.of(context).pop(r),
                 );
               },

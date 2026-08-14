@@ -5,8 +5,11 @@ publish_to: 'none'
 # Keep in sync with the monorepo release (managed by release-please).
 version: 0.5.0 # x-release-please-version
 
+# Dart 3.12 ships with Flutter 3.44. The floor is set by flutter_riverpod 3.x
+# (sdk ^3.12.0); cupertino_icons 1.0.9 and flutter_lints 6 would each be happy
+# with less. See CONTRIBUTING.md for the pinned toolchain.
 environment:
-  sdk: ^3.6.0
+  sdk: ^3.12.0
 
 dependencies:
   flutter:
@@ -14,37 +17,64 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-  cupertino_icons: ^1.0.8
+  cupertino_icons: ^1.0.9
+
+  # Brand layer: design tokens, theming and the An* atoms. Mirrors
+  # design-system/ and carries no dependency back on this package.
+  ambientnav_ui:
+    path: ../packages/ambientnav_ui
 
   # State management — testable via provider overrides, no BuildContext coupling.
-  flutter_riverpod: ^2.6.1
+  flutter_riverpod: ^3.4.2
 
   # Routing & navigation UI.
-  maplibre_gl: ^0.20.0          # OSS map rendering + offline regions (OSM tiles)
-  geolocator: ^13.0.1           # device GPS position
-  flutter_tts: ^4.2.0           # multi-language voice guidance
+  maplibre_gl: ^0.26.2          # OSS map rendering + offline regions (OSM tiles)
+  geolocator: ^14.0.3           # device GPS position
+  flutter_tts: ^4.2.5           # multi-language voice guidance
 
   # BLE — central role, RSSI exposed natively, bonding/pairing, MTU.
-  flutter_blue_plus: ^1.34.5
+  #
+  # NOT flutter_blue_plus: its 2.0.0 release relicensed from BSD-3-Clause to a
+  # proprietary dual licence under which any for-profit organisation needs a
+  # paid commercial licence — explicitly covering development, testing and
+  # evaluation, with no open-source exemption. universal_ble is MIT and covers
+  # everything this app needs: pair/isPaired (bonding), requestMtu, RSSI while
+  # connected, and write-without-response.
+  universal_ble: ^2.1.1
 
   # Networking (routing) — HTTPS-only.
-  dio: ^5.7.0
+  dio: ^5.11.0
 
   # Local persistence (route cache, configs, theme) behind LocalStore abstraction.
-  hive_ce: ^2.7.0
-  hive_ce_flutter: ^2.2.0
+  hive_ce: ^2.19.3
+  hive_ce_flutter: ^2.3.4
 
-  permission_handler: ^11.3.1   # BLE scan/connect + location runtime permissions
-  file_picker: ^8.1.4           # select firmware .bin for OTA
+  # Held at 12.x deliberately: permission_handler 13 pulls
+  # permission_handler_android 14, which requires compileSdk 37 — a platform
+  # Google has not published, so `sdkmanager platforms;android-37` cannot
+  # resolve it and the Android build is unbuildable. Revisit once API 37 ships.
+  permission_handler: ^12.0.3   # BLE scan/connect + location runtime permissions
+  file_picker: ^11.0.3           # select firmware .bin for OTA
   intl: any                     # localization formatting (pinned by flutter_localizations)
+
+# geolocator 14 pulls geolocator_linux 0.2.6 -> package_info_plus ^10 -> win32 ^6,
+# while every file_picker from 8.3.3 to 11.x pins win32 ^5.9.0. The two cannot
+# co-resolve, and there is no released file_picker that moves off win32 5.
+#
+# The whole conflict lives on the Linux and Windows implementations, which this
+# iOS/Android app never builds, so package_info_plus is held at 9.x — its last
+# win32 ^5 line. Drop this override once file_picker ships a win32 ^6 release
+# (the unreleased 12.0.0 line) or geolocator_linux relaxes its constraint.
+dependency_overrides:
+  package_info_plus: ^9.0.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   integration_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
-  mocktail: ^1.0.4
+  flutter_lints: ^6.0.0
+  mocktail: ^1.0.5
 
 flutter:
   uses-material-design: true

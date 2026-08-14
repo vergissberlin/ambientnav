@@ -13,8 +13,8 @@ class RssiIndicator extends StatelessWidget {
     final color = quality > 0.5
         ? Colors.green
         : quality > 0.25
-            ? Colors.orange
-            : Colors.red;
+        ? Colors.orange
+        : Colors.red;
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.end,

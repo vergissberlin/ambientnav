@@ -21,7 +21,7 @@ import '../ble/codecs/ota_codec.dart';
 /// streams a scripted OTA progress sequence.
 class MockControllerRepository implements ControllerRepository {
   MockControllerRepository({Random? random, this.passkey = '123456'})
-      : _random = random ?? Random(42);
+    : _random = random ?? Random(42);
 
   final Random _random;
 
@@ -101,8 +101,10 @@ class MockControllerRepository implements ControllerRepository {
     var voltage = _devices[id]!.voltage ?? 4.0;
     while (true) {
       // Battery slowly drains with small noise.
-      voltage = (voltage - 0.002 + (_random.nextDouble() - 0.5) * 0.01)
-          .clamp(3.0, 4.2);
+      voltage = (voltage - 0.002 + (_random.nextDouble() - 0.5) * 0.01).clamp(
+        3.0,
+        4.2,
+      );
       final rssi = -55 - _random.nextInt(25);
       _devices[id] = _devices[id]!.copyWith(voltage: voltage, rssi: rssi);
       yield Telemetry(
@@ -163,7 +165,10 @@ class MockControllerRepository implements ControllerRepository {
     final chunks = OtaCodec.chunk(firmware);
     var sent = 0;
     yield OtaProgress(
-        state: OtaState.transferring, bytesSent: 0, totalBytes: total);
+      state: OtaState.transferring,
+      bytesSent: 0,
+      totalBytes: total,
+    );
     for (final c in chunks) {
       await Future<void>.delayed(const Duration(milliseconds: 2));
       sent += c.length - 2; // minus 2-byte seq header
@@ -174,13 +179,22 @@ class MockControllerRepository implements ControllerRepository {
       );
     }
     yield OtaProgress(
-        state: OtaState.verifying, bytesSent: total, totalBytes: total);
+      state: OtaState.verifying,
+      bytesSent: total,
+      totalBytes: total,
+    );
     await Future<void>.delayed(const Duration(milliseconds: 10));
     yield OtaProgress(
-        state: OtaState.applying, bytesSent: total, totalBytes: total);
+      state: OtaState.applying,
+      bytesSent: total,
+      totalBytes: total,
+    );
     await Future<void>.delayed(const Duration(milliseconds: 10));
     yield OtaProgress(
-        state: OtaState.done, bytesSent: total, totalBytes: total);
+      state: OtaState.done,
+      bytesSent: total,
+      totalBytes: total,
+    );
   }
 
   // --- helpers ---

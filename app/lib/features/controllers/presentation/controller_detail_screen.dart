@@ -1,7 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:ambientnav/core/l10n/app_localizations.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../ui/molecules/pairing_banner.dart';
+import '../../../ui/organisms/controller_telemetry_list.dart';
 import '../domain/entities/controller_info.dart';
 import '../domain/entities/controller_role.dart';
 import 'controllers_controller.dart';
@@ -9,8 +11,6 @@ import 'led_config_form.dart';
 import 'ota_screen.dart';
 import 'pairing_screen.dart';
 import 'sensor_calibration_form.dart';
-import 'widgets/battery_gauge.dart';
-import 'widgets/rssi_indicator.dart';
 
 /// Per-controller detail: telemetry, LED config, sensor config and OTA.
 /// Mutating tabs are gated behind a pairing banner until bonded.
@@ -56,11 +56,14 @@ class ControllerDetailScreen extends ConsumerWidget {
         ),
         body: Column(
           children: [
-            if (!device.isPaired) _PairingBanner(deviceId: deviceId),
+            if (!device.isPaired)
+              PairingBanner(
+                onPair: () => PairingDialog.show(context, deviceId),
+              ),
             Expanded(
               child: TabBarView(
                 children: [
-                  _TelemetryTab(device: device),
+                  ControllerTelemetryList(device: device),
                   LedConfigForm(deviceId: deviceId),
                   if (isRear) SensorCalibrationForm(deviceId: deviceId),
                   OtaScreen(deviceId: deviceId),
@@ -70,60 +73,6 @@ class ControllerDetailScreen extends ConsumerWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _PairingBanner extends ConsumerWidget {
-  const _PairingBanner({required this.deviceId});
-
-  final String deviceId;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context);
-    return MaterialBanner(
-      backgroundColor: Theme.of(context).colorScheme.errorContainer,
-      leading: const Icon(Icons.lock),
-      content: Text(l10n.notPaired),
-      actions: [
-        TextButton(
-          onPressed: () => PairingDialog.show(context, deviceId),
-          child: Text(l10n.pair),
-        ),
-      ],
-    );
-  }
-}
-
-class _TelemetryTab extends StatelessWidget {
-  const _TelemetryTab({required this.device});
-
-  final ControllerInfo device;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        ListTile(
-          title: Text(l10n.signalStrength),
-          trailing:
-              RssiIndicator(quality: device.signalQuality, rssi: device.rssi),
-        ),
-        ListTile(
-          title: Text(l10n.battery),
-          trailing: BatteryGauge(voltage: device.voltage),
-        ),
-        ListTile(
-          title: Text(l10n.firmwareVersion(device.firmwareVersion ?? '—')),
-        ),
-        ListTile(
-          title: Text(device.isPaired ? l10n.paired : l10n.notPaired),
-          leading: Icon(device.isPaired ? Icons.lock : Icons.lock_open),
-        ),
-      ],
     );
   }
 }

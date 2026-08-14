@@ -1,0 +1,78 @@
+name: Build Widgetbook
+
+# Deliberately separate from build-app.yml and deliberately NOT a required
+# check (at least initially): the catalogue depends on the app, so it must be
+# able to fail on its own without blocking a release.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'app/**'
+      - 'packages/**'
+      - 'widgetbook/**'
+      - 'design-system/tokens/**'
+      - '.github/workflows/build-widgetbook.yml'
+  pull_request:
+    paths:
+      - 'app/**'
+      - 'packages/**'
+      - 'widgetbook/**'
+      - 'design-system/tokens/**'
+      - '.github/workflows/build-widgetbook.yml'
+
+permissions:
+  contents: read
+
+# Keep in sync with build-app.yml and app/.fvmrc.
+env:
+  FLUTTER_VERSION: '3.44.9'
+
+jobs:
+  build:
+    name: Analyze, test & build the catalogue
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      # The catalogue imports package:ambientnav/core/l10n/app_localizations.dart,
+      # so the app's generated localizations have to be current first.
+      - name: Prepare the app package
+        working-directory: app
+        run: |
+          flutter pub get
+          flutter gen-l10n
+
+      - name: Install dependencies
+        working-directory: widgetbook
+        run: flutter pub get
+
+      - name: Verify formatting
+        working-directory: widgetbook
+        run: dart format --set-exit-if-changed lib test
+
+      - name: Analyze
+        working-directory: widgetbook
+        run: flutter analyze
+
+      # Pumps every registered use case — a rendering regression suite.
+      - name: Run tests
+        working-directory: widgetbook
+        run: flutter test
+
+      - name: Build web
+        working-directory: widgetbook
+        run: flutter build web --base-href /ambientnav/widgetbook/
+
+      - name: Upload catalogue artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ambientnav-widgetbook
+          path: widgetbook/build/web
+          retention-days: 30

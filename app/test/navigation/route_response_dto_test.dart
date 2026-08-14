@@ -60,8 +60,10 @@ void main() {
     });
 
     test('throws when no routes present', () {
-      expect(() => RouteResponseDto.fromOsrm({'routes': []}),
-          throwsFormatException);
+      expect(
+        () => RouteResponseDto.fromOsrm({'routes': []}),
+        throwsFormatException,
+      );
     });
   });
 

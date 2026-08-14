@@ -1,4 +1,6 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+// StateNotifier / StateNotifierProvider / StateProvider moved to
+// legacy.dart in Riverpod 3. Tracked for migration to Notifier.
+import 'package:flutter_riverpod/legacy.dart';
 
 import '../domain/entities/maneuver.dart';
 import '../domain/entities/route.dart';
@@ -65,8 +67,9 @@ class NavController extends StateNotifier<NavigationState> {
       phase: NavPhase.navigating,
       route: route,
       nextManeuverIndex: 0,
-      distanceToManeuverMeters:
-          route.maneuvers.isNotEmpty ? route.maneuvers.first.distanceMeters : 0,
+      distanceToManeuverMeters: route.maneuvers.isNotEmpty
+          ? route.maneuvers.first.distanceMeters
+          : 0,
     );
   }
 
@@ -97,4 +100,5 @@ class NavController extends StateNotifier<NavigationState> {
 
 final navControllerProvider =
     StateNotifierProvider<NavController, NavigationState>(
-        (ref) => NavController());
+      (ref) => NavController(),
+    );

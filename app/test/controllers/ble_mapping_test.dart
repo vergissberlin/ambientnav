@@ -31,7 +31,7 @@ void main() {
       expect(
         BleMapping.isAmbientNavDevice(
           advertisedServiceUuids: const [
-            '0000180f-0000-1000-8000-00805f9b34fb'
+            '0000180f-0000-1000-8000-00805f9b34fb',
           ],
           name: 'SomeHeartRateMonitor',
           navServiceUuid: BleUuids.navService,
@@ -48,8 +48,11 @@ void main() {
     });
 
     test('builds ControllerInfo with a fallback name', () {
-      final info =
-          BleMapping.controllerInfoFrom(id: 'AA:BB', name: '', rssi: -60);
+      final info = BleMapping.controllerInfoFrom(
+        id: 'AA:BB',
+        name: '',
+        rssi: -60,
+      );
       expect(info.id, 'AA:BB');
       expect(info.name, 'AmbientNav');
       expect(info.rssi, -60);

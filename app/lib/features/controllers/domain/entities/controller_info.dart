@@ -76,13 +76,13 @@ class ControllerInfo {
 
   @override
   int get hashCode => Object.hash(
-        id,
-        name,
-        rssi,
-        voltage,
-        firmwareVersion,
-        role,
-        isConnected,
-        isPaired,
-      );
+    id,
+    name,
+    rssi,
+    voltage,
+    firmwareVersion,
+    role,
+    isConnected,
+    isPaired,
+  );
 }

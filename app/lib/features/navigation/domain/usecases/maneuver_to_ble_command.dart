@@ -9,8 +9,11 @@ import '../entities/maneuver.dart';
 class ManeuverToBleCommand {
   const ManeuverToBleCommand();
 
-  NavCommand call(Maneuver maneuver, double distanceToManeuverMeters,
-      {Blinker blinker = Blinker.off}) {
+  NavCommand call(
+    Maneuver maneuver,
+    double distanceToManeuverMeters, {
+    Blinker blinker = Blinker.off,
+  }) {
     final distance = distanceToManeuverMeters.round().clamp(0, 255);
     return NavCommand(
       direction: _direction(maneuver.type),

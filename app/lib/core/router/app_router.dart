@@ -16,11 +16,7 @@ class HomeShell extends StatefulWidget {
 class _HomeShellState extends State<HomeShell> {
   int _index = 0;
 
-  static const _tabs = [
-    MapScreen(),
-    ControllersListScreen(),
-    SettingsScreen(),
-  ];
+  static const _tabs = [MapScreen(), ControllersListScreen(), SettingsScreen()];
 
   @override
   Widget build(BuildContext context) {

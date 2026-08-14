@@ -4,17 +4,26 @@ import 'package:ambientnav/features/navigation/domain/usecases/maneuver_to_ble_c
 import 'package:flutter_test/flutter_test.dart';
 
 Maneuver _m(ManeuverType t) => Maneuver(
-    type: t, instruction: '', distanceMeters: 0, latitude: 0, longitude: 0);
+  type: t,
+  instruction: '',
+  distanceMeters: 0,
+  latitude: 0,
+  longitude: 0,
+);
 
 void main() {
   const usecase = ManeuverToBleCommand();
 
   test('maps maneuver types to nav directions', () {
     expect(usecase(_m(ManeuverType.turnLeft), 50).direction, NavDirection.left);
-    expect(usecase(_m(ManeuverType.slightRight), 50).direction,
-        NavDirection.right);
-    expect(usecase(_m(ManeuverType.straight), 50).direction,
-        NavDirection.straight);
+    expect(
+      usecase(_m(ManeuverType.slightRight), 50).direction,
+      NavDirection.right,
+    );
+    expect(
+      usecase(_m(ManeuverType.straight), 50).direction,
+      NavDirection.straight,
+    );
     expect(usecase(_m(ManeuverType.arrive), 50).direction, NavDirection.none);
   });
 

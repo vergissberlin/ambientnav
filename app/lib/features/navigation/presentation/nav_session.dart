@@ -26,7 +26,8 @@ class NavSession {
     final nav = _ref.read(navControllerProvider.notifier);
     nav.startPlanning();
     try {
-      final origin = originOverride ??
+      final origin =
+          originOverride ??
           await _ref.read(locationServiceProvider).currentPosition() ??
           fallbackOrigin;
       final route = await _ref

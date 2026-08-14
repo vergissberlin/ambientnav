@@ -1,6 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+// StateNotifier / StateNotifierProvider / StateProvider moved to
+// legacy.dart in Riverpod 3. Tracked for migration to Notifier.
+import 'package:flutter_riverpod/legacy.dart';
 
 import '../../../core/di/providers.dart';
 import '../domain/entities/controller_info.dart';
@@ -43,11 +46,11 @@ class ControllersController extends StateNotifier<ControllersState> {
     state = state.copyWith(isScanning: true, error: null);
     await _scanSub?.cancel();
     _scanSub = _repository.scan().listen(
-          (devices) => state = state.copyWith(devices: devices),
-          onError: (Object e) =>
-              state = state.copyWith(isScanning: false, error: e.toString()),
-          onDone: () => state = state.copyWith(isScanning: false),
-        );
+      (devices) => state = state.copyWith(devices: devices),
+      onError: (Object e) =>
+          state = state.copyWith(isScanning: false, error: e.toString()),
+      onDone: () => state = state.copyWith(isScanning: false),
+    );
   }
 
   Future<void> stopScan() async {
@@ -61,10 +64,7 @@ class ControllersController extends StateNotifier<ControllersState> {
     await _repository.connect(id);
     _patch(id, (d) => d.copyWith(isConnected: true));
     _telemetrySubs[id] = _repository.telemetry(id).listen((t) {
-      _patch(
-        id,
-        (d) => d.copyWith(voltage: t.voltageVolts, rssi: t.rssi),
-      );
+      _patch(id, (d) => d.copyWith(voltage: t.voltageVolts, rssi: t.rssi));
     });
   }
 
@@ -76,9 +76,7 @@ class ControllersController extends StateNotifier<ControllersState> {
 
   void _patch(String id, ControllerInfo Function(ControllerInfo) update) {
     state = state.copyWith(
-      devices: [
-        for (final d in state.devices) d.id == id ? update(d) : d,
-      ],
+      devices: [for (final d in state.devices) d.id == id ? update(d) : d],
     );
   }
 
@@ -92,7 +90,12 @@ class ControllersController extends StateNotifier<ControllersState> {
   }
 }
 
+/// Riverpod 3 recreates the notifier whenever this provider rebuilds, which is
+/// the correct semantic for a changed repository — but it means a rebuild of
+/// [controllerRepositoryProvider] disposes this controller, cancelling the
+/// active scan and every telemetry subscription with no visible error. That
+/// provider is a plain [Provider] that does not rebuild today; keep it that way.
 final controllersControllerProvider =
     StateNotifierProvider<ControllersController, ControllersState>((ref) {
-  return ControllersController(ref.watch(controllerRepositoryProvider));
-});
+      return ControllersController(ref.watch(controllerRepositoryProvider));
+    });
