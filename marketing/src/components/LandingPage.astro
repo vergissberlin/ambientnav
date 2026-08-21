@@ -1,0 +1,382 @@
+---
+import '../styles/theme.css';
+import HeroVisual from './HeroVisual.astro';
+import SystemDiagram from './SystemDiagram.astro';
+import logoLockup from '../assets/logo-lockup.svg?url';
+
+interface Props {
+  lang?: 'en' | 'de';
+}
+const { lang = 'en' } = Astro.props;
+
+const repoUrl = 'https://github.com/vergissberlin/ambientnav';
+const docsBase = 'https://vergissberlin.github.io/ambientnav';
+
+const copy = {
+  en: {
+    htmlLang: 'en',
+    pageTitle: 'AmbientNav — Ambient LED Navigation for Your Car',
+    metaDescription:
+      'AmbientNav turns addressable LED strips into a real-time navigation guide and parking-proximity display. Open-source, DIY-built with two ESP32 boards and a Flutter app.',
+    ogDescription:
+      'Navigation-guided ambient lighting and parking assistance for your vehicle. Open-source, no subscription, no cloud lock-in.',
+    docsUrl: `${docsBase}/getting-started/`,
+    altLangUrl: '/de/',
+    altLangLabel: 'DE',
+    nav: { features: 'Features', howItWorks: 'How it works', docs: 'Docs', github: 'GitHub' },
+    eyebrow: 'Open-source · DIY automotive hardware',
+    h1: 'Navigation-guided ambient lighting for your dashboard.',
+    heroSub:
+      'AmbientNav mirrors your phone’s turn-by-turn navigation and live parking distance on addressable LED strips — inspired by the VW ID.3 ambient lighting, built on two ESP32 boards and a Flutter app you run yourself.',
+    ctaPrimary: 'View on GitHub',
+    ctaSecondary: 'Read the Docs',
+    featuresHeading: 'What is AmbientNav?',
+    features: [
+      {
+        title: 'Navigation Lighting',
+        body: 'The front LED strip mirrors your phone’s turn-by-turn navigation — sweep left before a left turn, sweep right for a right turn, pulse forward when continuing straight.',
+      },
+      {
+        title: 'Parking Aid',
+        body: 'Three ultrasonic sensors at the rear feed a live distance bar. It narrows and shifts from green to red as you approach an obstacle.',
+      },
+      {
+        title: 'Open & Offline',
+        body: 'Built on OpenStreetMap and the Valhalla routing engine — no subscription, no cloud lock-in, and it works offline once map tiles are cached.',
+      },
+      {
+        title: 'Wireless Architecture',
+        body: 'The phone talks to the front ESP32 over Bluetooth LE. Front and rear ESP32s talk to each other over Bluetooth Classic — no wiring between the two boards.',
+      },
+    ],
+    howItWorksHeading: 'How it works',
+    howItWorksSub:
+      'The phone talks over Bluetooth LE to the front ESP32, which drives the navigation LEDs and relays state to the rear ESP32 over Bluetooth Classic for the parking-aid strip.',
+    scenariosHeading: 'Built for real driving',
+    scenarioTableHeader: { scenario: 'Scenario', effect: 'LED effect' },
+    scenarios: [
+      { scenario: 'Turn left', effect: 'Front strip sweeps left, amber' },
+      { scenario: 'Turn right', effect: 'Front strip sweeps right, amber' },
+      { scenario: 'Continue straight', effect: 'Front strip pulses forward, white' },
+      { scenario: 'Reversing — obstacle far', effect: 'Full rear bar, green' },
+      { scenario: 'Reversing — obstacle close', effect: 'Rear bar narrows, amber → red' },
+      { scenario: 'Idle', effect: 'Slow breathing, configurable color' },
+    ],
+    ctaHeading: 'Open hardware, open source.',
+    ctaBody:
+      'MIT-licensed. Requires an original ESP32 (WROOM/WROVER) with simultaneous Bluetooth Classic and BLE support — two boards, WS2812B LED strips, three HC-SR04 ultrasonic sensors, and Flutter for the companion app.',
+    ctaPrimary2: 'Get Started',
+    ctaSecondary2: 'Source on GitHub',
+    footerLicense: 'AmbientNav — MIT License',
+  },
+  de: {
+    htmlLang: 'de',
+    pageTitle: 'AmbientNav — Ambiente-LED-Navigation fürs Auto',
+    metaDescription:
+      'AmbientNav verwandelt adressierbare LED-Streifen in ein Echtzeit-Navigationssystem und eine Einparkhilfe. Open Source, selbst gebaut mit zwei ESP32-Boards und einer Flutter-App.',
+    ogDescription:
+      'Navigationsgesteuerte Umgebungsbeleuchtung und Einparkhilfe für dein Fahrzeug. Open Source, kein Abo, kein Anbieter-Lock-in.',
+    docsUrl: `${docsBase}/de/getting-started/`,
+    altLangUrl: '/',
+    altLangLabel: 'EN',
+    nav: { features: 'Funktionen', howItWorks: 'So funktioniert’s', docs: 'Docs', github: 'GitHub' },
+    eyebrow: 'Open Source · Selbstbau-Autoelektronik',
+    h1: 'Navigationsgesteuerte Umgebungsbeleuchtung für dein Cockpit.',
+    heroSub:
+      'AmbientNav spiegelt die Turn-by-Turn-Navigation deines Handys und den Live-Abstand beim Einparken auf adressierbaren LED-Streifen — inspiriert vom VW ID.3 Ambientelicht, gebaut mit zwei ESP32-Boards und einer Flutter-App, die du selbst betreibst.',
+    ctaPrimary: 'Auf GitHub ansehen',
+    ctaSecondary: 'Zur Dokumentation',
+    featuresHeading: 'Was ist AmbientNav?',
+    features: [
+      {
+        title: 'Navigationsbeleuchtung',
+        body: 'Der vordere LED-Streifen spiegelt die Turn-by-Turn-Navigation deines Handys wider — Sweep nach links vor einer Linkskurve, nach rechts vor einer Rechtskurve, Puls nach vorne bei geradeaus.',
+      },
+      {
+        title: 'Einparkhilfe',
+        body: 'Drei Ultraschallsensoren hinten liefern einen Live-Abstandsbalken. Er wird schmaler und wechselt von Grün nach Rot, je näher du einem Hindernis kommst.',
+      },
+      {
+        title: 'Offen & offline',
+        body: 'Basiert auf OpenStreetMap und dem Valhalla-Routing-Engine — kein Abo, kein Anbieter-Lock-in, und offline nutzbar, sobald die Kartenkacheln gecacht sind.',
+      },
+      {
+        title: 'Drahtlose Architektur',
+        body: 'Das Handy kommuniziert per Bluetooth LE mit dem vorderen ESP32. Vorderer und hinterer ESP32 kommunizieren über Bluetooth Classic — keine Kabelverbindung zwischen den beiden Boards.',
+      },
+    ],
+    howItWorksHeading: 'So funktioniert’s',
+    howItWorksSub:
+      'Das Handy spricht per Bluetooth LE mit dem vorderen ESP32, der die Navigations-LEDs steuert und den Zustand per Bluetooth Classic an den hinteren ESP32 für die Einparkhilfe weitergibt.',
+    scenariosHeading: 'Für den Alltag am Steuer gebaut',
+    scenarioTableHeader: { scenario: 'Szenario', effect: 'LED-Effekt' },
+    scenarios: [
+      { scenario: 'Abbiegen links', effect: 'Vorderer Streifen sweept links, Amber' },
+      { scenario: 'Abbiegen rechts', effect: 'Vorderer Streifen sweept rechts, Amber' },
+      { scenario: 'Geradeaus weiterfahren', effect: 'Vorderer Streifen pulsiert vorwärts, Weiß' },
+      { scenario: 'Rückwärts — Hindernis weit', effect: 'Hinterer Balken voll, Grün' },
+      { scenario: 'Rückwärts — Hindernis nah', effect: 'Hinterer Balken wird schmaler, Amber → Rot' },
+      { scenario: 'Leerlauf', effect: 'Langsames Atmen, konfigurierbare Farbe' },
+    ],
+    ctaHeading: 'Offene Hardware, offene Software.',
+    ctaBody:
+      'MIT-lizenziert. Benötigt einen originalen ESP32 (WROOM/WROVER) mit gleichzeitiger Unterstützung für Bluetooth Classic und BLE — zwei Boards, WS2812B-LED-Streifen, drei HC-SR04-Ultraschallsensoren und Flutter für die Begleit-App.',
+    ctaPrimary2: 'Jetzt starten',
+    ctaSecondary2: 'Quellcode auf GitHub',
+    footerLicense: 'AmbientNav — MIT-Lizenz',
+  },
+}[lang];
+
+const year = new Date().getFullYear();
+---
+
+<!doctype html>
+<html lang={copy.htmlLang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>{copy.pageTitle}</title>
+    <meta name="description" content={copy.metaDescription} />
+    <meta property="og:title" content={copy.pageTitle} />
+    <meta property="og:description" content={copy.ogDescription} />
+    <meta property="og:type" content="website" />
+    <link rel="alternate" hreflang="en" href="/" />
+    <link rel="alternate" hreflang="de" href="/de/" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href={lang === 'de' ? '/de/' : '/'} aria-label="AmbientNav home">
+        <img src={logoLockup} alt="AmbientNav" height="28" />
+      </a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="#features">{copy.nav.features}</a>
+        <a href="#how-it-works">{copy.nav.howItWorks}</a>
+        <a href={copy.docsUrl}>{copy.nav.docs}</a>
+        <a href={repoUrl}>{copy.nav.github}</a>
+        <a href={copy.altLangUrl} class="lang-switch">{copy.altLangLabel}</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <p class="eyebrow">{copy.eyebrow}</p>
+        <h1>{copy.h1}</h1>
+        <p class="hero-sub">{copy.heroSub}</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href={repoUrl}>{copy.ctaPrimary}</a>
+          <a class="btn btn-secondary" href={copy.docsUrl}>{copy.ctaSecondary}</a>
+        </div>
+      </section>
+
+      <HeroVisual lang={lang} />
+
+      <section id="features" class="features">
+        <h2>{copy.featuresHeading}</h2>
+        <div class="feature-grid">
+          {copy.features.map((f) => (
+            <article class="feature-card">
+              <h3>{f.title}</h3>
+              <p>{f.body}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section id="how-it-works" class="how-it-works">
+        <h2>{copy.howItWorksHeading}</h2>
+        <p class="section-sub">{copy.howItWorksSub}</p>
+        <SystemDiagram lang={lang} />
+      </section>
+
+      <section class="scenarios">
+        <h2>{copy.scenariosHeading}</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>{copy.scenarioTableHeader.scenario}</th>
+              <th>{copy.scenarioTableHeader.effect}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {copy.scenarios.map((s) => (
+              <tr>
+                <td>{s.scenario}</td>
+                <td>{s.effect}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+
+      <section class="cta">
+        <h2>{copy.ctaHeading}</h2>
+        <p>{copy.ctaBody}</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href={copy.docsUrl}>{copy.ctaPrimary2}</a>
+          <a class="btn btn-secondary" href={repoUrl}>{copy.ctaSecondary2}</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>&copy; {year} {copy.footerLicense}</span>
+      <span class="footer-links">
+        <a href={repoUrl}>{copy.nav.github}</a>
+        <a href={copy.docsUrl}>{copy.nav.docs}</a>
+      </span>
+    </footer>
+
+    <style>
+      .site-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--space-5) var(--space-6);
+        border-bottom: 1px solid var(--amb-line);
+      }
+      .brand img { display: block; }
+      .site-nav { display: flex; align-items: center; gap: var(--space-6); }
+      .site-nav a {
+        color: var(--amb-text-3);
+        text-decoration: none;
+        font-size: 0.9rem;
+      }
+      .site-nav a:hover { color: var(--amb-cyan-soft); }
+      .lang-switch {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        letter-spacing: 0.06em;
+        border: 1px solid var(--amb-line-strong);
+        border-radius: var(--radius-xs);
+        padding: 0.15rem 0.45rem;
+      }
+
+      main {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 0 var(--space-6) var(--space-8);
+      }
+
+      .hero {
+        text-align: center;
+        padding: var(--space-8) 0 var(--space-6);
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--amb-cyan-soft);
+        margin: 0 0 var(--space-4);
+      }
+      .hero h1 {
+        font-size: clamp(2rem, 5vw, 3.2rem);
+        line-height: 1.1;
+        margin: 0 0 var(--space-5);
+      }
+      .hero-sub {
+        max-width: 640px;
+        margin: 0 auto var(--space-6);
+        color: var(--amb-text-3);
+        font-size: 1.05rem;
+        line-height: 1.6;
+      }
+      .hero-actions {
+        display: flex;
+        gap: var(--space-4);
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .btn {
+        display: inline-block;
+        padding: 0.7rem 1.4rem;
+        border-radius: var(--radius-md);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+      .btn-primary {
+        background: var(--amb-gradient-h);
+        color: var(--amb-cockpit);
+        box-shadow: var(--amb-glow-cyan);
+      }
+      .btn-secondary {
+        border: 1px solid var(--amb-line-strong);
+        color: var(--amb-text);
+      }
+
+      section { padding: var(--space-8) 0; }
+      section h2 {
+        font-size: clamp(1.5rem, 3vw, 2rem);
+        margin-bottom: var(--space-5);
+        text-align: center;
+      }
+      .section-sub {
+        max-width: 640px;
+        margin: 0 auto var(--space-6);
+        text-align: center;
+        color: var(--amb-text-3);
+      }
+
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-5);
+      }
+      .feature-card {
+        background: var(--amb-surface-2);
+        border: 1px solid var(--amb-line);
+        border-radius: var(--radius-lg);
+        padding: var(--space-5);
+        box-shadow: var(--shadow-card);
+      }
+      .feature-card h3 {
+        font-size: 1.05rem;
+        margin-bottom: var(--space-3);
+      }
+      .feature-card p { margin: 0; color: var(--amb-text-3); line-height: 1.55; }
+
+      .scenarios table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.95rem;
+      }
+      .scenarios th, .scenarios td {
+        text-align: left;
+        padding: var(--space-3) var(--space-4);
+        border-bottom: 1px solid var(--amb-line);
+      }
+      .scenarios th { color: var(--amb-text-4); font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; }
+
+      .cta {
+        text-align: center;
+        border-top: 1px solid var(--amb-line);
+      }
+      .cta p {
+        max-width: 620px;
+        margin: 0 auto var(--space-6);
+        color: var(--amb-text-3);
+      }
+
+      .site-footer {
+        display: flex;
+        justify-content: space-between;
+        padding: var(--space-5) var(--space-6);
+        border-top: 1px solid var(--amb-line);
+        color: var(--amb-text-4);
+        font-size: 0.85rem;
+      }
+      .footer-links { display: flex; gap: var(--space-4); }
+      .footer-links a { color: var(--amb-text-4); text-decoration: none; }
+      .footer-links a:hover { color: var(--amb-cyan-soft); }
+
+      @media (max-width: 640px) {
+        .feature-grid { grid-template-columns: 1fr; }
+        .site-header { flex-direction: column; gap: var(--space-4); }
+        .site-nav { gap: var(--space-4); flex-wrap: wrap; justify-content: center; }
+        .site-footer { flex-direction: column; gap: var(--space-3); text-align: center; }
+      }
+    </style>
+  </body>
+</html>

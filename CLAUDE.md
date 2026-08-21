@@ -13,6 +13,7 @@ ambientnav/
 ├── firmware/front/          # ESP32 master — BLE + front LED strip
 ├── firmware/rear/           # ESP32 slave  — ultrasonic sensors + rear LED strip
 ├── docs/                    # Astro/Starlight documentation site
+├── marketing/               # Astro marketing landing page — deployed on Netlify
 ├── wokwi/                   # ESP32 circuit simulations
 └── Justfile                 # Top-level dev shortcuts
 ```
@@ -61,6 +62,19 @@ cd docs && pnpm install
 cd docs && pnpm run dev      # dev server
 cd docs && pnpm run build    # production build
 ```
+
+### Marketing site (Astro — pnpm, Netlify)
+```bash
+just marketing-dev           # pnpm install + dev server
+just marketing-build         # production build (dist/)
+```
+Deployed on Netlify (`marketing/netlify.toml`: base `marketing/`, build
+`pnpm run build`, publish `dist`), independently of the GitHub Pages
+deployment for `docs/` — Netlify's own repo integration builds and deploys
+this package on push, no GitHub Actions workflow involved. It reuses the
+same `--amb-*` design tokens and `HeroVisual`/`SystemDiagram` components as
+`docs/`, inlined locally per the same isolated-build convention (see
+`docs/src/styles/theme.css`).
 
 ## Architecture
 

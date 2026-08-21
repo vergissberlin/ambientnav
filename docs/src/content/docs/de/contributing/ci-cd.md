@@ -111,6 +111,37 @@ Wenn du das Repository forkst, ist GitHub Pages standardmäßig nicht aktiviert.
 2. Wähle unter **Source** die Option **GitHub Actions** (nicht einen Branch).
 3. Speichern. Beim nächsten Push auf `main`, der `docs/` berührt, wird der `deploy-docs.yml`-Workflow ausgelöst und die Seite veröffentlicht.
 
+## Marketing-Seiten-Deployment (Netlify)
+
+Anders als `docs/` wird das Package `marketing/` **nicht** über einen GitHub Actions Workflow deployt — es baut und deployt direkt auf [Netlify](https://www.netlify.com/), das das Repository eigenständig beobachtet.
+
+### Einmalige Einrichtung
+
+1. Wähle im Netlify-Dashboard **Add new site → Import an existing project** und verbinde das GitHub-Repository `vergissberlin/ambientnav`.
+2. Setze unter **Site settings → Build & deploy → Build settings**:
+   - **Base directory:** `marketing`
+   - **Build command:** `pnpm run build`
+   - **Publish directory:** `dist`
+
+   Das entspricht genau dem, was in `marketing/netlify.toml` bereits deklariert ist — Netlify übernimmt diese Werte automatisch. Die Dashboard-Felder müssen nur gesetzt werden, wenn du sie überschreiben willst.
+3. Speichern. Der erste Deploy startet sofort vom aktuellen `main`-Branch aus. Es ist kein GitHub Actions Secret nötig — Netlify authentifiziert sich und löst Builds vollständig über die eigene GitHub-App aus, sobald die Site verknüpft ist.
+
+### Was bei jedem Push passiert
+
+| Ereignis | Ergebnis |
+|---|---|
+| Push auf `main`, der `marketing/**` berührt | Netlify baut und deployt die Produktionsseite neu |
+| Pull Request, der `marketing/**` berührt | Netlify postet einen **Deploy Preview** mit eigener URL als PR-Check |
+| Push, der nur andere Packages berührt (`app/`, `docs/`, `firmware/`, …) | Kein Netlify-Build — die Site ist auf das Base-Directory `marketing` beschränkt |
+
+:::note
+GitHub Pages (`docs/`) und Netlify (`marketing/`) sind zwei unabhängige Deployment-Ziele im selben Repository — unterschiedliche Build-Systeme, unterschiedliche Trigger, kein gemeinsamer Workflow.
+:::
+
+### Eigene Domain (optional)
+
+Füge eine eigene Domain unter **Site settings → Domain management** hinzu. Netlify stellt das TLS-Zertifikat automatisch aus und erneuert es, sobald die DNS auf die Site zeigt (ein `A`/`ALIAS`-Record auf Netlifys Load Balancer, oder ein `CNAME` auf die `*.netlify.app`-Subdomain).
+
 ## CI-Prüfungen lokal vor dem Push ausführen
 
 Reproduziere das vollständige CI-Gate lokal, um Probleme zu finden, bevor sie einen PR blockieren:

@@ -2,6 +2,10 @@ docs/dist/
 docs/.astro/
 docs/.pnpm-store/
 docs/node_modules/
+marketing/dist/
+marketing/.astro/
+marketing/.pnpm-store/
+marketing/node_modules/
 .claude/
 
 # PlatformIO build output
