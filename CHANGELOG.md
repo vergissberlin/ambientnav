@@ -1,5 +1,53 @@
 # Changelog
 
+## [0.6.0](https://github.com/vergissberlin/ambientnav/compare/ambientnav-v0.5.0...ambientnav-v0.6.0) (2026-08-21)
+
+
+### Features
+
+* **app:** adopt the brand signal palette ([163cb26](https://github.com/vergissberlin/ambientnav/commit/163cb26a27b7984a25a7cf441708e047d80fa25f))
+* **app:** replace flutter_blue_plus with universal_ble ([32af4bc](https://github.com/vergissberlin/ambientnav/commit/32af4bcbd27163c57f03ea7938b1211181aa348a))
+* **docs:** add CSS LED effects visualizer to led-effects page ([6b78e03](https://github.com/vergissberlin/ambientnav/commit/6b78e039326acbc2516612ff7ac52ad8bc2b5587))
+* **front-led:** nav wave as soft colour bar sliding centre→edge ([e61d01e](https://github.com/vergissberlin/ambientnav/commit/e61d01e6111cbd56a82b9cfbab588c18c0cf6651))
+* **front-led:** replace nav sweep dot with sequential ambient wave ([dc98912](https://github.com/vergissberlin/ambientnav/commit/dc98912347d7b13e0ce5601b4133f6eff5e1a2e8))
+* **marketing:** add German localization at /de/ ([95a4c17](https://github.com/vergissberlin/ambientnav/commit/95a4c1781bfe3711b92af9869b3c6fb47c422a61))
+* **marketing:** add standalone Astro marketing landing page for Netlify ([15e1622](https://github.com/vergissberlin/ambientnav/commit/15e1622f4cd9b07aad9137a90852b709b21be709))
+* **marketing:** add standalone Astro marketing landing page for Netlify ([0c5dccf](https://github.com/vergissberlin/ambientnav/commit/0c5dccfb13f9e0101f46ed9b1a8a947f3b3feebe))
+* **ui:** add the ambientnav_ui package with design tokens and theming ([e2b60b2](https://github.com/vergissberlin/ambientnav/commit/e2b60b252f7994c71eeb067fd103ce9b9b5dfd2b))
+* **ui:** add the AnButton, AnBadge, AnCard and AnLightStrip atoms ([6574794](https://github.com/vergissberlin/ambientnav/commit/65747942d636a7863f83cdaa5c253bc371baa8a1))
+* Widgetbook component catalogue, Atomic Design layer and dependency modernisation ([2dd639e](https://github.com/vergissberlin/ambientnav/commit/2dd639ec48d951c9af975d8bd31caddcd3d93598))
+* **widgetbook:** add the component catalogue ([d96f54c](https://github.com/vergissberlin/ambientnav/commit/d96f54c91bba96a8045e0351e9ef58ad25e66771))
+* **widgetbook:** catalogue the extracted components and guard coverage ([5a3c18e](https://github.com/vergissberlin/ambientnav/commit/5a3c18edcf45af5866d8f218dbe861debc247a3b))
+* **widgetbook:** catalogue the provider-bound organisms and screens ([0e8205e](https://github.com/vergissberlin/ambientnav/commit/0e8205e9f42581adb7d25648098d9f38ca66d546))
+
+
+### Bug Fixes
+
+* **app:** correct the Riverpod 3 and universal_ble API mismatches ([7dd18a3](https://github.com/vergissberlin/ambientnav/commit/7dd18a34da7584e741a38ba8ac65bc7a200006e1))
+* **app:** hold permission_handler at 12.x — API 37 is not published ([cfc3381](https://github.com/vergissberlin/ambientnav/commit/cfc3381e3cb6e358cbc9f9bca294b17dd3a87ea3))
+* **app:** raise the iOS deployment target to 13.1 for universal_ble ([5110bc6](https://github.com/vergissberlin/ambientnav/commit/5110bc6ed2226a935d1e2a2160d42a15fb63775e))
+* **ci:** attach app builds (APK + iOS) to GitHub Releases ([6c1f273](https://github.com/vergissberlin/ambientnav/commit/6c1f273906e84094d17f939e47da6b30002ccd2d))
+* **ci:** use heredoc syntax for multi-line GITHUB_OUTPUT value ([40c9e08](https://github.com/vergissberlin/ambientnav/commit/40c9e08af1b62b7f0ed5edf8458aea3d59390943))
+* **docs:** filter versions without content dir and add PR build check ([#40](https://github.com/vergissberlin/ambientnav/issues/40)) ([f4d50fb](https://github.com/vergissberlin/ambientnav/commit/f4d50fbcaa6d846f094bfd7fea54180fb491d49e))
+* **docs:** make theme surfaces and hairlines theme-aware for light mode ([01a558e](https://github.com/vergissberlin/ambientnav/commit/01a558efd66d0220542a099240cb146899629ed7))
+* **docs:** make theme surfaces and hairlines theme-aware for light mode ([9843361](https://github.com/vergissberlin/ambientnav/commit/98433611e110e0f2990a9583cc3db0e1c5dde125))
+* **docs:** restore version selector when git tags are unavailable ([9c50df2](https://github.com/vergissberlin/ambientnav/commit/9c50df2e73a1456215024cbc8d38870361a1772f))
+
+
+### Documentation
+
+* add CLAUDE.md and sync nav-wave CSS animation to firmware ([1972455](https://github.com/vergissberlin/ambientnav/commit/1972455ad08c44419b95d36920a7051a3a2fdf42))
+* add complete dual-audience documentation structure ([f75d76d](https://github.com/vergissberlin/ambientnav/commit/f75d76dc712e46eafb666dfcb40dc940a5093dd7))
+* add comprehensive contributing guides and app user documentation ([507226b](https://github.com/vergissberlin/ambientnav/commit/507226b346cafe2a28ed322f8f79f0421788150c))
+* add remaining German translations for contributing section ([e2f72cf](https://github.com/vergissberlin/ambientnav/commit/e2f72cf2a8630b869c1ef01476a49c72fc518e71))
+* add versioned content dirs for v0.2.0 and v0.3.0 ([48359b5](https://github.com/vergissberlin/ambientnav/commit/48359b5648c6cf0341cf4f6ea962b4500ceea24c))
+* add versioned documentation for 0.2 and 0.3 releases ([ff1427a](https://github.com/vergissberlin/ambientnav/commit/ff1427ad90fd2492d19d46a06b07f23dcde8afbe))
+* **contributing:** document Netlify deployment for marketing/ ([b80f429](https://github.com/vergissberlin/ambientnav/commit/b80f429140320895f6038d960a708dba34e49496))
+* improve DE translations for design-system, testing, ci-cd ([19e0d90](https://github.com/vergissberlin/ambientnav/commit/19e0d902e629f2af27bb0ed28d6a3e594265ff6a))
+* update ci-cd page and add DE firmware translation ([ba35ed5](https://github.com/vergissberlin/ambientnav/commit/ba35ed5a4bbfe3ee5752b9d4d1b82d1d927e1a54))
+* use animated logo in documentation header ([8cd7319](https://github.com/vergissberlin/ambientnav/commit/8cd731983ffcb5cd9de10149151f398f8d416c25))
+* use animated logo in documentation header ([97a482e](https://github.com/vergissberlin/ambientnav/commit/97a482eea84221ef21232d412f37124c62c89092))
+
 ## [0.5.0](https://github.com/vergissberlin/ambientnav/compare/ambientnav-v0.4.0...ambientnav-v0.5.0) (2026-06-20)
 
 
