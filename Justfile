@@ -4,6 +4,7 @@
 app_dir := "app"
 ui_dir := "packages/ambientnav_ui"
 widgetbook_dir := "widgetbook"
+marketing_dir := "marketing"
 mock := "--dart-define=USE_MOCK=true"
 default_sim := "iPhone 17"
 
@@ -96,6 +97,17 @@ fmt:
     cd {{app_dir}} && dart format lib test integration_test
     cd {{ui_dir}} && dart format lib test
     cd {{widgetbook_dir}} && dart format lib test
+
+# --- Marketing site (deployed on Netlify, separate from docs/) ---
+
+marketing-prepare:
+    cd {{marketing_dir}} && pnpm install
+
+marketing-dev: marketing-prepare
+    cd {{marketing_dir}} && pnpm run dev
+
+marketing-build: marketing-prepare
+    cd {{marketing_dir}} && pnpm run build
 
 # Everything CI runs, locally
 check:
