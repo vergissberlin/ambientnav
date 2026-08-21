@@ -28,7 +28,7 @@ dependencies:
   flutter_riverpod: ^3.4.2
 
   # Routing & navigation UI.
-  maplibre_gl: ^0.26.2          # OSS map rendering + offline regions (OSM tiles)
+  maplibre_gl: ^0.27.0          # OSS map rendering + offline regions (OSM tiles)
   geolocator: ^14.0.3           # device GPS position
   flutter_tts: ^4.2.5           # multi-language voice guidance
 
@@ -49,11 +49,9 @@ dependencies:
   hive_ce: ^2.19.3
   hive_ce_flutter: ^2.3.4
 
-  # Held at 12.x deliberately: permission_handler 13 pulls
-  # permission_handler_android 14, which requires compileSdk 37 — a platform
-  # Google has not published, so `sdkmanager platforms;android-37` cannot
-  # resolve it and the Android build is unbuildable. Revisit once API 37 ships.
-  permission_handler: ^12.0.3   # BLE scan/connect + location runtime permissions
+  # Runtime permissions for BLE scan/connect + location.
+  # Track with `fvm flutter pub upgrade --major-versions` when bumping Android SDK.
+  permission_handler: ^13.0.1   # BLE scan/connect + location runtime permissions
   file_picker: ^11.0.3           # select firmware .bin for OTA
   intl: any                     # localization formatting (pinned by flutter_localizations)
 
