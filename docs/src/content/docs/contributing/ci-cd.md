@@ -111,6 +111,37 @@ If you fork the repository, GitHub Pages is not enabled by default. To activate 
 2. Under **Source**, select **GitHub Actions** (not a branch).
 3. Save. The next push to `main` that touches `docs/` will trigger the `deploy-docs.yml` workflow and publish the site.
 
+## Marketing Site Deployment (Netlify)
+
+Unlike `docs/`, the `marketing/` package is **not** deployed through a GitHub Actions workflow — it builds and deploys directly on [Netlify](https://www.netlify.com/), which watches the repository on its own.
+
+### One-time setup
+
+1. In the Netlify dashboard, choose **Add new site → Import an existing project** and connect the `vergissberlin/ambientnav` GitHub repository.
+2. Under **Site settings → Build & deploy → Build settings**, set:
+   - **Base directory:** `marketing`
+   - **Build command:** `pnpm run build`
+   - **Publish directory:** `dist`
+
+   These match what's already declared in `marketing/netlify.toml`, so Netlify picks them up automatically — the dashboard fields only need to be set if you want to override them.
+3. Save. The first deploy starts immediately from the current `main` branch. No GitHub Actions secret is required — Netlify authenticates and triggers builds entirely through its own GitHub App installation once the site is linked.
+
+### What happens on every push
+
+| Event | Result |
+|---|---|
+| Push to `main` touching `marketing/**` | Netlify rebuilds and deploys the production site |
+| Pull request touching `marketing/**` | Netlify posts a **deploy preview** with its own URL as a PR check |
+| Push touching only other packages (`app/`, `docs/`, `firmware/`, …) | No Netlify build — the site is scoped to the `marketing` base directory |
+
+:::note
+GitHub Pages (`docs/`) and Netlify (`marketing/`) are two independent deployment targets in the same repository — different build systems, different triggers, no shared workflow.
+:::
+
+### Custom domain (optional)
+
+Add a custom domain under **Site settings → Domain management**. Netlify provisions and renews the TLS certificate automatically once DNS points at the site (an `A`/`ALIAS` record to Netlify's load balancer, or a `CNAME` to the `*.netlify.app` subdomain).
+
 ## Running CI Checks Locally Before Pushing
 
 Reproduce the full CI gate locally to catch issues before they block a PR:
