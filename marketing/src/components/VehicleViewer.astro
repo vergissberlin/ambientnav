@@ -290,11 +290,30 @@ const modes = [
       roughness: 0.15,
       metalness: 0.1,
       transparent: true,
-      opacity: 0.55,
+      opacity: 0.26,
+      depthWrite: false,
     });
     const tireMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.9 });
     const rimMat = new THREE.MeshStandardMaterial({ color: 0xb8bec8, roughness: 0.3, metalness: 0.85 });
     const housingMat = new THREE.MeshStandardMaterial({ color: 0x1a1e28, roughness: 0.6, metalness: 0.2 });
+    const obstacleMat = new THREE.MeshStandardMaterial({
+      color: 0x3a4050,
+      roughness: 0.8,
+      transparent: true,
+      opacity: 0.85,
+      emissive: MAGENTA,
+      emissiveIntensity: 0.08,
+    });
+    function pingMaterial() {
+      return new THREE.MeshBasicMaterial({
+        color: MAGENTA,
+        transparent: true,
+        opacity: 0,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+      });
+    }
 
     function ledMaterial(colorHex: number) {
       return new THREE.MeshStandardMaterial({
@@ -310,6 +329,10 @@ const modes = [
     let guideSegs: THREE.Mesh[] = [];
     let alertSegs: THREE.Mesh[] = [];
     let linkSegs: THREE.Mesh[] = [];
+    let frontRings: THREE.Mesh[][] = [];
+    let frontObstacle: THREE.Mesh | null = null;
+    let rearRings: THREE.Mesh[][] = [];
+    let rearObstacle: THREE.Mesh | null = null;
 
     try {
       const loader = new OBJLoader();
@@ -322,28 +345,34 @@ const modes = [
       alertSegs.forEach((mesh) => (mesh.material = ledMaterial(MAGENTA)));
       linkSegs.forEach((mesh) => (mesh.material = ledMaterial(VIOLET)));
 
-      // The obstacle prop + its sensor-ping rings tell a "parking aid" story
-      // that reads as a distant demo prop rather than the product itself at
-      // hero-visual scale — hide them here and let the alert strip alone
-      // (on the car) carry the proximity story.
-      const HIDDEN = new Set(['obstacle']);
+      // Front sensor-ping rings: grouped 3-per-sensor (wave_<sensor>_<ring>),
+      // each ring gets its own material clone so rings at different phases
+      // of the same ping can fade independently.
       for (let s = 1; s <= 4; s++) {
-        for (let r = 1; r <= 3; r++) HIDDEN.add(`wave_${s}_${r}`);
+        const rings: THREE.Mesh[] = [];
+        for (let r = 1; r <= 3; r++) {
+          const mesh = model.getObjectByName(`wave_${s}_${r}`) as THREE.Mesh | null;
+          if (mesh) {
+            mesh.material = pingMaterial();
+            rings.push(mesh);
+          }
+        }
+        if (rings.length) frontRings.push(rings);
       }
 
       model.traverse((obj) => {
         if (!(obj as THREE.Mesh).isMesh) return;
         const mesh = obj as THREE.Mesh;
         const name = mesh.name;
-        if (HIDDEN.has(name)) {
-          mesh.visible = false;
-          return;
-        }
         if (name === 'body_shell' || name === 'sill_left' || name === 'sill_right') mesh.material = paintMat;
         else if (name === 'glass_greenhouse') mesh.material = glassMat;
         else if (name.startsWith('wheel_')) mesh.material = tireMat;
         else if (name.startsWith('rim_')) mesh.material = rimMat;
         else if (name.startsWith('sensor_front_')) mesh.material = housingMat;
+        else if (name === 'obstacle') {
+          mesh.material = obstacleMat;
+          frontObstacle = mesh;
+        }
       });
 
       // Bounding boxes for the per-feature close-up views, computed in the
@@ -358,10 +387,42 @@ const modes = [
       const alertBox = boxOf(alertSegs);
       const linkBox = boxOf(linkSegs);
 
+      // The source model only ships a sensor+obstacle assembly at the
+      // front; procedurally mirror it at the rear (next to the link strip)
+      // so the demo shows both ends' distance sensors, matching the real
+      // product's rear-mounted parking sensors.
+      const linkZMin = linkBox.min.z;
+      const linkZSpan = linkBox.max.z - linkBox.min.z;
+      const rearX = linkBox.min.x - 0.12;
+      const rearY = 0.42;
+      [0.18, 0.5, 0.82].forEach((f) => {
+        const z = linkZMin + linkZSpan * f;
+        const puck = new THREE.Mesh(new THREE.SphereGeometry(0.035, 12, 8), housingMat);
+        puck.position.set(rearX, rearY, z);
+        model.add(puck);
+
+        const rings: THREE.Mesh[] = [];
+        for (let r = 0; r < 3; r++) {
+          const ring = new THREE.Mesh(new THREE.RingGeometry(0.02, 0.05, 24), pingMaterial());
+          ring.rotation.y = -Math.PI / 2;
+          ring.position.set(rearX - 0.01, rearY, z);
+          model.add(ring);
+          rings.push(ring);
+        }
+        rearRings.push(rings);
+      });
+      rearObstacle = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.5, 1.5), obstacleMat.clone());
+      rearObstacle.name = 'obstacle';
+      rearObstacle.position.set(rearX - 0.85, 0.25, linkZMin + linkZSpan * 0.5);
+      model.add(rearObstacle);
+
       // Frame the car with a flattering 3/4 angle, centred on its midsection.
+      // The obstacle prop sits well beyond the car's own silhouette — leave
+      // it out of the framing box so the default overview stays a shot of
+      // the car, not a shot of the car-plus-a-wall.
       const carBox = new THREE.Box3();
       model.traverse((obj) => {
-        if ((obj as THREE.Mesh).isMesh && obj.visible) carBox.expandByObject(obj);
+        if ((obj as THREE.Mesh).isMesh && obj.visible && obj.name !== 'obstacle') carBox.expandByObject(obj);
       });
       const center = carBox.getCenter(new THREE.Vector3());
       const size = carBox.getSize(new THREE.Vector3());
@@ -387,11 +448,26 @@ const modes = [
         const d = r * 3.2 + 1.1;
         return { pos: c.clone().addScaledVector(off, d), target: c.clone() };
       }
+      // The Proximity/Link close-ups should frame the sensor hardware too,
+      // not just the light strip — union in the sensor housings, ping
+      // rings, and obstacle so clicking the button brings the whole
+      // "sensor sees an obstacle" story into view.
+      const alertFocusBox = alertBox.clone();
+      if (frontObstacle) alertFocusBox.expandByObject(frontObstacle);
+      model.traverse((obj) => {
+        if ((obj as THREE.Mesh).isMesh && obj.name.startsWith('sensor_front_')) alertFocusBox.expandByObject(obj);
+      });
+      frontRings.forEach((rings) => rings.forEach((r) => alertFocusBox.expandByObject(r)));
+
+      const linkFocusBox = linkBox.clone();
+      if (rearObstacle) linkFocusBox.expandByObject(rearObstacle);
+      rearRings.forEach((rings) => rings.forEach((r) => linkFocusBox.expandByObject(r)));
+
       const focusViews: Record<Mode, { pos: THREE.Vector3; target: THREE.Vector3 }> = {
         all: defaultView,
         guide: focusView(guideBox),
-        alert: focusView(alertBox),
-        link: focusView(linkBox),
+        alert: focusView(alertFocusBox),
+        link: focusView(linkFocusBox),
       };
 
       // Unfocused strips fade to the car's neutral trim colour, not just a
@@ -547,6 +623,61 @@ const modes = [
       }
     }
 
+    // Rear sensors run on their own clock, out of phase with the front —
+    // two independent systems, not a mirrored pair ticking in lockstep.
+    const REAR_PHASE_OFFSET_MS = 4500;
+    function rearDistanceRatio() {
+      return (Math.sin((elapsed + REAR_PHASE_OFFSET_MS) / ALERT_PERIOD_MS - Math.PI / 2) + 1) / 2;
+    }
+
+    function animatePingRings(rings: THREE.Mesh[][], d: number) {
+      const speed = 0.55 + (1 - d) * 1.1;
+      const dur = 1800 / speed;
+      rings.forEach((ring) => {
+        ring.forEach((mesh, r) => {
+          const phase = ((elapsed + r * (dur / 3)) % dur) / dur;
+          mesh.scale.setScalar(0.7 + phase * 0.9);
+          (mesh.material as THREE.MeshBasicMaterial).opacity = 0.7 * (1 - phase) * (0.4 + 0.6 * (1 - d));
+        });
+      });
+    }
+
+    function setRingsVisible(rings: THREE.Mesh[][], v: boolean) {
+      rings.forEach((r) => r.forEach((mesh) => (mesh.visible = v)));
+    }
+
+    function animateSensors() {
+      // The obstacle walls + ping rings tell a "sensor detects a wall"
+      // story that only makes sense up close — shown only while that end
+      // is focused, so the default overview and the other feature's
+      // close-up stay uncluttered.
+      const frontActive = activeMode === 'alert';
+      setRingsVisible(frontRings, frontActive);
+      if (frontObstacle) frontObstacle.visible = frontActive;
+      if (frontActive) {
+        const df = distanceRatio();
+        animatePingRings(frontRings, df);
+        if (frontObstacle) {
+          const closePulse = df < 0.14 ? 0.5 + 0.5 * Math.sin(elapsed / 130) : 0;
+          (frontObstacle.material as THREE.MeshStandardMaterial).emissiveIntensity =
+            0.08 + (1 - df) * 0.55 + closePulse * 0.3;
+        }
+      }
+
+      const rearActive = activeMode === 'link';
+      setRingsVisible(rearRings, rearActive);
+      if (rearObstacle) rearObstacle.visible = rearActive;
+      if (rearActive) {
+        const dr = rearDistanceRatio();
+        animatePingRings(rearRings, dr);
+        if (rearObstacle) {
+          const closePulse = dr < 0.14 ? 0.5 + 0.5 * Math.sin(elapsed / 130 + 1.7) : 0;
+          (rearObstacle.material as THREE.MeshStandardMaterial).emissiveIntensity =
+            0.08 + (1 - dr) * 0.55 + closePulse * 0.3;
+        }
+      }
+    }
+
     function tick() {
       requestAnimationFrame(tick);
       const dt = clock.getDelta();
@@ -564,6 +695,7 @@ const modes = [
       animateGuide();
       animateAlert();
       animateLink();
+      animateSensors();
 
       controls.update();
       composer.render();
