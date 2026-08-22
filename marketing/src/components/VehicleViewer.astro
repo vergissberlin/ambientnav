@@ -1,0 +1,449 @@
+---
+import HeroVisual from './HeroVisual.astro';
+
+interface Props {
+  lang?: 'en' | 'de';
+}
+const { lang = 'en' } = Astro.props;
+
+const t = {
+  en: {
+    eyebrow: '3D Preview',
+    hint: 'Drag to rotate',
+    guide: 'Guide',
+    alert: 'Proximity',
+    link: 'Link',
+  },
+  de: {
+    eyebrow: '3D-Vorschau',
+    hint: 'Ziehen zum Drehen',
+    guide: 'Führung',
+    alert: 'Nähe',
+    link: 'Verbindung',
+  },
+}[lang];
+---
+
+<div class="vv" data-vehicle-viewer>
+  <div class="vv-stage">
+    <div class="vv-fallback" data-vv-fallback>
+      <HeroVisual lang={lang} />
+    </div>
+    <div class="vv-canvas-wrap" data-vv-canvas-wrap aria-hidden="true">
+      <canvas class="vv-canvas" data-vv-canvas></canvas>
+    </div>
+  </div>
+  <div class="vv-footer">
+    <span class="vv-hint" data-vv-hint hidden>{t.hint}</span>
+    <div class="vv-legend">
+      <span class="vv-legend-item"><i class="vv-dot" style="background:#19E3FF;box-shadow:0 0 8px rgba(25,227,255,.7)"></i>{t.guide}</span>
+      <span class="vv-legend-item"><i class="vv-dot" style="background:#FF2D9C;box-shadow:0 0 8px rgba(255,45,156,.7)"></i>{t.alert}</span>
+      <span class="vv-legend-item"><i class="vv-dot" style="background:#7C5CFF;box-shadow:0 0 8px rgba(124,92,255,.7)"></i>{t.link}</span>
+    </div>
+  </div>
+</div>
+
+<style>
+  .vv {
+    margin: 2rem 0 2.5rem;
+  }
+
+  .vv-stage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--amb-cockpit, #06080e);
+    border: 1px solid var(--amb-line, rgba(255, 255, 255, 0.08));
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+  }
+
+  .vv-fallback,
+  .vv-canvas-wrap {
+    position: absolute;
+    inset: 0;
+  }
+
+  .vv-fallback :global(.hv) {
+    margin: 0;
+    height: 100%;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .vv-canvas-wrap {
+    opacity: 0;
+    transition: opacity 480ms ease;
+    pointer-events: none;
+  }
+  .vv-canvas-wrap[data-ready='true'] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .vv-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    touch-action: pan-y;
+  }
+
+  .vv-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-top: var(--space-3);
+    flex-wrap: wrap;
+  }
+
+  .vv-hint {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--amb-text-4);
+  }
+
+  .vv-legend {
+    display: flex;
+    gap: var(--space-5);
+    margin-left: auto;
+  }
+  .vv-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    color: var(--amb-text-3);
+  }
+  .vv-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    display: inline-block;
+  }
+
+  @media (max-width: 640px) {
+    .vv-stage {
+      aspect-ratio: 4 / 5;
+    }
+    .vv-legend {
+      margin-left: 0;
+      gap: var(--space-4);
+    }
+  }
+</style>
+
+<script>
+  import * as THREE from 'three';
+  import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
+  import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+  import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+  import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+  import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+
+  const CYAN = 0x19e3ff;
+  const MAGENTA = 0xff2d9c;
+  const VIOLET = 0x7c5cff;
+
+  function orderedSegments(root: THREE.Object3D, prefix: string) {
+    const items: { mesh: THREE.Mesh; index: number }[] = [];
+    root.traverse((obj) => {
+      if ((obj as THREE.Mesh).isMesh && obj.name.startsWith(prefix)) {
+        const m = obj.name.match(/(\d+)$/);
+        items.push({ mesh: obj as THREE.Mesh, index: m ? parseInt(m[1], 10) : 0 });
+      }
+    });
+    items.sort((a, b) => a.index - b.index);
+    return items.map((i) => i.mesh);
+  }
+
+  // Shortest wrap-around distance between two points on a [0,1) ring.
+  function wrapDist(a: number, b: number) {
+    const d = Math.abs(a - b);
+    return Math.min(d, 1 - d);
+  }
+
+  function gaussian(x: number, width: number) {
+    return Math.exp(-(x * x) / (2 * width * width));
+  }
+
+  async function init(root: HTMLElement) {
+    if (!window.WebGLRenderingContext) return; // no WebGL — keep the 2D fallback
+
+    const stage = root.querySelector<HTMLElement>('.vv-stage');
+    const wrap = root.querySelector<HTMLElement>('[data-vv-canvas-wrap]');
+    const canvas = root.querySelector<HTMLCanvasElement>('[data-vv-canvas]');
+    const hint = root.querySelector<HTMLElement>('[data-vv-hint]');
+    const fallback = root.querySelector<HTMLElement>('[data-vv-fallback]');
+    if (!stage || !wrap || !canvas) return;
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setClearColor(0x000000, 0);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
+
+    scene.add(new THREE.AmbientLight(0x505868, 0.85));
+    const key = new THREE.DirectionalLight(0xd8ecff, 3.6);
+    key.position.set(4, 5, 6);
+    scene.add(key);
+    const rim = new THREE.DirectionalLight(VIOLET, 0.55);
+    rim.position.set(-5, 3, -4);
+    scene.add(rim);
+    const fill = new THREE.DirectionalLight(MAGENTA, 0.3);
+    fill.position.set(-2, -1, 5);
+    scene.add(fill);
+
+    const composer = new EffectComposer(renderer);
+    composer.addPass(new RenderPass(scene, camera));
+    const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.55, 0.4, 0.35);
+    composer.addPass(bloom);
+
+    const controls = new OrbitControls(camera, canvas);
+    controls.enableDamping = true;
+    controls.enableZoom = false;
+    controls.enablePan = false;
+    controls.minPolarAngle = Math.PI * 0.28;
+    controls.maxPolarAngle = Math.PI * 0.52;
+    controls.autoRotate = !reducedMotion;
+    controls.autoRotateSpeed = 0.7;
+
+    let userInteracting = false;
+    let resumeTimer: number | undefined;
+    canvas.addEventListener('pointerdown', () => {
+      userInteracting = true;
+      controls.autoRotate = false;
+      if (hint) hint.hidden = true;
+      window.clearTimeout(resumeTimer);
+    });
+    window.addEventListener('pointerup', () => {
+      if (!userInteracting) return;
+      userInteracting = false;
+      resumeTimer = window.setTimeout(() => {
+        controls.autoRotate = !reducedMotion;
+      }, 2200);
+    });
+
+    const paintMat = new THREE.MeshPhysicalMaterial({
+      color: 0x475066,
+      metalness: 0.55,
+      roughness: 0.32,
+      clearcoat: 0.7,
+      clearcoatRoughness: 0.2,
+    });
+    const glassMat = new THREE.MeshStandardMaterial({
+      color: 0x0e121c,
+      roughness: 0.15,
+      metalness: 0.1,
+      transparent: true,
+      opacity: 0.55,
+    });
+    const tireMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.9 });
+    const rimMat = new THREE.MeshStandardMaterial({ color: 0xb8bec8, roughness: 0.3, metalness: 0.85 });
+    const housingMat = new THREE.MeshStandardMaterial({ color: 0x1a1e28, roughness: 0.6, metalness: 0.2 });
+
+    function ledMaterial(colorHex: number) {
+      return new THREE.MeshStandardMaterial({
+        color: colorHex,
+        emissive: colorHex,
+        emissiveIntensity: 0.25,
+        roughness: 0.4,
+        transparent: true,
+        opacity: 1,
+      });
+    }
+
+    let guideSegs: THREE.Mesh[] = [];
+    let alertSegs: THREE.Mesh[] = [];
+    let linkSegs: THREE.Mesh[] = [];
+
+    try {
+      const loader = new OBJLoader();
+      const model = await loader.loadAsync('/models/ambientnav-vehicle.obj');
+
+      guideSegs = orderedSegments(model, 'guide_strip_seg_');
+      alertSegs = orderedSegments(model, 'alert_strip_seg_');
+      linkSegs = orderedSegments(model, 'link_strip_seg_');
+      guideSegs.forEach((mesh) => (mesh.material = ledMaterial(CYAN)));
+      alertSegs.forEach((mesh) => (mesh.material = ledMaterial(MAGENTA)));
+      linkSegs.forEach((mesh) => (mesh.material = ledMaterial(VIOLET)));
+
+      // The obstacle prop + its sensor-ping rings tell a "parking aid" story
+      // that reads as a distant demo prop rather than the product itself at
+      // hero-visual scale — hide them here and let the alert strip alone
+      // (on the car) carry the proximity story.
+      const HIDDEN = new Set(['obstacle']);
+      for (let s = 1; s <= 4; s++) {
+        for (let r = 1; r <= 3; r++) HIDDEN.add(`wave_${s}_${r}`);
+      }
+
+      model.traverse((obj) => {
+        if (!(obj as THREE.Mesh).isMesh) return;
+        const mesh = obj as THREE.Mesh;
+        const name = mesh.name;
+        if (HIDDEN.has(name)) {
+          mesh.visible = false;
+          return;
+        }
+        if (name === 'body_shell' || name === 'sill_left' || name === 'sill_right') mesh.material = paintMat;
+        else if (name === 'glass_greenhouse') mesh.material = glassMat;
+        else if (name.startsWith('wheel_')) mesh.material = tireMat;
+        else if (name.startsWith('rim_')) mesh.material = rimMat;
+        else if (name.startsWith('sensor_front_')) mesh.material = housingMat;
+      });
+
+      // Frame the car with a flattering 3/4 angle, centred on its midsection.
+      const carBox = new THREE.Box3();
+      model.traverse((obj) => {
+        if ((obj as THREE.Mesh).isMesh && obj.visible) carBox.expandByObject(obj);
+      });
+      const center = carBox.getCenter(new THREE.Vector3());
+      const size = carBox.getSize(new THREE.Vector3());
+      const radius = Math.max(size.x, size.y, size.z) * 0.5;
+
+      model.position.sub(center);
+      controls.target.set(0, size.y * 0.38, 0);
+      const dist = (radius / Math.sin((camera.fov * Math.PI) / 360)) * 0.86;
+      camera.position.set(dist * 0.62, dist * 0.42, dist * 0.72);
+      camera.lookAt(controls.target);
+      controls.update();
+
+      scene.add(model);
+    } catch (err) {
+      console.warn('[vehicle-viewer] failed to load model, keeping 2D fallback', err);
+      return;
+    }
+
+    function resize() {
+      const w = stage!.clientWidth;
+      const h = stage!.clientHeight;
+      if (!w || !h) return;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h, false);
+      composer.setSize(w, h);
+    }
+    const resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(stage);
+    resize();
+
+    let visible = true;
+    const intersectionObserver = new IntersectionObserver(
+      (entries) => {
+        visible = entries[0]?.isIntersecting ?? true;
+      },
+      { threshold: 0.05 },
+    );
+    intersectionObserver.observe(stage);
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) visible = false;
+      else intersectionObserver.observe(stage);
+    });
+
+    const GUIDE_CYCLE_MS = 20000;
+    const LINK_LOOP_MS = 2200;
+    const clock = new THREE.Clock();
+    let elapsed = 0;
+
+    function animateGuide() {
+      const n = guideSegs.length;
+      if (!n) return;
+      const t = (elapsed % GUIDE_CYCLE_MS) / GUIDE_CYCLE_MS;
+      const breathe = 0.28 + 0.14 * Math.sin(elapsed / 1400);
+
+      for (let i = 0; i < n; i++) {
+        const ratio = i / (n - 1);
+        let intensity = breathe * 0.6;
+
+        if (t >= 0.15 && t < 0.4) {
+          // Sweep toward the high-index end.
+          const progress = (t - 0.15) / 0.25;
+          intensity = Math.max(intensity, 0.25 + 1.1 * gaussian(ratio - progress, 0.16));
+        } else if (t >= 0.42 && t < 0.62) {
+          // Sweep toward the low-index end.
+          const progress = 1 - (t - 0.42) / 0.2;
+          intensity = Math.max(intensity, 0.25 + 1.1 * gaussian(ratio - progress, 0.16));
+        } else if (t >= 0.64 && t < 0.8) {
+          // Symmetric centre-out pulse.
+          intensity = Math.max(intensity, 0.3 + 1.0 * gaussian(ratio - 0.5, 0.22));
+        }
+
+        (guideSegs[i].material as THREE.MeshStandardMaterial).emissiveIntensity = intensity;
+      }
+    }
+
+    function distanceRatio() {
+      // 0 = obstacle very close, 1 = far. ~9s full approach/retreat cycle.
+      return (Math.sin(elapsed / 9000 - Math.PI / 2) + 1) / 2;
+    }
+
+    function animateAlert() {
+      const n = alertSegs.length;
+      if (!n) return;
+      const d = distanceRatio();
+      const lit = Math.round((1 - d) * (n / 2));
+      const closePulse = d < 0.14 ? 0.5 + 0.5 * Math.sin(elapsed / 130) : 0;
+
+      for (let i = 0; i < n; i++) {
+        const distFromEdge = Math.min(i, n - 1 - i);
+        const base = distFromEdge <= lit ? 0.9 : 0.15;
+        const mat = alertSegs[i].material as THREE.MeshStandardMaterial;
+        mat.emissiveIntensity = Math.max(base, closePulse);
+      }
+    }
+
+    function animateLink() {
+      const n = linkSegs.length;
+      if (!n) return;
+      const pos = (elapsed % LINK_LOOP_MS) / LINK_LOOP_MS;
+      for (let i = 0; i < n; i++) {
+        const ratio = i / (n - 1);
+        const intensity = 0.18 + 0.85 * gaussian(wrapDist(ratio, pos), 0.1);
+        (linkSegs[i].material as THREE.MeshStandardMaterial).emissiveIntensity = intensity;
+      }
+    }
+
+    function tick() {
+      requestAnimationFrame(tick);
+      const dt = clock.getDelta();
+      if (!visible) return;
+      elapsed += dt * 1000 * (reducedMotion ? 0.15 : 1);
+
+      animateGuide();
+      animateAlert();
+      animateLink();
+
+      controls.update();
+      composer.render();
+    }
+    tick();
+
+    wrap.dataset.ready = 'true';
+    wrap.setAttribute('aria-hidden', 'false');
+    if (hint) hint.hidden = false;
+    if (fallback) fallback.style.display = 'none';
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-vehicle-viewer]').forEach((el) => {
+    const start = () => init(el).catch((err) => console.warn('[vehicle-viewer] init failed', err));
+    if ('requestIdleCallback' in window) {
+      (window as any).requestIdleCallback(start, { timeout: 1500 });
+    } else {
+      window.setTimeout(start, 200);
+    }
+  });
+</script>
