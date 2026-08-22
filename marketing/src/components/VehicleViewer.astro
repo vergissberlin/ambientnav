@@ -10,6 +10,7 @@ const t = {
   en: {
     eyebrow: '3D Preview',
     hint: 'Drag to rotate',
+    all: 'All',
     guide: 'Guide',
     alert: 'Proximity',
     link: 'Link',
@@ -17,11 +18,19 @@ const t = {
   de: {
     eyebrow: '3D-Vorschau',
     hint: 'Ziehen zum Drehen',
+    all: 'Alle',
     guide: 'Führung',
     alert: 'Nähe',
     link: 'Verbindung',
   },
 }[lang];
+
+const modes = [
+  { key: 'all', label: t.all, color: null },
+  { key: 'guide', label: t.guide, color: '#19E3FF' },
+  { key: 'alert', label: t.alert, color: '#FF2D9C' },
+  { key: 'link', label: t.link, color: '#7C5CFF' },
+];
 ---
 
 <div class="vv" data-vehicle-viewer>
@@ -35,10 +44,18 @@ const t = {
   </div>
   <div class="vv-footer">
     <span class="vv-hint" data-vv-hint hidden>{t.hint}</span>
-    <div class="vv-legend">
-      <span class="vv-legend-item"><i class="vv-dot" style="background:#19E3FF;box-shadow:0 0 8px rgba(25,227,255,.7)"></i>{t.guide}</span>
-      <span class="vv-legend-item"><i class="vv-dot" style="background:#FF2D9C;box-shadow:0 0 8px rgba(255,45,156,.7)"></i>{t.alert}</span>
-      <span class="vv-legend-item"><i class="vv-dot" style="background:#7C5CFF;box-shadow:0 0 8px rgba(124,92,255,.7)"></i>{t.link}</span>
+    <div class="vv-modes" data-vv-modes hidden role="group" aria-label="Feature focus">
+      {modes.map((m) => (
+        <button
+          type="button"
+          class="vv-mode-btn"
+          data-vv-mode={m.key}
+          aria-pressed={m.key === 'all' ? 'true' : 'false'}
+        >
+          {m.color && <i class="vv-dot" style={`background:${m.color};box-shadow:0 0 8px ${m.color}b3`}></i>}
+          {m.label}
+        </button>
+      ))}
     </div>
   </div>
 </div>
@@ -110,12 +127,12 @@ const t = {
     color: var(--amb-text-4);
   }
 
-  .vv-legend {
+  .vv-modes {
     display: flex;
-    gap: var(--space-5);
+    gap: var(--space-2);
     margin-left: auto;
   }
-  .vv-legend-item {
+  .vv-mode-btn {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
@@ -123,21 +140,38 @@ const t = {
     font-size: 0.72rem;
     letter-spacing: 0.06em;
     color: var(--amb-text-3);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    padding: 0.3rem 0.7rem;
+    cursor: pointer;
+    transition: all 160ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .vv-mode-btn:hover {
+    background: var(--amb-surface-2);
+    color: var(--amb-text);
+  }
+  .vv-mode-btn[aria-pressed='true'] {
+    background: var(--amb-surface-3);
+    border-color: var(--amb-line-strong);
+    color: var(--amb-text);
   }
   .vv-dot {
     width: 8px;
     height: 8px;
     border-radius: 999px;
     display: inline-block;
+    flex-shrink: 0;
   }
 
   @media (max-width: 640px) {
     .vv-stage {
       aspect-ratio: 4 / 5;
     }
-    .vv-legend {
+    .vv-modes {
       margin-left: 0;
-      gap: var(--space-4);
+      gap: var(--space-1);
+      flex-wrap: wrap;
     }
   }
 </style>
@@ -153,6 +187,8 @@ const t = {
   const CYAN = 0x19e3ff;
   const MAGENTA = 0xff2d9c;
   const VIOLET = 0x7c5cff;
+  const NEUTRAL_DIM = 0x11141c;
+  const IDLE_INTENSITY = 0.12;
 
   function orderedSegments(root: THREE.Object3D, prefix: string) {
     const items: { mesh: THREE.Mesh; index: number }[] = [];
@@ -184,7 +220,11 @@ const t = {
     const canvas = root.querySelector<HTMLCanvasElement>('[data-vv-canvas]');
     const hint = root.querySelector<HTMLElement>('[data-vv-hint]');
     const fallback = root.querySelector<HTMLElement>('[data-vv-fallback]');
+    const modesEl = root.querySelector<HTMLElement>('[data-vv-modes]');
     if (!stage || !wrap || !canvas) return;
+
+    type Mode = 'all' | 'guide' | 'alert' | 'link';
+    let activeMode: Mode = 'all';
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -234,7 +274,7 @@ const t = {
       if (!userInteracting) return;
       userInteracting = false;
       resumeTimer = window.setTimeout(() => {
-        controls.autoRotate = !reducedMotion;
+        if (activeMode === 'all') controls.autoRotate = !reducedMotion;
       }, 2200);
     });
 
@@ -306,6 +346,18 @@ const t = {
         else if (name.startsWith('sensor_front_')) mesh.material = housingMat;
       });
 
+      // Bounding boxes for the per-feature close-up views, computed in the
+      // model's original (pre-recenter) space so they share a coordinate
+      // system with `carBox` below.
+      function boxOf(meshes: THREE.Mesh[]) {
+        const box = new THREE.Box3();
+        meshes.forEach((m) => box.expandByObject(m));
+        return box;
+      }
+      const guideBox = boxOf(guideSegs);
+      const alertBox = boxOf(alertSegs);
+      const linkBox = boxOf(linkSegs);
+
       // Frame the car with a flattering 3/4 angle, centred on its midsection.
       const carBox = new THREE.Box3();
       model.traverse((obj) => {
@@ -322,10 +374,80 @@ const t = {
       camera.lookAt(controls.target);
       controls.update();
 
+      const defaultView = { pos: camera.position.clone(), target: controls.target.clone() };
+      function focusView(box: THREE.Box3) {
+        const c = box.getCenter(new THREE.Vector3()).sub(center);
+        const s = box.getSize(new THREE.Vector3());
+        const r = Math.max(s.x, s.y, s.z, 0.12);
+        // Approach from outside the car body on whichever end (front/rear)
+        // this feature sits on, not a fixed direction — a rear feature
+        // needs the camera behind the car, not hovering over the middle.
+        const xSign = c.x >= 0 ? 1 : -1;
+        const off = new THREE.Vector3(0.9 * xSign, 0.5, 0.85).normalize();
+        const d = r * 3.2 + 1.1;
+        return { pos: c.clone().addScaledVector(off, d), target: c.clone() };
+      }
+      const focusViews: Record<Mode, { pos: THREE.Vector3; target: THREE.Vector3 }> = {
+        all: defaultView,
+        guide: focusView(guideBox),
+        alert: focusView(alertBox),
+        link: focusView(linkBox),
+      };
+
+      // Unfocused strips fade to the car's neutral trim colour, not just a
+      // lower emissive intensity — emissive alone still reads as a tinted
+      // surface under the key/rim lights, which doesn't read as "off".
+      function setStripFocus(segs: THREE.Mesh[], colorHex: number, focused: boolean) {
+        segs.forEach((m) => {
+          const mat = m.material as THREE.MeshStandardMaterial;
+          mat.color.setHex(focused ? colorHex : NEUTRAL_DIM);
+          if (!focused) mat.emissiveIntensity = IDLE_INTENSITY;
+        });
+      }
+      function applyMode(mode: Mode) {
+        setStripFocus(guideSegs, CYAN, mode === 'all' || mode === 'guide');
+        setStripFocus(alertSegs, MAGENTA, mode === 'all' || mode === 'alert');
+        setStripFocus(linkSegs, VIOLET, mode === 'all' || mode === 'link');
+      }
+
+      const modeButtons = modesEl
+        ? Array.from(modesEl.querySelectorAll<HTMLButtonElement>('[data-vv-mode]'))
+        : [];
+      modeButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const mode = btn.dataset.vvMode as Mode;
+          if (mode === activeMode) return;
+          activeMode = mode;
+          modeButtons.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+          applyMode(mode);
+          tweenTo(focusViews[mode].pos, focusViews[mode].target, 750);
+          controls.autoRotate = mode === 'all' && !reducedMotion;
+        });
+      });
+
       scene.add(model);
     } catch (err) {
       console.warn('[vehicle-viewer] failed to load model, keeping 2D fallback', err);
       return;
+    }
+
+    let tween: {
+      fromPos: THREE.Vector3;
+      toPos: THREE.Vector3;
+      fromTarget: THREE.Vector3;
+      toTarget: THREE.Vector3;
+      t0: number;
+      dur: number;
+    } | null = null;
+    function tweenTo(pos: THREE.Vector3, target: THREE.Vector3, dur = 700) {
+      tween = {
+        fromPos: camera.position.clone(),
+        toPos: pos.clone(),
+        fromTarget: controls.target.clone(),
+        toTarget: target.clone(),
+        t0: performance.now(),
+        dur,
+      };
     }
 
     function resize() {
@@ -355,6 +477,9 @@ const t = {
     });
 
     const GUIDE_CYCLE_MS = 20000;
+    const GUIDE_FOCUS_CYCLE_MS = 6500;
+    const ALERT_PERIOD_MS = 9000;
+    const ALERT_FOCUS_PERIOD_MS = 4000;
     const LINK_LOOP_MS = 2200;
     const clock = new THREE.Clock();
     let elapsed = 0;
@@ -362,7 +487,9 @@ const t = {
     function animateGuide() {
       const n = guideSegs.length;
       if (!n) return;
-      const t = (elapsed % GUIDE_CYCLE_MS) / GUIDE_CYCLE_MS;
+      if (activeMode !== 'all' && activeMode !== 'guide') return;
+      const cycle = activeMode === 'guide' ? GUIDE_FOCUS_CYCLE_MS : GUIDE_CYCLE_MS;
+      const t = (elapsed % cycle) / cycle;
       const breathe = 0.28 + 0.14 * Math.sin(elapsed / 1400);
 
       for (let i = 0; i < n; i++) {
@@ -387,13 +514,15 @@ const t = {
     }
 
     function distanceRatio() {
-      // 0 = obstacle very close, 1 = far. ~9s full approach/retreat cycle.
-      return (Math.sin(elapsed / 9000 - Math.PI / 2) + 1) / 2;
+      // 0 = obstacle very close, 1 = far.
+      const period = activeMode === 'alert' ? ALERT_FOCUS_PERIOD_MS : ALERT_PERIOD_MS;
+      return (Math.sin(elapsed / period - Math.PI / 2) + 1) / 2;
     }
 
     function animateAlert() {
       const n = alertSegs.length;
       if (!n) return;
+      if (activeMode !== 'all' && activeMode !== 'alert') return;
       const d = distanceRatio();
       const lit = Math.round((1 - d) * (n / 2));
       const closePulse = d < 0.14 ? 0.5 + 0.5 * Math.sin(elapsed / 130) : 0;
@@ -409,6 +538,7 @@ const t = {
     function animateLink() {
       const n = linkSegs.length;
       if (!n) return;
+      if (activeMode !== 'all' && activeMode !== 'link') return;
       const pos = (elapsed % LINK_LOOP_MS) / LINK_LOOP_MS;
       for (let i = 0; i < n; i++) {
         const ratio = i / (n - 1);
@@ -423,6 +553,14 @@ const t = {
       if (!visible) return;
       elapsed += dt * 1000 * (reducedMotion ? 0.15 : 1);
 
+      if (tween) {
+        const k = Math.min(1, (performance.now() - tween.t0) / tween.dur);
+        const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+        camera.position.lerpVectors(tween.fromPos, tween.toPos, e);
+        controls.target.lerpVectors(tween.fromTarget, tween.toTarget, e);
+        if (k >= 1) tween = null;
+      }
+
       animateGuide();
       animateAlert();
       animateLink();
@@ -435,6 +573,7 @@ const t = {
     wrap.dataset.ready = 'true';
     wrap.setAttribute('aria-hidden', 'false');
     if (hint) hint.hidden = false;
+    if (modesEl) modesEl.hidden = false;
     if (fallback) fallback.style.display = 'none';
   }
 
