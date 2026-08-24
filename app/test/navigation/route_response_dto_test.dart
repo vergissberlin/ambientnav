@@ -65,6 +65,34 @@ void main() {
         throwsFormatException,
       );
     });
+
+    test('maps "new name" to ManeuverType.newName', () {
+      final json = {
+        'routes': [
+          {
+            'distance': 500.0,
+            'duration': 60.0,
+            'geometry': '_p~iF~ps|U_ulLnnqC',
+            'legs': [
+              {
+                'steps': [
+                  {
+                    'name': 'Elm Street',
+                    'distance': 500.0,
+                    'maneuver': {
+                      'type': 'new name',
+                      'location': [-120.2, 38.5],
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      };
+      final route = RouteResponseDto.fromOsrm(json);
+      expect(route.maneuvers.single.type, ManeuverType.newName);
+    });
   });
 
   group('Valhalla parsing', () {
@@ -98,6 +126,29 @@ void main() {
       expect(route.maneuvers.first.type, ManeuverType.depart);
       expect(route.maneuvers[1].type, ManeuverType.turnLeft);
       expect(route.maneuvers.first.distanceMeters, 500.0); // 0.5 km
+    });
+
+    test('maps type 7 (kBecomes) to ManeuverType.newName', () {
+      final json = {
+        'trip': {
+          'summary': {'length': 0.5, 'time': 60.0},
+          'legs': [
+            {
+              'shape': '_p~iF~ps|U',
+              'maneuvers': [
+                {
+                  'type': 7,
+                  'instruction': 'Continue on Elm Street.',
+                  'length': 0.5,
+                  'begin_shape_index': 0,
+                },
+              ],
+            },
+          ],
+        },
+      };
+      final route = RouteResponseDto.fromValhalla(json);
+      expect(route.maneuvers.single.type, ManeuverType.newName);
     });
   });
 }

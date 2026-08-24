@@ -107,6 +107,8 @@ class RouteResponseDto {
       case 'roundabout':
       case 'rotary':
         return ManeuverType.roundabout;
+      case 'new name':
+        return ManeuverType.newName;
     }
     switch (modifier) {
       case 'left':
@@ -135,6 +137,8 @@ class RouteResponseDto {
       case 5:
       case 6:
         return ManeuverType.arrive;
+      case 7: // kBecomes — same road, name changes.
+        return ManeuverType.newName;
       case 15:
       case 16:
         return ManeuverType.turnLeft;

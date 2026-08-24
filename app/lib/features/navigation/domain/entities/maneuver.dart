@@ -6,6 +6,12 @@ enum ManeuverType {
   slightLeft,
   slightRight,
   straight,
+
+  /// Continue in the same direction, but the road's name changes — OSRM's
+  /// `"new name"` step type / Valhalla's `kBecomes` (7). Distinct from
+  /// [straight] so the UI can call out the name change instead of silently
+  /// treating it as an ordinary continuation.
+  newName,
   uturn,
   roundabout,
   arrive,

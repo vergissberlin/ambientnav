@@ -164,13 +164,22 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     }
   }
 
-  /// Which effect the real front strip would show right now — mirrors
-  /// `orchestrator.cpp`'s `chooseEffect()` priority: an active maneuver
-  /// within 200m always wins over hazard, which in turn wins over the idle
-  /// ambient glow.
+  /// Distance (metres) before a maneuver at which the strip starts
+  /// signalling it. Firmware's own `orchestrator.cpp` uses 200m; the app
+  /// deliberately shows it earlier, at 500m, so the driver gets more advance
+  /// notice on the phone preview than the physical strip currently gives.
+  static const double _maneuverLeadMeters = 500;
+
+  /// Which effect the front strip preview shows right now: an upcoming
+  /// maneuver within [_maneuverLeadMeters] always wins over hazard, which
+  /// wins over [FrontStripEffect.off] — once a maneuver is passed (or hazard
+  /// is toggled off), the strip goes dark rather than idling on
+  /// [FrontStripEffect.ambient], which firmware would show but reads as
+  /// visual noise on a phone screen between turns.
   FrontStripEffect _stripEffectFor(NavigationState navState, bool hazard) {
     final maneuver = navState.nextManeuver;
-    if (maneuver != null && navState.distanceToManeuverMeters < 200) {
+    if (maneuver != null &&
+        navState.distanceToManeuverMeters < _maneuverLeadMeters) {
       switch (maneuver.type) {
         case ManeuverType.turnLeft:
         case ManeuverType.slightLeft:
@@ -181,13 +190,15 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         case ManeuverType.straight:
         case ManeuverType.depart:
           return FrontStripEffect.navStraight;
+        case ManeuverType.newName:
+          return FrontStripEffect.navContinue;
         case ManeuverType.uturn:
         case ManeuverType.roundabout:
         case ManeuverType.arrive:
-          break; // no direction — fall through to hazard/ambient
+          break; // no direction — fall through to hazard/off
       }
     }
-    return hazard ? FrontStripEffect.hazard : FrontStripEffect.ambient;
+    return hazard ? FrontStripEffect.hazard : FrontStripEffect.off;
   }
 
   void _toggleOverview() {

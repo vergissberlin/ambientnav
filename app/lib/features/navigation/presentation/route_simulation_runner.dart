@@ -20,6 +20,13 @@ class RouteSimulationRunner {
   static const Duration tickInterval = Duration(milliseconds: 200);
   static const double _dt = 0.2;
 
+  /// A scripted "danger spot" early in the drive — purely to demonstrate the
+  /// hazard animation on [hazardPreviewProvider] without the user needing to
+  /// toggle it by hand. Firmware has no equivalent; this is dev-simulation
+  /// only, mirroring how [RouteSimulator] itself only exists for this mode.
+  static const double _hazardZoneStartMeters = 400;
+  static const double _hazardZoneEndMeters = 700;
+
   bool get isRunning => _timer != null;
 
   void start(Routes route, {double speedMps = 13.9}) {
@@ -34,6 +41,7 @@ class RouteSimulationRunner {
     _timer = null;
     _sim = null;
     _ref.read(simulatedPositionProvider.notifier).state = null;
+    _ref.read(hazardPreviewProvider.notifier).state = false;
   }
 
   void _onTick() {
@@ -44,6 +52,12 @@ class RouteSimulationRunner {
       position: step.position,
       bearingDeg: step.bearingDeg,
     );
+
+    final inHazardZone =
+        sim.traveledMeters >= _hazardZoneStartMeters &&
+        sim.traveledMeters < _hazardZoneEndMeters;
+    final hazard = _ref.read(hazardPreviewProvider.notifier);
+    if (hazard.state != inHazardZone) hazard.state = inHazardZone;
 
     final nav = _ref.read(navControllerProvider.notifier);
 

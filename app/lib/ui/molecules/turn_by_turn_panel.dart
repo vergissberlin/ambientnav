@@ -22,6 +22,7 @@ class TurnByTurnPanel extends StatelessWidget {
     ManeuverType.roundabout => Icons.roundabout_right,
     ManeuverType.arrive => Icons.flag,
     ManeuverType.depart || ManeuverType.straight => Icons.straight,
+    ManeuverType.newName => Icons.signpost,
   };
 
   String _distanceLabel() {

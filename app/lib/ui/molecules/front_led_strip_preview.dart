@@ -7,8 +7,17 @@ import 'package:flutter/scheduler.dart';
 /// Which LED effect the simulated front strip is currently showing — mirrors
 /// a subset of `firmware/front/src/led_effects.cpp`'s `EffectType` (turning
 /// and hazard only; a standalone turn-signal/blinker state isn't modeled
-/// since the app has no manual turn-signal control to drive it from).
-enum FrontStripEffect { ambient, navLeft, navRight, navStraight, hazard }
+/// since the app has no manual turn-signal control to drive it from), plus
+/// [off], which has no firmware counterpart — see its doc comment.
+enum FrontStripEffect {
+  ambient,
+  navLeft,
+  navRight,
+  navStraight,
+  navContinue,
+  hazard,
+  off,
+}
 
 /// A live, on-screen simulation of the physical front LED strip, matching
 /// `firmware/front/src/led_effects.cpp`'s actual colors and timing (not the
@@ -20,9 +29,22 @@ enum FrontStripEffect { ambient, navLeft, navRight, navStraight, hazard }
 ///   loop.
 /// - [FrontStripEffect.navStraight] — the whole strip pulses white, one
 ///   half-sine hump every 800ms.
+/// - [FrontStripEffect.navContinue] — no firmware counterpart. Same
+///   purple-core/pink-edge bar as [navLeft]/[navRight], but held stationary
+///   at the strip's centre and hard-blinked (200ms on / 200ms off) instead
+///   of sliding to an edge. Selected for OSRM's `"new name"` maneuver
+///   ("continue straight, the road changes name") so it reads as visually
+///   related to a turn without claiming one is happening.
 /// - [FrontStripEffect.hazard] — the whole strip blinks amber, 200ms on /
 ///   200ms off.
 /// - [FrontStripEffect.ambient] — a slow white breathing glow, 3000ms cycle.
+/// - [FrontStripEffect.off] — every LED dark. Firmware has no such state
+///   (the real strip always shows at least [ambient]); the app selects this
+///   between maneuvers instead so the preview reads as a clear "nothing to
+///   signal right now" rather than a constant idle glow. Kept as a distinct
+///   case (not folded into `ambient`) so firmware's actual idle behaviour
+///   stays implemented and demonstrable even though `map_screen.dart`
+///   doesn't currently select it.
 ///
 /// Deliberately a separate widget from `AnLightStrip`: that atom is
 /// documented as a brand specimen kept off live effect state, so extending
@@ -117,8 +139,12 @@ class _FrontLedStripPreviewState extends State<FrontLedStripPreview>
         return _navWave(ms, n, toRight: true);
       case FrontStripEffect.navStraight:
         return _navStraight(ms, n);
+      case FrontStripEffect.navContinue:
+        return _navContinue(ms, n);
       case FrontStripEffect.hazard:
         return _hazard(ms, n);
+      case FrontStripEffect.off:
+        return List.filled(n, Colors.transparent);
     }
   }
 
@@ -177,6 +203,26 @@ class _FrontLedStripPreviewState extends State<FrontLedStripPreview>
     final value = math.sin(math.pi * phase).clamp(0.0, 1.0);
     final color = Colors.white.withValues(alpha: value);
     return List.filled(n, color);
+  }
+
+  /// `renderNavContinue()` — the same purple-core/pink-edge bar shape as
+  /// [_navWave], but centred and hard-blinked (200ms on / 200ms off) rather
+  /// than sliding to an edge — "still going straight, but pay attention".
+  static List<Color> _navContinue(int ms, int n) {
+    final on = (ms % 400) < 200;
+    if (!on) return List.filled(n, Colors.transparent);
+    final centerPos = n / 2;
+    final barHalf = n * (9 / 60);
+    return List.generate(n, (i) {
+      final dist = (i - centerPos).abs();
+      if (dist > barHalf) return Colors.transparent;
+      final envelope = 0.5 * (1 + math.cos(math.pi * dist / barHalf));
+      final cosT = (dist / barHalf).clamp(0.0, 1.0);
+      final r = (120 + 135 * cosT).round();
+      final g = (80 * cosT).round();
+      final b = (220 - 35 * cosT).round();
+      return Color.fromRGBO(r, g, b, envelope);
+    });
   }
 
   /// `renderHazard()` — whole strip, hard amber blink, 200ms on / 200ms off.
