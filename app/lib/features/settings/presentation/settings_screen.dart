@@ -5,9 +5,12 @@ import 'package:ambientnav/core/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/dev/dev_settings.dart';
+import '../../../core/permissions/permission_service.dart';
+import '../../../core/settings/camera_background_settings.dart';
 import '../../../core/theme/theme_controller.dart';
 
-/// App settings: theme mode (dark/light/system) and voice guidance toggle.
+/// App settings: theme mode (dark/light/system) and the camera navigation
+/// background toggle.
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
@@ -16,6 +19,10 @@ class SettingsScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final mode = ref.watch(themeControllerProvider);
     final controller = ref.read(themeControllerProvider.notifier);
+    final cameraBackgroundEnabled = ref.watch(cameraBackgroundEnabledProvider);
+    final cameraPermissionDenied = ref.watch(
+      cameraBackgroundPermissionDeniedProvider,
+    );
 
     final appBar = AnAppBar(title: Text(l10n.settingsTab));
     return Scaffold(
@@ -55,6 +62,37 @@ class SettingsScreen extends ConsumerWidget {
             ],
             selected: {mode},
             onSelectionChanged: (s) => controller.setMode(s.first),
+          ),
+          const Divider(),
+          SwitchListTile(
+            key: const Key('cameraNavBackgroundSwitch'),
+            secondary: const Icon(Icons.camera_alt_outlined),
+            title: Text(l10n.cameraNavBackground),
+            subtitle: Text(
+              cameraPermissionDenied
+                  ? l10n.cameraNavBackgroundPermissionDenied
+                  : l10n.cameraNavBackgroundDesc,
+            ),
+            value: cameraBackgroundEnabled,
+            onChanged: (v) async {
+              if (!v) {
+                ref
+                    .read(cameraBackgroundEnabledProvider.notifier)
+                    .setEnabled(false);
+                return;
+              }
+              final granted = await const PermissionService()
+                  .ensureCameraPermission();
+              final deniedNotifier = ref.read(
+                cameraBackgroundPermissionDeniedProvider.notifier,
+              );
+              deniedNotifier.state = !granted;
+              if (granted) {
+                ref
+                    .read(cameraBackgroundEnabledProvider.notifier)
+                    .setEnabled(true);
+              }
+            },
           ),
           if (kDebugMode) ...[
             const Divider(),

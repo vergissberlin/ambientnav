@@ -1,12 +1,15 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:ambientnav/core/l10n/app_localizations.dart';
 import 'package:ambientnav_ui/ambientnav_ui.dart';
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 import '../../../core/di/providers.dart';
+import '../../../core/settings/camera_background_settings.dart';
 import '../../../ui/molecules/front_led_strip_preview.dart';
 import '../../../ui/molecules/turn_by_turn_panel.dart';
 import '../domain/entities/maneuver.dart';
@@ -26,7 +29,8 @@ class MapScreen extends ConsumerStatefulWidget {
   ConsumerState<MapScreen> createState() => _MapScreenState();
 }
 
-class _MapScreenState extends ConsumerState<MapScreen> {
+class _MapScreenState extends ConsumerState<MapScreen>
+    with WidgetsBindingObserver {
   MapLibreMapController? _mapController;
   Line? _routeLine;
   Line? _hazardZoneLine;
@@ -38,10 +42,100 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   bool _celebrateArrival = false;
   Timer? _arrivalTimer;
 
+  /// Live feed for the optional blurred navigation background. Only opened
+  /// while [cameraBackgroundEnabledProvider] is on, and released whenever the
+  /// app is backgrounded — it's an exclusively-held hardware handle.
+  CameraController? _cameraController;
+  bool _cameraInitializing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    if (ref.read(cameraBackgroundEnabledProvider)) {
+      _initCameraBackground();
+    }
+  }
+
   @override
   void dispose() {
     _arrivalTimer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
+    _cameraController?.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      _disposeCameraBackground();
+    } else if (state == AppLifecycleState.resumed &&
+        ref.read(cameraBackgroundEnabledProvider)) {
+      _initCameraBackground();
+    }
+  }
+
+  /// Opens the rear camera for the blurred navigation background. Silently
+  /// falls back to the normal basemap on any failure (no hardware, revoked
+  /// permission, already in use elsewhere).
+  Future<void> _initCameraBackground() async {
+    if (_cameraController != null || _cameraInitializing) return;
+    _cameraInitializing = true;
+    try {
+      final cameras = await availableCameras();
+      if (cameras.isEmpty) return;
+      final backCamera = cameras.firstWhere(
+        (c) => c.lensDirection == CameraLensDirection.back,
+        orElse: () => cameras.first,
+      );
+      final controller = CameraController(
+        backCamera,
+        ResolutionPreset.medium,
+        enableAudio: false,
+      );
+      await controller.initialize();
+      if (!mounted) {
+        await controller.dispose();
+        return;
+      }
+      setState(() => _cameraController = controller);
+    } catch (_) {
+      // Camera unavailable — the map falls back to the full basemap below.
+    } finally {
+      _cameraInitializing = false;
+    }
+  }
+
+  Future<void> _disposeCameraBackground() async {
+    final controller = _cameraController;
+    if (controller == null) return;
+    _cameraController = null;
+    if (mounted) setState(() {});
+    await controller.dispose();
+  }
+
+  /// A full-bleed, aspect-correct camera preview (the plugin's own
+  /// [CameraPreview] doesn't crop to fill), blurred so it reads as ambience
+  /// rather than a sharp video feed behind the roads/route graphic.
+  Widget _buildBlurredCameraBackground(CameraController controller) {
+    final previewSize = controller.value.previewSize;
+    final preview = previewSize == null
+        ? CameraPreview(controller)
+        : FittedBox(
+            fit: BoxFit.cover,
+            child: SizedBox(
+              width: previewSize.height,
+              height: previewSize.width,
+              child: CameraPreview(controller),
+            ),
+          );
+    return Positioned.fill(
+      child: ImageFiltered(
+        imageFilter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: preview,
+      ),
+    );
   }
 
   /// Annotations may only be added once the style has loaded — since
@@ -294,7 +388,18 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final (:effect, :progress) = _stripEffectFor(navState, hazardActive);
     final stripEffect = _celebrateArrival ? FrontStripEffect.arriving : effect;
     final stripProgress = _celebrateArrival ? 1.0 : progress;
+    final cameraBackgroundEnabled = ref.watch(cameraBackgroundEnabledProvider);
+    final showCameraBackground =
+        cameraBackgroundEnabled &&
+        (_cameraController?.value.isInitialized ?? false);
 
+    ref.listen<bool>(cameraBackgroundEnabledProvider, (_, enabled) {
+      if (enabled) {
+        _initCameraBackground();
+      } else {
+        _disposeCameraBackground();
+      }
+    });
     ref.listen(navControllerProvider, (_, _) => _drawRouteLine());
     ref.listen(simulatedPositionProvider, (_, p) => _updateSimPosition(p));
     ref.listen(
@@ -324,6 +429,27 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final trackingMode = (isNavigating && following && !simulating)
         ? MyLocationTrackingMode.trackingGps
         : MyLocationTrackingMode.none;
+
+    // Roads/route only, transparent basemap when the camera background is
+    // showing, so it — half-transparent below — lets the blur through.
+    final effectiveStyleUrl = showCameraBackground
+        ? kMapStyleUrlTransparent
+        : styleUrl;
+    final map = MapLibreMap(
+      key: ValueKey(effectiveStyleUrl),
+      styleString: effectiveStyleUrl,
+      initialCameraPosition: const CameraPosition(
+        target: LatLng(52.52, 13.405), // Berlin
+        zoom: 12,
+      ),
+      onMapCreated: _onMapCreated,
+      onStyleLoadedCallback: _onStyleLoaded,
+      myLocationEnabled: true,
+      myLocationTrackingMode: trackingMode,
+      myLocationRenderMode: trackingMode == MyLocationTrackingMode.none
+          ? MyLocationRenderMode.normal
+          : MyLocationRenderMode.compass,
+    );
 
     final appBar = AnAppBar(
       title: Text(l10n.navTab),
@@ -386,21 +512,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       ),
       body: Stack(
         children: [
-          MapLibreMap(
-            key: ValueKey(styleUrl),
-            styleString: styleUrl,
-            initialCameraPosition: const CameraPosition(
-              target: LatLng(52.52, 13.405), // Berlin
-              zoom: 12,
-            ),
-            onMapCreated: _onMapCreated,
-            onStyleLoadedCallback: _onStyleLoaded,
-            myLocationEnabled: true,
-            myLocationTrackingMode: trackingMode,
-            myLocationRenderMode: trackingMode == MyLocationTrackingMode.none
-                ? MyLocationRenderMode.normal
-                : MyLocationRenderMode.compass,
-          ),
+          if (showCameraBackground)
+            _buildBlurredCameraBackground(_cameraController!),
+          showCameraBackground ? Opacity(opacity: 0.65, child: map) : map,
           Padding(
             padding: EdgeInsets.only(
               top:

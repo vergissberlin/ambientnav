@@ -224,6 +224,24 @@ abstract class AppLocalizations {
   /// **'Voice guidance'**
   String get voiceGuidance;
 
+  /// No description provided for @cameraNavBackground.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera background'**
+  String get cameraNavBackground;
+
+  /// No description provided for @cameraNavBackgroundDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Show a blurred live camera view behind the navigation map'**
+  String get cameraNavBackgroundDesc;
+
+  /// No description provided for @cameraNavBackgroundPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera permission is required for this feature'**
+  String get cameraNavBackgroundPermissionDenied;
+
   /// No description provided for @theme.
   ///
   /// In en, this message translates to:

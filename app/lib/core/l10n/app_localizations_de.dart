@@ -74,6 +74,17 @@ class AppLocalizationsDe extends AppLocalizations {
   String get voiceGuidance => 'Sprachausgabe';
 
   @override
+  String get cameraNavBackground => 'Kamera-Hintergrund';
+
+  @override
+  String get cameraNavBackgroundDesc =>
+      'Unscharfes Live-Kamerabild hinter der Navigationskarte anzeigen';
+
+  @override
+  String get cameraNavBackgroundPermissionDenied =>
+      'Für diese Funktion ist die Kamera-Berechtigung erforderlich';
+
+  @override
   String get theme => 'Design';
 
   @override

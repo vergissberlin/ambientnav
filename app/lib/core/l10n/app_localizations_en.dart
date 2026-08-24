@@ -74,6 +74,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get voiceGuidance => 'Voice guidance';
 
   @override
+  String get cameraNavBackground => 'Camera background';
+
+  @override
+  String get cameraNavBackgroundDesc =>
+      'Show a blurred live camera view behind the navigation map';
+
+  @override
+  String get cameraNavBackgroundPermissionDenied =>
+      'Camera permission is required for this feature';
+
+  @override
   String get theme => 'Theme';
 
   @override
