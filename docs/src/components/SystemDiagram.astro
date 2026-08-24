@@ -37,7 +37,7 @@ const t = {
 <figure class="sd-wrap" aria-label="System architecture diagram">
   <svg
     class="sd-svg"
-    viewBox="0 0 760 220"
+    viewBox="0 0 800 260"
     xmlns="http://www.w3.org/2000/svg"
     role="img"
     aria-label={lang === 'de' ? 'Systemarchitektur-Diagramm' : 'System architecture diagram'}
@@ -70,11 +70,14 @@ const t = {
     </defs>
 
     <!-- ── Cybernetic frame corner brackets ───────────────────── -->
+    <!-- Sit at the true viewBox edges; the diagram content below is shifted
+         +20,+20 via the <g> wrapper so nothing crowds the frame. -->
     <polyline class="sd-frame-corner" points="4,20 4,4 20,4" filter="url(#glow-cyan)"/>
-    <polyline class="sd-frame-corner" points="740,4 756,4 756,20" filter="url(#glow-cyan)"/>
-    <polyline class="sd-frame-corner" points="4,200 4,216 20,216" filter="url(#glow-cyan)"/>
-    <polyline class="sd-frame-corner" points="740,216 756,216 756,200" filter="url(#glow-cyan)"/>
+    <polyline class="sd-frame-corner" points="780,4 796,4 796,20" filter="url(#glow-cyan)"/>
+    <polyline class="sd-frame-corner" points="4,240 4,256 20,256" filter="url(#glow-cyan)"/>
+    <polyline class="sd-frame-corner" points="780,256 796,256 796,240" filter="url(#glow-cyan)"/>
 
+    <g transform="translate(20,20)">
     <!-- ── iPhone App ─────────────────────────────────────────── -->
     <rect class="sd-box sd-box-app" x="12" y="48" width="130" height="72" rx="10"/>
     <!-- Phone icon outline -->
@@ -147,6 +150,7 @@ const t = {
     <path class="sd-sensor-arc" d="M 648 14 Q 663 0 678 14" fill="none"/>
     <path class="sd-sensor-arc" d="M 688 18 Q 703 4 718 18" fill="none"/>
     <text class="sd-sensor-label" x="663" y="8">{t.sensors}</text>
+    </g>
   </svg>
 </figure>
 
