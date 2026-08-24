@@ -47,8 +47,10 @@ class NavigationLocationRunner {
       return;
     }
 
-    nav.updateDistance(progress.distanceToManeuverMeters);
-    nav.updateProgress(progress.distanceAlongMeters);
+    nav.updateProgress(
+      distanceToManeuverMeters: progress.distanceToManeuverMeters,
+      distanceAlongMeters: progress.distanceAlongMeters,
+    );
   }
 
   void stop() {

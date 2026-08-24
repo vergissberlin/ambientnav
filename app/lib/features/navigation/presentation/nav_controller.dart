@@ -97,10 +97,18 @@ class NavController extends StateNotifier<NavigationState> {
   void updateDistance(double meters) =>
       state = state.copyWith(distanceToManeuverMeters: meters);
 
-  /// Reports how far along the route the driver has travelled, so the map
-  /// can glow the already-driven portion of the line.
-  void updateProgress(double distanceAlongMeters) =>
-      state = state.copyWith(distanceAlongMeters: distanceAlongMeters);
+  /// Reports the latest maneuver distance together with how far along the
+  /// route the driver has travelled, so the map can glow the already-driven
+  /// portion of the line. Combined into one state transition (rather than a
+  /// separate call per value) so map_screen's `ref.listen` fires once per
+  /// tick instead of twice.
+  void updateProgress({
+    required double distanceToManeuverMeters,
+    required double distanceAlongMeters,
+  }) => state = state.copyWith(
+    distanceToManeuverMeters: distanceToManeuverMeters,
+    distanceAlongMeters: distanceAlongMeters,
+  );
 
   void markOfflineReady() => state = state.copyWith(offlineReady: true);
 

@@ -46,7 +46,10 @@ class RouteSimulationRunner {
     );
 
     final nav = _ref.read(navControllerProvider.notifier);
-    nav.updateProgress(sim.traveledMeters);
+    nav.updateProgress(
+      distanceToManeuverMeters: step.distanceToManeuverMeters,
+      distanceAlongMeters: sim.traveledMeters,
+    );
 
     // Advance the controller's maneuver pointer to match the simulator.
     while (_ref.read(navControllerProvider).nextManeuverIndex <
@@ -66,8 +69,6 @@ class RouteSimulationRunner {
       stop();
       return;
     }
-
-    nav.updateDistance(step.distanceToManeuverMeters);
   }
 }
 
