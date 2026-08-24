@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:ambientnav/core/l10n/app_localizations.dart';
 import 'package:ambientnav_ui/ambientnav_ui.dart';
 import 'package:flutter/material.dart';
@@ -30,37 +28,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   Line? _routeLine;
   Circle? _simCircle;
 
-  /// The route currently backing [_routeLine] — lets `_drawRouteLine` skip
-  /// work on ticks that only changed progress/distance, not the route
-  /// itself. Without this it removed+re-added the whole polyline on every
-  /// single position update (every ~200ms in the simulator).
-  Routes? _drawnRoute;
-
-  /// Two stacked lines (wide+blurred, then narrower+blurred) tracing the
-  /// portion of the route already driven — a glow layered on top of the
-  /// plain [_routeLine], which supplies the sharp core. Both share one
-  /// geometry, updated together.
+  /// Three stacked lines (wide+blurred to narrow+sharp) tracing the portion
+  /// of the route already driven — a glow effect layered on top of the plain
+  /// [_routeLine]. All three share one geometry, updated together.
   Line? _traveledGlowOuter;
   Line? _traveledGlowMid;
-
-  /// `distanceAlongMeters` the glow lines were last drawn at. Updates are
-  /// skipped for movements smaller than [_glowUpdateMinDeltaMeters] — a
-  /// driving car doesn't need the glow re-sent to the platform channel every
-  /// single GPS fix or 200ms sim tick.
-  double _lastGlowDistanceAlong = -1;
-  static const double _glowUpdateMinDeltaMeters = 5;
-
-  /// Re-entrancy guards: `ref.listen` can fire again before a prior
-  /// `_updateTraveledGlow`/`_drawRouteLine` call's awaited platform-channel
-  /// round trips finish. Without this, two overlapping calls could both see
-  /// a glow line as "not yet created" and both create it, or one could
-  /// `removeLine` an annotation the other is mid-`updateLine` on — which
-  /// throws `you can only set existing annotations` and, at sim-tick
-  /// frequency, floods the log and burns CPU on repeated failed calls.
-  bool _glowBusy = false;
-  bool _glowPending = false;
-  bool _routeLineBusy = false;
-  bool _routeLinePending = false;
+  Line? _traveledGlowCore;
 
   /// Annotations may only be added once the style has loaded — since
   /// maplibre_gl 0.24.1 the annotation managers are initialised explicitly and
@@ -76,11 +49,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     _mapController = controller;
     _styleLoaded = false;
     _routeLine = null;
-    _drawnRoute = null;
     _simCircle = null;
     _traveledGlowOuter = null;
     _traveledGlowMid = null;
-    _lastGlowDistanceAlong = -1;
+    _traveledGlowCore = null;
   }
 
   Future<void> _onStyleLoaded() async {
@@ -105,32 +77,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   double _followZoom(double distanceToManeuver) =>
       distanceToManeuver < 150 ? 17.5 : 16.5;
 
-  /// Draw (or redraw) the route polyline — without moving the camera. A
-  /// no-op when [route] is unchanged from the last draw (see [_drawnRoute]),
-  /// so pure progress/distance ticks don't touch this annotation at all.
+  /// Draw (or redraw) the route polyline — without moving the camera.
   Future<void> _drawRouteLine() async {
-    if (_routeLineBusy) {
-      _routeLinePending = true;
-      return;
-    }
-    _routeLineBusy = true;
-    try {
-      await _drawRouteLineImpl();
-    } finally {
-      _routeLineBusy = false;
-      if (_routeLinePending) {
-        _routeLinePending = false;
-        unawaited(_drawRouteLine());
-      }
-    }
-  }
-
-  Future<void> _drawRouteLineImpl() async {
     final controller = _mapController;
     final route = ref.read(navControllerProvider).route;
     if (controller == null || !_styleLoaded) return;
-    if (identical(route, _drawnRoute)) return;
-    _drawnRoute = route;
     if (_routeLine != null) {
       await controller.removeLine(_routeLine!);
       _routeLine = null;
@@ -147,51 +98,26 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     );
   }
 
-  /// Redraw the "already driven" glow to match the latest progress — two
-  /// stacked lines (wide+blurred, then narrower+blurred) over the plain
-  /// route line, from the route start up to
-  /// [NavigationState.distanceAlongMeters]. Coalesces overlapping calls (see
-  /// [_glowBusy]) and skips sub-[_glowUpdateMinDeltaMeters] movements.
+  /// Redraw the "already driven" glow to match the latest progress —
+  /// three stacked lines (wide+blurred under narrow+sharp) over the plain
+  /// route line, from the route start up to [NavigationState.distanceAlongMeters].
   Future<void> _updateTraveledGlow() async {
-    if (_glowBusy) {
-      _glowPending = true;
-      return;
-    }
-    _glowBusy = true;
-    try {
-      await _updateTraveledGlowImpl();
-    } finally {
-      _glowBusy = false;
-      if (_glowPending) {
-        _glowPending = false;
-        unawaited(_updateTraveledGlow());
-      }
-    }
-  }
-
-  Future<void> _updateTraveledGlowImpl() async {
     final controller = _mapController;
     if (controller == null || !_styleLoaded) return;
     final navState = ref.read(navControllerProvider);
     final route = navState.route;
-    final distanceAlong = navState.distanceAlongMeters;
     if (route == null || route.geometry.length < 2) {
       await _removeTraveledGlow();
       return;
     }
-    final coords = _traveledCoordinates(route.geometry, distanceAlong);
+    final coords = _traveledCoordinates(
+      route.geometry,
+      navState.distanceAlongMeters,
+    );
     if (coords.length < 2) {
       await _removeTraveledGlow();
       return;
     }
-    // Skip the platform-channel round trip for imperceptibly small moves —
-    // but never for the first draw or right after a reset.
-    if (_traveledGlowOuter != null &&
-        (distanceAlong - _lastGlowDistanceAlong).abs() <
-            _glowUpdateMinDeltaMeters) {
-      return;
-    }
-    _lastGlowDistanceAlong = distanceAlong;
     final geometry = [for (final p in coords) LatLng(p.latitude, p.longitude)];
     if (_traveledGlowOuter == null) {
       _traveledGlowOuter = await controller.addLine(
@@ -212,33 +138,43 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           lineOpacity: 0.45,
         ),
       );
+      _traveledGlowCore = await controller.addLine(
+        LineOptions(
+          geometry: geometry,
+          lineColor: AnColors.cyanHex,
+          lineWidth: 5,
+        ),
+      );
     } else {
-      await Future.wait([
-        controller.updateLine(
-          _traveledGlowOuter!,
-          LineOptions(geometry: geometry),
-        ),
-        controller.updateLine(
-          _traveledGlowMid!,
-          LineOptions(geometry: geometry),
-        ),
-      ]);
+      await controller.updateLine(
+        _traveledGlowOuter!,
+        LineOptions(geometry: geometry),
+      );
+      await controller.updateLine(
+        _traveledGlowMid!,
+        LineOptions(geometry: geometry),
+      );
+      await controller.updateLine(
+        _traveledGlowCore!,
+        LineOptions(geometry: geometry),
+      );
     }
   }
 
   Future<void> _removeTraveledGlow() async {
     final controller = _mapController;
     if (controller == null) return;
-    _lastGlowDistanceAlong = -1;
     if (_traveledGlowOuter != null) {
-      final line = _traveledGlowOuter!;
+      await controller.removeLine(_traveledGlowOuter!);
       _traveledGlowOuter = null;
-      await controller.removeLine(line);
     }
     if (_traveledGlowMid != null) {
-      final line = _traveledGlowMid!;
+      await controller.removeLine(_traveledGlowMid!);
       _traveledGlowMid = null;
-      await controller.removeLine(line);
+    }
+    if (_traveledGlowCore != null) {
+      await controller.removeLine(_traveledGlowCore!);
+      _traveledGlowCore = null;
     }
   }
 
