@@ -5,8 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 import '../../../core/di/providers.dart';
-import '../../../core/utils/geo.dart';
-import '../domain/entities/route.dart';
 import 'nav_controller.dart';
 import 'nav_session.dart';
 import 'search_screen.dart';
@@ -28,13 +26,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   Line? _routeLine;
   Circle? _simCircle;
 
-  /// Three stacked lines (wide+blurred to narrow+sharp) tracing the portion
-  /// of the route already driven — a glow effect layered on top of the plain
-  /// [_routeLine]. All three share one geometry, updated together.
-  Line? _traveledGlowOuter;
-  Line? _traveledGlowMid;
-  Line? _traveledGlowCore;
-
   /// Annotations may only be added once the style has loaded — since
   /// maplibre_gl 0.24.1 the annotation managers are initialised explicitly and
   /// `addLine`/`addCircle` throw before that, where they used to no-op. The
@@ -50,15 +41,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     _styleLoaded = false;
     _routeLine = null;
     _simCircle = null;
-    _traveledGlowOuter = null;
-    _traveledGlowMid = null;
-    _traveledGlowCore = null;
   }
 
   Future<void> _onStyleLoaded() async {
     _styleLoaded = true;
     await _drawRouteLine();
-    await _updateTraveledGlow();
     await _updateSimPosition(ref.read(simulatedPositionProvider));
   }
 
@@ -96,104 +83,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         lineWidth: 5,
       ),
     );
-  }
-
-  /// Redraw the "already driven" glow to match the latest progress —
-  /// three stacked lines (wide+blurred under narrow+sharp) over the plain
-  /// route line, from the route start up to [NavigationState.distanceAlongMeters].
-  Future<void> _updateTraveledGlow() async {
-    final controller = _mapController;
-    if (controller == null || !_styleLoaded) return;
-    final navState = ref.read(navControllerProvider);
-    final route = navState.route;
-    if (route == null || route.geometry.length < 2) {
-      await _removeTraveledGlow();
-      return;
-    }
-    final coords = _traveledCoordinates(
-      route.geometry,
-      navState.distanceAlongMeters,
-    );
-    if (coords.length < 2) {
-      await _removeTraveledGlow();
-      return;
-    }
-    final geometry = [for (final p in coords) LatLng(p.latitude, p.longitude)];
-    if (_traveledGlowOuter == null) {
-      _traveledGlowOuter = await controller.addLine(
-        LineOptions(
-          geometry: geometry,
-          lineColor: AnColors.cyanHex,
-          lineWidth: 14,
-          lineBlur: 6,
-          lineOpacity: 0.22,
-        ),
-      );
-      _traveledGlowMid = await controller.addLine(
-        LineOptions(
-          geometry: geometry,
-          lineColor: AnColors.cyanHex,
-          lineWidth: 8,
-          lineBlur: 3,
-          lineOpacity: 0.45,
-        ),
-      );
-      _traveledGlowCore = await controller.addLine(
-        LineOptions(
-          geometry: geometry,
-          lineColor: AnColors.cyanHex,
-          lineWidth: 5,
-        ),
-      );
-    } else {
-      await controller.updateLine(
-        _traveledGlowOuter!,
-        LineOptions(geometry: geometry),
-      );
-      await controller.updateLine(
-        _traveledGlowMid!,
-        LineOptions(geometry: geometry),
-      );
-      await controller.updateLine(
-        _traveledGlowCore!,
-        LineOptions(geometry: geometry),
-      );
-    }
-  }
-
-  Future<void> _removeTraveledGlow() async {
-    final controller = _mapController;
-    if (controller == null) return;
-    if (_traveledGlowOuter != null) {
-      await controller.removeLine(_traveledGlowOuter!);
-      _traveledGlowOuter = null;
-    }
-    if (_traveledGlowMid != null) {
-      await controller.removeLine(_traveledGlowMid!);
-      _traveledGlowMid = null;
-    }
-    if (_traveledGlowCore != null) {
-      await controller.removeLine(_traveledGlowCore!);
-      _traveledGlowCore = null;
-    }
-  }
-
-  /// The route's coordinates from the start up to [traveledMeters], ending
-  /// exactly at the interpolated point so the glow's tip tracks smoothly
-  /// between vertices rather than jumping from one to the next.
-  List<GeoPoint> _traveledCoordinates(
-    List<GeoPoint> geometry,
-    double traveledMeters,
-  ) {
-    if (traveledMeters <= 0) return const [];
-    final cumulative = Geo.cumulativeDistances(geometry);
-    final out = <GeoPoint>[geometry.first];
-    for (var i = 1; i < geometry.length; i++) {
-      if (cumulative[i] >= traveledMeters) break;
-      out.add(geometry[i]);
-    }
-    out.add(Geo.interpolateAlong(geometry, traveledMeters));
-    return out;
   }
 
   /// Frame the whole route (overview).
@@ -296,10 +185,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final cameraMode = ref.watch(cameraModeProvider);
     final following = cameraMode == CameraMode.follow;
 
-    ref.listen(navControllerProvider, (_, _) {
-      _drawRouteLine();
-      _updateTraveledGlow();
-    });
+    ref.listen(navControllerProvider, (_, _) => _drawRouteLine());
     ref.listen(simulatedPositionProvider, (_, p) => _updateSimPosition(p));
 
     // Real-GPS heading-up follow is handled natively by MapLibre; the simulator

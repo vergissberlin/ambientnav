@@ -16,7 +16,6 @@ class NavigationState {
     this.route,
     this.nextManeuverIndex = 0,
     this.distanceToManeuverMeters = 0,
-    this.distanceAlongMeters = 0,
     this.offlineReady = false,
     this.error,
   });
@@ -25,10 +24,6 @@ class NavigationState {
   final Routes? route;
   final int nextManeuverIndex;
   final double distanceToManeuverMeters;
-
-  /// Distance travelled along [route] so far — drives the "already driven"
-  /// glow on the map's route line. Reset to 0 by [NavController.setRoute].
-  final double distanceAlongMeters;
   final bool offlineReady;
   final String? error;
 
@@ -43,7 +38,6 @@ class NavigationState {
     Routes? route,
     int? nextManeuverIndex,
     double? distanceToManeuverMeters,
-    double? distanceAlongMeters,
     bool? offlineReady,
     String? error,
   }) {
@@ -53,7 +47,6 @@ class NavigationState {
       nextManeuverIndex: nextManeuverIndex ?? this.nextManeuverIndex,
       distanceToManeuverMeters:
           distanceToManeuverMeters ?? this.distanceToManeuverMeters,
-      distanceAlongMeters: distanceAlongMeters ?? this.distanceAlongMeters,
       offlineReady: offlineReady ?? this.offlineReady,
       error: error,
     );
@@ -96,11 +89,6 @@ class NavController extends StateNotifier<NavigationState> {
 
   void updateDistance(double meters) =>
       state = state.copyWith(distanceToManeuverMeters: meters);
-
-  /// Reports how far along the route the driver has travelled, so the map
-  /// can glow the already-driven portion of the line.
-  void updateProgress(double distanceAlongMeters) =>
-      state = state.copyWith(distanceAlongMeters: distanceAlongMeters);
 
   void markOfflineReady() => state = state.copyWith(offlineReady: true);
 
