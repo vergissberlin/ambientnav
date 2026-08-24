@@ -41,27 +41,30 @@ class SettingsScreen extends ConsumerWidget {
               ThemeMode.dark => l10n.themeDark,
             }),
           ),
-          SegmentedButton<ThemeMode>(
-            key: const Key('themeSelector'),
-            segments: [
-              ButtonSegment(
-                value: ThemeMode.system,
-                label: Text(l10n.themeSystem),
-                icon: const Icon(Icons.brightness_auto),
-              ),
-              ButtonSegment(
-                value: ThemeMode.light,
-                label: Text(l10n.themeLight),
-                icon: const Icon(Icons.light_mode),
-              ),
-              ButtonSegment(
-                value: ThemeMode.dark,
-                label: Text(l10n.themeDark),
-                icon: const Icon(Icons.dark_mode),
-              ),
-            ],
-            selected: {mode},
-            onSelectionChanged: (s) => controller.setMode(s.first),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AnSpace.s4),
+            child: SegmentedButton<ThemeMode>(
+              key: const Key('themeSelector'),
+              segments: [
+                ButtonSegment(
+                  value: ThemeMode.system,
+                  label: Text(l10n.themeSystem),
+                  icon: const Icon(Icons.brightness_auto),
+                ),
+                ButtonSegment(
+                  value: ThemeMode.light,
+                  label: Text(l10n.themeLight),
+                  icon: const Icon(Icons.light_mode),
+                ),
+                ButtonSegment(
+                  value: ThemeMode.dark,
+                  label: Text(l10n.themeDark),
+                  icon: const Icon(Icons.dark_mode),
+                ),
+              ],
+              selected: {mode},
+              onSelectionChanged: (s) => controller.setMode(s.first),
+            ),
           ),
           const Divider(),
           SwitchListTile(
