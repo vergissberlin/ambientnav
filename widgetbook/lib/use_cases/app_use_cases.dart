@@ -2,6 +2,7 @@ import 'package:ambientnav/features/navigation/domain/entities/maneuver.dart';
 import 'package:ambientnav/ui/atoms/battery_gauge.dart';
 import 'package:ambientnav/ui/atoms/rssi_indicator.dart';
 import 'package:ambientnav/ui/molecules/front_led_strip_preview.dart';
+import 'package:ambientnav/ui/molecules/simulated_camera_background.dart';
 import 'package:ambientnav/ui/molecules/turn_by_turn_panel.dart';
 import 'package:ambientnav_ui/ambientnav_ui.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +23,7 @@ List<WidgetbookNode> appAtoms() => [_batteryGauge, _rssiIndicator];
 List<WidgetbookNode> appMolecules() => [
   _turnByTurnPanel,
   _frontLedStripPreview,
+  _simulatedCameraBackground,
 ];
 
 // Centres a use case on the cockpit ground so the restyled BatteryGauge (and
@@ -265,6 +267,31 @@ final _frontLedStripPreview = WidgetbookComponent(
             initialValue: 48,
             min: 12,
             max: 80,
+          ),
+        ),
+      ),
+    ),
+  ],
+);
+
+// ── SimulatedCameraBackground ────────────────────────────────────────────────
+
+final _simulatedCameraBackground = WidgetbookComponent(
+  name: 'SimulatedCameraBackground',
+  useCases: [
+    WidgetbookUseCase(
+      name: 'Playground',
+      builder: (context) => _stage(
+        context,
+        SizedBox(
+          width: 320,
+          height: 400,
+          child: SimulatedCameraBackground(
+            speedMps: context.knobs.double.slider(
+              label: 'speedMps',
+              initialValue: 13.9,
+              max: 40,
+            ),
           ),
         ),
       ),
