@@ -16,6 +16,7 @@ enum FrontStripEffect {
   navStraight,
   navContinue,
   hazard,
+  arriving,
   off,
 }
 
@@ -37,6 +38,16 @@ enum FrontStripEffect {
 ///   visually related to a turn without claiming one is happening.
 /// - [FrontStripEffect.hazard] — the whole strip blinks amber, 200ms on /
 ///   200ms off.
+/// - [FrontStripEffect.arriving] — no firmware counterpart. Solid green that
+///   grows outward from a single centre pixel as
+///   [FrontLedStripPreview.progress] goes 0→1, the same "closing in"
+///   language as a parking-distance sensor: `map_screen.dart` drives
+///   [progress] from the live distance to the final "arrive" maneuver (0
+///   when that leg starts, 1 once actually arrived — capped to that leg's
+///   own length rather than the usual maneuver-lead distance, so a short
+///   final leg right after a turn still shows the fill growing from
+///   scratch instead of jumping in half-grown), then holds it at 1 for a
+///   few seconds as a "destination reached" flourish.
 /// - [FrontStripEffect.ambient] — a slow white breathing glow, 3000ms cycle.
 /// - [FrontStripEffect.off] — every LED dark. Firmware has no such state
 ///   (the real strip always shows at least [ambient]); the app selects this
@@ -57,10 +68,15 @@ class FrontLedStripPreview extends StatefulWidget {
   const FrontLedStripPreview({
     super.key,
     required this.effect,
+    this.progress = 1.0,
     this.ledCount = 48,
   });
 
   final FrontStripEffect effect;
+
+  /// How far [FrontStripEffect.arriving]'s fill has grown from the centre,
+  /// 0 (nothing lit) to 1 (whole strip). Ignored by every other effect.
+  final double progress;
   final int ledCount;
 
   @override
@@ -101,6 +117,7 @@ class _FrontLedStripPreviewState extends State<FrontLedStripPreview>
       widget.effect,
       _elapsedInEffect.inMilliseconds,
       widget.ledCount,
+      widget.progress,
     );
     return Container(
       padding: const EdgeInsets.all(4),
@@ -129,7 +146,12 @@ class _FrontLedStripPreviewState extends State<FrontLedStripPreview>
     );
   }
 
-  static List<Color> _colorsFor(FrontStripEffect effect, int ms, int n) {
+  static List<Color> _colorsFor(
+    FrontStripEffect effect,
+    int ms,
+    int n,
+    double progress,
+  ) {
     switch (effect) {
       case FrontStripEffect.ambient:
         return _ambient(ms, n);
@@ -143,6 +165,8 @@ class _FrontLedStripPreviewState extends State<FrontLedStripPreview>
         return _navContinue(ms, n);
       case FrontStripEffect.hazard:
         return _hazard(ms, n);
+      case FrontStripEffect.arriving:
+        return _arriving(ms, n, progress);
       case FrontStripEffect.off:
         return List.filled(n, Colors.transparent);
     }
@@ -226,5 +250,20 @@ class _FrontLedStripPreviewState extends State<FrontLedStripPreview>
     final on = (ms % 400) < 200;
     final color = on ? const Color(0xFFFFA000) : Colors.transparent;
     return List.filled(n, color);
+  }
+
+  /// `renderArriving()` — no firmware counterpart, and not a status signal
+  /// so it uses its own colour rather than the brand's cyan/violet/magenta.
+  /// Solid green from a single centre pixel, growing left and right as
+  /// [progress] (0→1) increases — deliberately simple, no motion of its own.
+  static const _arrivedGreen = Color(0xFF00E676);
+
+  static List<Color> _arriving(int ms, int n, double progress) {
+    final halfFilled = (n / 2) * progress.clamp(0.0, 1.0);
+    final centerLed = (n - 1) / 2;
+    return List.generate(n, (i) {
+      final dist = (i - centerLed).abs();
+      return dist <= halfFilled ? _arrivedGreen : Colors.transparent;
+    });
   }
 }

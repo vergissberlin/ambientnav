@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:ambientnav/core/l10n/app_localizations.dart';
 import 'package:ambientnav_ui/ambientnav_ui.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +31,18 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   Line? _routeLine;
   Line? _hazardZoneLine;
   Circle? _simCircle;
+
+  /// True for a few seconds right after [NavPhase.arrived] is reached, so the
+  /// strip gets one last "destination reached" flourish instead of just
+  /// disappearing the instant [isNavigating] flips false.
+  bool _celebrateArrival = false;
+  Timer? _arrivalTimer;
+
+  @override
+  void dispose() {
+    _arrivalTimer?.cancel();
+    super.dispose();
+  }
 
   /// Annotations may only be added once the style has loaded — since
   /// maplibre_gl 0.24.1 the annotation managers are initialised explicitly and
@@ -196,39 +210,62 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   /// on the phone preview.
   static const double _maneuverLeadSeconds = 20;
 
-  /// Which effect the front strip preview shows right now: an upcoming
-  /// maneuver within [_maneuverLeadSeconds] always wins over hazard, which
-  /// wins over [FrontStripEffect.off] — once a maneuver is passed (or hazard
-  /// is toggled off), the strip goes dark rather than idling on
-  /// [FrontStripEffect.ambient], which firmware would show but reads as
-  /// visual noise on a phone screen between turns. Back-to-back maneuvers
-  /// need no special case: once the current one is passed,
+  /// Which effect the front strip preview shows right now (plus, for
+  /// [FrontStripEffect.arriving], how far its centre-out fill has grown): an
+  /// upcoming maneuver within [_maneuverLeadSeconds] always wins over
+  /// hazard, which wins over [FrontStripEffect.off] — once a maneuver is
+  /// passed (or hazard is toggled off), the strip goes dark rather than
+  /// idling on [FrontStripEffect.ambient], which firmware would show but
+  /// reads as visual noise on a phone screen between turns. Back-to-back
+  /// maneuvers need no special case: once the current one is passed,
   /// [NavigationState.nextManeuver]/[NavigationState.distanceToManeuverMeters]
   /// already point at the following one, so if that one is also within the
   /// lead window its direction shows immediately instead of a dark gap.
-  FrontStripEffect _stripEffectFor(NavigationState navState, bool hazard) {
+  ({FrontStripEffect effect, double progress}) _stripEffectFor(
+    NavigationState navState,
+    bool hazard,
+  ) {
     final maneuver = navState.nextManeuver;
     final leadMeters = navState.speedMps * _maneuverLeadSeconds;
     if (maneuver != null && navState.distanceToManeuverMeters < leadMeters) {
       switch (maneuver.type) {
         case ManeuverType.turnLeft:
         case ManeuverType.slightLeft:
-          return FrontStripEffect.navLeft;
+          return (effect: FrontStripEffect.navLeft, progress: 1);
         case ManeuverType.turnRight:
         case ManeuverType.slightRight:
-          return FrontStripEffect.navRight;
+          return (effect: FrontStripEffect.navRight, progress: 1);
         case ManeuverType.straight:
         case ManeuverType.depart:
-          return FrontStripEffect.navStraight;
+          return (effect: FrontStripEffect.navStraight, progress: 1);
         case ManeuverType.newName:
-          return FrontStripEffect.navContinue;
+          return (effect: FrontStripEffect.navContinue, progress: 1);
+        case ManeuverType.arrive:
+          // Cap the growth window to this final leg's own length (distance
+          // from the previous maneuver to the destination) when it's
+          // shorter than the usual lead distance — otherwise a destination
+          // just past a turn would start the fill already half (or more)
+          // grown instead of from a single centre pixel.
+          final legLength = maneuver.distanceMeters;
+          final growthWindow = legLength > 0 && legLength < leadMeters
+              ? legLength
+              : leadMeters;
+          final progress = growthWindow > 0
+              ? (1 - navState.distanceToManeuverMeters / growthWindow).clamp(
+                  0.0,
+                  1.0,
+                )
+              : 1.0;
+          return (effect: FrontStripEffect.arriving, progress: progress);
         case ManeuverType.uturn:
         case ManeuverType.roundabout:
-        case ManeuverType.arrive:
           break; // no direction — fall through to hazard/off
       }
     }
-    return hazard ? FrontStripEffect.hazard : FrontStripEffect.off;
+    return (
+      effect: hazard ? FrontStripEffect.hazard : FrontStripEffect.off,
+      progress: 1,
+    );
   }
 
   void _toggleOverview() {
@@ -254,7 +291,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final cameraMode = ref.watch(cameraModeProvider);
     final following = cameraMode == CameraMode.follow;
     final hazardActive = ref.watch(hazardPreviewProvider);
-    final stripEffect = _stripEffectFor(navState, hazardActive);
+    final (:effect, :progress) = _stripEffectFor(navState, hazardActive);
+    final stripEffect = _celebrateArrival ? FrontStripEffect.arriving : effect;
+    final stripProgress = _celebrateArrival ? 1.0 : progress;
 
     ref.listen(navControllerProvider, (_, _) => _drawRouteLine());
     ref.listen(simulatedPositionProvider, (_, p) => _updateSimPosition(p));
@@ -262,6 +301,23 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       hazardZoneGeometryProvider,
       (_, geometry) => _drawHazardZone(geometry),
     );
+    ref.listen<NavPhase>(navControllerProvider.select((s) => s.phase), (
+      prev,
+      next,
+    ) {
+      if (next == NavPhase.arrived && prev != NavPhase.arrived) {
+        _arrivalTimer?.cancel();
+        setState(() => _celebrateArrival = true);
+        _arrivalTimer = Timer(const Duration(seconds: 3), () {
+          if (mounted) setState(() => _celebrateArrival = false);
+        });
+      } else if (next == NavPhase.idle && _celebrateArrival) {
+        // Stopped manually mid-celebration (e.g. the FAB) — don't leave the
+        // strip animating over an otherwise-empty screen.
+        _arrivalTimer?.cancel();
+        setState(() => _celebrateArrival = false);
+      }
+    });
 
     // Real-GPS heading-up follow is handled natively by MapLibre; the simulator
     // drives the camera manually (its position isn't the OS location).
@@ -360,10 +416,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     maneuver: navState.nextManeuver,
                     distanceMeters: navState.distanceToManeuverMeters,
                   ),
-                  if (isNavigating)
+                  if (isNavigating || _celebrateArrival)
                     Padding(
                       padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                      child: FrontLedStripPreview(effect: stripEffect),
+                      child: FrontLedStripPreview(
+                        effect: stripEffect,
+                        progress: stripProgress,
+                      ),
                     ),
                 ],
               ),
