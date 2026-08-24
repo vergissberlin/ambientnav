@@ -1,6 +1,7 @@
 import 'package:ambientnav/features/navigation/domain/entities/maneuver.dart';
 import 'package:ambientnav/ui/atoms/battery_gauge.dart';
 import 'package:ambientnav/ui/atoms/rssi_indicator.dart';
+import 'package:ambientnav/ui/molecules/front_led_strip_preview.dart';
 import 'package:ambientnav/ui/molecules/turn_by_turn_panel.dart';
 import 'package:ambientnav_ui/ambientnav_ui.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +19,10 @@ import 'package:widgetbook/widgetbook.dart';
 List<WidgetbookNode> appAtoms() => [_batteryGauge, _rssiIndicator];
 
 /// App-domain molecules composed from those atoms and a domain entity.
-List<WidgetbookNode> appMolecules() => [_turnByTurnPanel];
+List<WidgetbookNode> appMolecules() => [
+  _turnByTurnPanel,
+  _frontLedStripPreview,
+];
 
 // Centres a use case on the cockpit ground so the restyled BatteryGauge (and
 // TurnByTurnPanel's AnPanel frame) render against the dark surface they were
@@ -212,6 +216,53 @@ final _turnByTurnPanel = WidgetbookComponent(
             max: 15000,
             divisions: 150,
             precision: 0,
+          ),
+        ),
+      ),
+    ),
+  ],
+);
+
+// ── FrontLedStripPreview ─────────────────────────────────────────────────────
+
+final _frontLedStripPreview = WidgetbookComponent(
+  name: 'FrontLedStripPreview',
+  useCases: [
+    WidgetbookUseCase(
+      name: 'Every effect',
+      builder: (context) {
+        final brand = AnBrandTheme.of(context);
+        return _stage(
+          context,
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: AnSpace.s4,
+            children: [
+              for (final effect in FrontStripEffect.values) ...[
+                Text(effect.name, style: TextStyle(color: brand.text4)),
+                FrontLedStripPreview(effect: effect),
+              ],
+            ],
+          ),
+        );
+      },
+    ),
+    WidgetbookUseCase(
+      name: 'Playground',
+      builder: (context) => _stage(
+        context,
+        FrontLedStripPreview(
+          effect: context.knobs.object.dropdown(
+            label: 'effect',
+            options: FrontStripEffect.values,
+            labelBuilder: (e) => e.name,
+          ),
+          ledCount: context.knobs.int.slider(
+            label: 'ledCount',
+            initialValue: 48,
+            min: 12,
+            max: 80,
           ),
         ),
       ),

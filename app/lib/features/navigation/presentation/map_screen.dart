@@ -224,56 +224,65 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         ? MyLocationTrackingMode.trackingGps
         : MyLocationTrackingMode.none;
 
+    final appBar = AnAppBar(
+      title: Text(l10n.navTab),
+      actions: [
+        if (simulating)
+          const Padding(
+            padding: EdgeInsets.only(right: 8),
+            child: Chip(
+              label: Text('SIM'),
+              visualDensity: VisualDensity.compact,
+            ),
+          ),
+        if (navState.offlineReady)
+          const Padding(
+            padding: EdgeInsets.only(right: 12),
+            child: Icon(Icons.offline_pin),
+          ),
+        if (isNavigating)
+          IconButton(
+            tooltip: following ? l10n.routeOverview : l10n.followRoute,
+            icon: Icon(following ? Icons.alt_route : Icons.navigation),
+            onPressed: _toggleOverview,
+          ),
+        if (isNavigating)
+          IconButton(
+            tooltip: l10n.downloadOffline,
+            icon: const Icon(Icons.download_for_offline),
+            onPressed: () => ref.read(navSessionProvider).downloadOffline(),
+          ),
+        if (isNavigating)
+          IconButton(
+            tooltip: l10n.toggleHazardLights,
+            isSelected: hazardActive,
+            icon: const Icon(Icons.warning_amber_rounded),
+            onPressed: () =>
+                ref.read(hazardPreviewProvider.notifier).state = !hazardActive,
+          ),
+      ],
+    );
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.navTab),
-        actions: [
-          if (simulating)
-            const Padding(
-              padding: EdgeInsets.only(right: 8),
-              child: Chip(
-                label: Text('SIM'),
-                visualDensity: VisualDensity.compact,
+      extendBodyBehindAppBar: true,
+      appBar: appBar,
+      // See the matching comment in controllers_list_screen.dart — the outer
+      // HomeShell's `extendBody: true` otherwise lands this FAB behind the
+      // glass bottom nav bar.
+      floatingActionButton: Padding(
+        padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom),
+        child: isNavigating
+            ? FloatingActionButton.extended(
+                onPressed: () => ref.read(navSessionProvider).stop(),
+                icon: const Icon(Icons.close),
+                label: Text(l10n.stopNavigation),
+              )
+            : FloatingActionButton.extended(
+                onPressed: _openSearch,
+                icon: const Icon(Icons.search),
+                label: Text(l10n.searchDestination),
               ),
-            ),
-          if (navState.offlineReady)
-            const Padding(
-              padding: EdgeInsets.only(right: 12),
-              child: Icon(Icons.offline_pin),
-            ),
-          if (isNavigating)
-            IconButton(
-              tooltip: following ? l10n.routeOverview : l10n.followRoute,
-              icon: Icon(following ? Icons.alt_route : Icons.navigation),
-              onPressed: _toggleOverview,
-            ),
-          if (isNavigating)
-            IconButton(
-              tooltip: l10n.downloadOffline,
-              icon: const Icon(Icons.download_for_offline),
-              onPressed: () => ref.read(navSessionProvider).downloadOffline(),
-            ),
-          if (isNavigating)
-            IconButton(
-              tooltip: l10n.toggleHazardLights,
-              isSelected: hazardActive,
-              icon: const Icon(Icons.warning_amber_rounded),
-              onPressed: () => ref.read(hazardPreviewProvider.notifier).state =
-                  !hazardActive,
-            ),
-        ],
       ),
-      floatingActionButton: isNavigating
-          ? FloatingActionButton.extended(
-              onPressed: () => ref.read(navSessionProvider).stop(),
-              icon: const Icon(Icons.close),
-              label: Text(l10n.stopNavigation),
-            )
-          : FloatingActionButton.extended(
-              onPressed: _openSearch,
-              icon: const Icon(Icons.search),
-              label: Text(l10n.searchDestination),
-            ),
       body: Stack(
         children: [
           MapLibreMap(
@@ -291,21 +300,28 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 ? MyLocationRenderMode.normal
                 : MyLocationRenderMode.compass,
           ),
-          Align(
-            alignment: Alignment.topCenter,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TurnByTurnPanel(
-                  maneuver: navState.nextManeuver,
-                  distanceMeters: navState.distanceToManeuverMeters,
-                ),
-                if (isNavigating)
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                    child: FrontLedStripPreview(effect: stripEffect),
+          Padding(
+            padding: EdgeInsets.only(
+              top:
+                  MediaQuery.paddingOf(context).top +
+                  appBar.preferredSize.height,
+            ),
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TurnByTurnPanel(
+                    maneuver: navState.nextManeuver,
+                    distanceMeters: navState.distanceToManeuverMeters,
                   ),
-              ],
+                  if (isNavigating)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                      child: FrontLedStripPreview(effect: stripEffect),
+                    ),
+                ],
+              ),
             ),
           ),
         ],

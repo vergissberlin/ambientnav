@@ -1,3 +1,4 @@
+import 'package:ambientnav_ui/ambientnav_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:ambientnav/core/l10n/app_localizations.dart';
@@ -16,9 +17,14 @@ class SettingsScreen extends ConsumerWidget {
     final mode = ref.watch(themeControllerProvider);
     final controller = ref.read(themeControllerProvider.notifier);
 
+    final appBar = AnAppBar(title: Text(l10n.settingsTab));
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.settingsTab)),
+      extendBodyBehindAppBar: true,
+      appBar: appBar,
       body: ListView(
+        padding: EdgeInsets.only(
+          top: MediaQuery.paddingOf(context).top + appBar.preferredSize.height,
+        ),
         children: [
           ListTile(
             title: Text(l10n.theme),

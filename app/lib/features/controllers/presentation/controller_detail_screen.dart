@@ -48,46 +48,62 @@ class ControllerDetailScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final device = _device(ref);
     if (device == null) {
+      final appBar = AnAppBar();
       return Scaffold(
-        appBar: AppBar(),
-        body: Center(child: Text(l10n.noControllers)),
+        extendBodyBehindAppBar: true,
+        appBar: appBar,
+        body: Padding(
+          padding: EdgeInsets.only(
+            top:
+                MediaQuery.paddingOf(context).top + appBar.preferredSize.height,
+          ),
+          child: Center(child: Text(l10n.noControllers)),
+        ),
       );
     }
     final isRear = device.role == ControllerRole.rear;
+    final appBar = AnAppBar(
+      title: Text(device.name),
+      bottom: TabBar(
+        isScrollable: true,
+        tabs: [
+          Tab(text: l10n.signalStrength),
+          Tab(text: l10n.ledConfig),
+          if (isRear) Tab(text: l10n.sensorConfig),
+          Tab(text: l10n.firmwareUpdate),
+        ],
+      ),
+    );
 
     return DefaultTabController(
       length: isRear ? 4 : 3,
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(device.name),
-          bottom: TabBar(
-            isScrollable: true,
-            tabs: [
-              Tab(text: l10n.signalStrength),
-              Tab(text: l10n.ledConfig),
-              if (isRear) Tab(text: l10n.sensorConfig),
-              Tab(text: l10n.firmwareUpdate),
+        extendBodyBehindAppBar: true,
+        appBar: appBar,
+        body: Padding(
+          padding: EdgeInsets.only(
+            top:
+                MediaQuery.paddingOf(context).top + appBar.preferredSize.height,
+          ),
+          child: Column(
+            children: [
+              if (!device.isPaired)
+                PairingBanner(
+                  onPair: () => PairingDialog.show(context, deviceId),
+                ),
+              Expanded(
+                child: TabBarView(
+                  children: [
+                    _tabPanel(ControllerTelemetryList(device: device)),
+                    _tabPanel(LedConfigForm(deviceId: deviceId)),
+                    if (isRear)
+                      _tabPanel(SensorCalibrationForm(deviceId: deviceId)),
+                    _tabPanel(OtaScreen(deviceId: deviceId)),
+                  ],
+                ),
+              ),
             ],
           ),
-        ),
-        body: Column(
-          children: [
-            if (!device.isPaired)
-              PairingBanner(
-                onPair: () => PairingDialog.show(context, deviceId),
-              ),
-            Expanded(
-              child: TabBarView(
-                children: [
-                  _tabPanel(ControllerTelemetryList(device: device)),
-                  _tabPanel(LedConfigForm(deviceId: deviceId)),
-                  if (isRear)
-                    _tabPanel(SensorCalibrationForm(deviceId: deviceId)),
-                  _tabPanel(OtaScreen(deviceId: deviceId)),
-                ],
-              ),
-            ),
-          ],
         ),
       ),
     );
