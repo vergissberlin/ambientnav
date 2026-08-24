@@ -8,6 +8,7 @@ class RouteProgress {
     required this.bearingDeg,
     required this.nextManeuverIndex,
     required this.distanceToManeuverMeters,
+    required this.distanceAlongMeters,
     required this.arrived,
   });
 
@@ -15,6 +16,9 @@ class RouteProgress {
   final double bearingDeg;
   final int nextManeuverIndex;
   final double distanceToManeuverMeters;
+
+  /// Distance travelled along the route so far, in metres.
+  final double distanceAlongMeters;
   final bool arrived;
 }
 
@@ -71,6 +75,7 @@ class RouteProgressTracker {
           ? (_cumManeuver.isEmpty ? 0 : _cumManeuver.length - 1)
           : nextIndex,
       distanceToManeuverMeters: distanceToManeuver,
+      distanceAlongMeters: traveled,
       arrived: arrived,
     );
   }
