@@ -110,7 +110,7 @@ Quarks are not widgets. They are token constants and theme definitions in `core/
 ```
 AppTheme.signalCyan        → Color(0xFF00D4FF)
 AppTheme.backgroundDeep    → Color(0xFF0A0A0F)
-AppTheme.fontDisplay       → 'Space Grotesk'
+AppTheme.fontDisplay       → 'Orbitron'
 AppTheme.spacingMd         → 16.0
 ```
 

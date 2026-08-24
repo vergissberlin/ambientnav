@@ -14,11 +14,14 @@ import 'package:flutter/painting.dart';
 ///
 /// `google_fonts` is deliberately not used — it downloads at runtime, and this
 /// app exists to navigate offline in a car.
+///
+/// [display] mirrors `--font-display`, which the Cybernetic Frame direction
+/// repointed from Space Grotesk to Orbitron (see `design-system/readme.md`).
 abstract final class AnTypography {
   /// Flip once the OFL fonts are bundled and declared in the app's pubspec.
   static const bool kBrandFontsAvailable = false;
 
-  static const String? display = kBrandFontsAvailable ? 'Space Grotesk' : null;
+  static const String? display = kBrandFontsAvailable ? 'Orbitron' : null;
   static const String? body = kBrandFontsAvailable ? 'IBM Plex Sans' : null;
   static const String? mono = kBrandFontsAvailable ? 'IBM Plex Mono' : null;
 

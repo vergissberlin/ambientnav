@@ -76,7 +76,7 @@ The content is **bilingual (EN primary / DE secondary)**.
 - Base is layered near-black: `#06080E` cockpit → `#0B0F18` / `#0E121C` surfaces → `#151A26` hover.
 - Cyan and magenta are *meaningful*, never decorative — don't paint a cyan button next to a magenta one for variety; the colors signal state.
 
-**Type** — Space Grotesk (display/headings, geometric, tight `-0.02`–`-0.035em` tracking), IBM Plex Sans (body/UI), IBM Plex Mono (eyebrows, data, metrics, wide `0.26em` tracking, UPPERCASE). The mono/Plex pairing reads "technical instrument".
+**Type** — Orbitron (display/headings — a HUD-geometry cyberpunk face, tight `-0.02`–`-0.035em` tracking; replaces the earlier Space Grotesk as the Cybernetic Frame direction landed), IBM Plex Sans (body/UI), IBM Plex Mono (eyebrows, data, metrics, wide `0.26em` tracking, UPPERCASE). The mono/Plex pairing still reads "technical instrument"; Orbitron sharpens headings into HUD-readout territory without touching body copy.
 
 **Backgrounds** — solid cockpit black, optionally with large soft radial glows in cyan (top-left) and magenta (bottom-right) at low opacity. No photographic backgrounds, no busy patterns. Large `--amb-gradient` washes are now permitted as atmospheric backdrops — but only *behind* a bracket/frame structure (see **The Cybernetic Frame** below), never as flat standalone decoration on their own.
 
