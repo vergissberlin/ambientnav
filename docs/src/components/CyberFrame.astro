@@ -1,0 +1,65 @@
+---
+// Decorative "cybernetic frame" chrome — four glowing corner brackets applied
+// around a container, with optional scanline/glitch accents. Purely visual;
+// carries no semantics of its own (`as` lets the caller keep the original
+// element/tag of whatever it wraps).
+interface Props {
+  as?: string;
+  scanline?: boolean;
+  glitch?: boolean;
+  class?: string;
+}
+const { as: Tag = 'div', scanline = false, glitch = false, class: className = '' } = Astro.props;
+---
+<Tag class:list={['cyber-frame', className, { 'cyber-frame--scanline': scanline, 'cyber-frame--glitch': glitch }]}>
+  <span class="cf-corner cf-corner-tl" aria-hidden="true"></span>
+  <span class="cf-corner cf-corner-tr" aria-hidden="true"></span>
+  <span class="cf-corner cf-corner-bl" aria-hidden="true"></span>
+  <span class="cf-corner cf-corner-br" aria-hidden="true"></span>
+  <slot />
+</Tag>
+
+<style>
+  .cyber-frame { position: relative; }
+
+  .cf-corner {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .cf-corner-tl { top: -1px; left: -1px; border-top: 2px solid var(--amb-frame-color, var(--amb-cyan)); border-left: 2px solid var(--amb-frame-color, var(--amb-cyan)); }
+  .cf-corner-tr { top: -1px; right: -1px; border-top: 2px solid var(--amb-frame-color, var(--amb-cyan)); border-right: 2px solid var(--amb-frame-color, var(--amb-cyan)); }
+  .cf-corner-bl { bottom: -1px; left: -1px; border-bottom: 2px solid var(--amb-frame-color, var(--amb-cyan)); border-left: 2px solid var(--amb-frame-color, var(--amb-cyan)); }
+  .cf-corner-br { bottom: -1px; right: -1px; border-bottom: 2px solid var(--amb-frame-color, var(--amb-cyan)); border-right: 2px solid var(--amb-frame-color, var(--amb-cyan)); }
+
+  /* Optional CRT-style scanline overlay */
+  .cyber-frame--scanline::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background: repeating-linear-gradient(to bottom,
+      rgba(255,255,255,.035) 0px, rgba(255,255,255,.035) 1px,
+      transparent 1px, transparent 3px);
+    mix-blend-mode: overlay;
+    animation: cf-scan 8s linear infinite;
+  }
+  @keyframes cf-scan { from { background-position-y: 0; } to { background-position-y: 40px; } }
+
+  /* Optional rare hue-shift "glitch" flicker */
+  .cyber-frame--glitch { animation: cf-glitch 6s ease-in-out infinite; }
+  @keyframes cf-glitch {
+    0%, 96%, 100% { filter: none; }
+    97% { filter: hue-rotate(6deg) saturate(1.4); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cyber-frame--scanline::after,
+    .cyber-frame--glitch {
+      animation: none !important;
+    }
+  }
+</style>

@@ -17,4 +17,17 @@ abstract final class AnMotion {
 
   /// `--dur-slow: 420ms` — entrances, larger surface changes.
   static const Duration slow = Duration(milliseconds: 420);
+
+  /// Glitch-flicker duration for the Cybernetic Frame's triggered RGB-split /
+  /// opacity-jitter accent (hover, state-change, page-load reveal — never a
+  /// looping animation). `frame.css` has no `--amb-glitch-dur` variable; this
+  /// is a Dart-only motion value kept in the 150–250ms range readme.md
+  /// specifies.
+  static const Duration glitchFlicker = Duration(milliseconds: 180);
+
+  /// 7s idle-loop duration for [AnPanelAccent.scanline] — ambient background
+  /// motion, not a transition. `frame.css` only documents the *look* of a
+  /// scanline texture, not a loop speed, so this is a Dart-only value picked
+  /// in the 6–8s range that reads as slow HUD sweep rather than a spinner.
+  static const Duration scan = Duration(milliseconds: 7000);
 }

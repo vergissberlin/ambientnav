@@ -1,4 +1,6 @@
 ---
+import CyberFrame from './CyberFrame.astro';
+
 interface Props {
   lang?: 'en' | 'de';
 }
@@ -32,7 +34,7 @@ const t = {
 }[lang];
 ---
 
-<section class="hv" aria-label={t.eyebrow}>
+<CyberFrame as="section" class="hv" aria-label={t.eyebrow}>
   <div class="hv-header">
     <span class="hv-eyebrow">{t.eyebrow}</span>
     <div class="hv-mode-labels" aria-live="polite" aria-atomic="true">
@@ -85,7 +87,7 @@ const t = {
       <span class="hv-ml hv-pl-danger">{t.parkDanger}</span>
     </div>
   </div>
-</section>
+</CyberFrame>
 
 <style>
   /* ── Container ─────────────────────────────────────────────── */

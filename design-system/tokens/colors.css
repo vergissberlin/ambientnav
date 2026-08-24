@@ -41,6 +41,13 @@
   --amb-glow-violet: 0 0 24px rgba(124,92,255,.55);
   --amb-glow-magenta: 0 0 24px rgba(255,45,156,.55);
 
+  /* ---- Scanline texture (literal, not an alias) ---- */
+  --amb-scanline-color: rgba(255,255,255,.035);
+
+  /* ---- Frame glow — tighter blur than card glow, brackets are thin ---- */
+  --amb-glow-frame-cyan: 0 0 8px rgba(25,227,255,.6);
+  --amb-glow-frame-magenta: 0 0 8px rgba(255,45,156,.6);
+
   /* ---- Semantic aliases ---- */
   --bg: var(--amb-cockpit);
   --surface: var(--amb-surface-2);

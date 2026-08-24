@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:ambientnav_ui/ambientnav_ui.dart';
 import 'package:flutter/animation.dart';
+import 'package:flutter/painting.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Guards the Dart mirror in `lib/tokens/` against the CSS it is derived from.
@@ -15,6 +16,7 @@ void main() {
 
   late Map<String, String> colors;
   late Map<String, String> spacing;
+  late Map<String, String> frame;
 
   setUpAll(() {
     expect(
@@ -24,6 +26,7 @@ void main() {
     );
     colors = _parse(File('${tokensDir.path}/colors.css'));
     spacing = _parse(File('${tokensDir.path}/spacing.css'));
+    frame = _parse(File('${tokensDir.path}/frame.css'));
   });
 
   group('colors.css', () {
@@ -67,6 +70,35 @@ void main() {
       expect(_alpha(AnColors.lineStrong), closeTo(0.14, 0.005));
       expect(colors['amb-line'], contains('.08'));
       expect(colors['amb-line-strong'], contains('.14'));
+    });
+
+    test('scanline alpha matches', () {
+      expect(_alpha(AnColors.scanline), closeTo(0.035, 0.002));
+      expect(colors['amb-scanline-color'], contains('.035'));
+    });
+
+    test('frame glow blur and alpha match', () {
+      void expectGlow(String token, List<BoxShadow> shadow) {
+        final css = colors[token];
+        expect(css, isNotNull, reason: '--$token missing from colors.css');
+        final blurMatch = RegExp(r'(\d+(?:\.\d+)?)px').firstMatch(css!);
+        expect(blurMatch, isNotNull, reason: '--$token missing a blur radius');
+        expect(
+          double.parse(blurMatch!.group(1)!),
+          shadow.single.blurRadius,
+          reason: '--$token blur drifted',
+        );
+        final alphaMatch = RegExp(r',\s*([\d.]+)\s*\)').firstMatch(css);
+        expect(alphaMatch, isNotNull, reason: '--$token missing an alpha');
+        expect(
+          _alpha(shadow.single.color),
+          closeTo(double.parse(alphaMatch!.group(1)!), 0.005),
+          reason: '--$token alpha drifted',
+        );
+      }
+
+      expectGlow('amb-glow-frame-cyan', AnShadows.glowFrameCyan);
+      expectGlow('amb-glow-frame-magenta', AnShadows.glowFrameMagenta);
     });
 
     test('the MapLibre hex strings match the Color tokens', () {
@@ -113,6 +145,7 @@ void main() {
         'radius-lg': AnRadius.lg,
         'radius-xl': AnRadius.xl,
         'radius-strip': AnRadius.strip,
+        'radius-frame': AnFrame.radius,
       };
       expected.forEach((token, value) {
         expect(
@@ -141,6 +174,24 @@ void main() {
       expect(nums[1], closeTo(curve.b, 0.001));
       expect(nums[2], closeTo(curve.c, 0.001));
       expect(nums[3], closeTo(curve.d, 0.001));
+    });
+  });
+
+  group('frame.css', () {
+    test('geometry constants match', () {
+      expect(frame['amb-frame-thickness'], '${AnFrame.thickness.toInt()}px');
+      expect(frame['amb-glitch-offset'], '${AnFrame.glitchOffset.toInt()}px');
+    });
+
+    test('opacity constants match', () {
+      expect(
+        double.parse(frame['amb-frame-opacity-rest']!),
+        closeTo(AnFrame.opacityRest, 0.001),
+      );
+      expect(
+        double.parse(frame['amb-frame-opacity-active']!),
+        closeTo(AnFrame.opacityActive, 0.001),
+      );
     });
   });
 }

@@ -78,7 +78,7 @@ The content is **bilingual (EN primary / DE secondary)**.
 
 **Type** — Space Grotesk (display/headings, geometric, tight `-0.02`–`-0.035em` tracking), IBM Plex Sans (body/UI), IBM Plex Mono (eyebrows, data, metrics, wide `0.26em` tracking, UPPERCASE). The mono/Plex pairing reads "technical instrument".
 
-**Backgrounds** — solid cockpit black, optionally with large soft radial glows in cyan (top-left) and magenta (bottom-right) at low opacity. No photographic backgrounds, no busy patterns, no purple-haze gradients across whole sections.
+**Backgrounds** — solid cockpit black, optionally with large soft radial glows in cyan (top-left) and magenta (bottom-right) at low opacity. No photographic backgrounds, no busy patterns. Large `--amb-gradient` washes are now permitted as atmospheric backdrops — but only *behind* a bracket/frame structure (see **The Cybernetic Frame** below), never as flat standalone decoration on their own.
 
 **Glow, not shadow** — on dark surfaces, elevation and emphasis come from a colored *glow* in the element's own hue (`--amb-glow-cyan/violet/magenta`), never a grey drop shadow. Cards use a near-flat surface fill + 1px hairline border (`--amb-line`) and a deep ambient drop only.
 
@@ -86,7 +86,31 @@ The content is **bilingual (EN primary / DE secondary)**.
 
 **Corner radii** — soft, 12–16px for cards/panels, 4–8px for chips/labels. Pill (`999px`) reserved for the light-strip graphic and toggles.
 
-**Cards** — `--amb-surface-2` fill, hairline border, 16px radius, ambient drop shadow. No colored left-border accent stripes. Hover lifts to `--amb-surface-3` and may add a faint hue glow.
+**Cards** — `--amb-surface-2` fill, hairline border, 16px radius, ambient drop shadow. Flat, full-height colored left-border accent stripes stay banned — they read as generic dashboard chrome. Corner brackets now carry the state/hue signal instead — see **The Cybernetic Frame** below. Hover lifts to `--amb-surface-3` and may add a faint hue glow.
+
+---
+
+### The Cybernetic Frame
+
+A second layer on top of the calm cockpit foundation: sharp corner brackets, occasional scanline texture, and brief glitch-flicker accents — all built from the existing cyan/violet/magenta signal palette. This is the "cybernetic" half of the brand; it never replaces the calm cockpit base, it decorates it.
+
+**Corner brackets** — the replacement for side-stripes as the state/hue signal on cards and panels.
+- Geometry: `--amb-frame-thickness` (2px) line, `--amb-frame-leg` (`--space-4`, 16px) leg length snapped to the 4px grid.
+- Opacity: `--amb-frame-opacity-rest` (.35) at rest, `--amb-frame-opacity-active` (.9) on hover/active/selected state.
+- Color: `--amb-frame-color` (cyan) is the default; `--amb-frame-color-alert` (magenta) signals warning/alert; `--amb-frame-color-brand` (violet) is reserved for brand/hero contexts.
+- Radius: brackets are near-sharp (`--radius-frame`, 2px) — a deliberate contrast against the soft 12–16px card radius they sit on.
+
+**Scanline texture** — a repeating horizontal line texture at 2–4% opacity (`--amb-scanline-color`). Use only on large, empty, dark surfaces — hero backgrounds, section dividers. Never over body text, form fields, or dense lists; it degrades legibility there.
+
+**Glitch-flicker** — a brief (150–250ms) triggered RGB-split / opacity-jitter using `--amb-glitch-color-a` (cyan) and `--amb-glitch-color-b` (magenta) offset by `--amb-glitch-offset` (2px). Fires on hover, state-change, or a page-load reveal. It is **never** a looping or idle animation — light that glitches forever reads as broken hardware, not a design choice.
+
+**Scope-out** — brackets stay static (no glitch/scanline) on: the live turn-by-turn guide screen, the proximity/parking screen, form inputs, and body text anywhere. Those surfaces stay calm; the frame is decoration for chrome and hero/marketing surfaces, not for anything the driver reads while driving or typing into.
+
+**Motion & accessibility** — respect `prefers-reduced-motion`. Static corner brackets remain in all cases; animated accents (glitch-flicker, any scanline motion) are disabled under reduced motion.
+
+**Color discipline** — every frame, scanline, and glitch color is an alias of the existing `--amb-cyan` / `--amb-violet` / `--amb-magenta` signal hues (see `tokens/frame.css`). No new arbitrary neon colors.
+
+---
 
 **Hover / press** — hover: lighten surface one step and/or raise glow opacity. Press: scale down ~`0.97`, glow brief and brighter. Calm `cubic-bezier(.4,0,.2,1)` easing, 140–240ms.
 
@@ -103,7 +127,7 @@ The content is **bilingual (EN primary / DE secondary)**.
 - **System:** [Lucide](https://lucide.dev) (CDN) — 2px stroke, round caps/joins, outline style. It matches the precise, technical, instrument-like feel and pairs cleanly with IBM Plex. Load from `https://unpkg.com/lucide@latest`.
 - Icons inherit `currentColor`; in signal contexts they take the semantic hue (cyan for navigation/direction, magenta for proximity/warning, `--amb-text` neutral otherwise).
 - The **navigation arrow / chevron** is the brand's signature glyph — reuse Lucide `arrow-right`, `corner-up-right`, `navigation`, `chevron-down`.
-- **No emoji. No filled/duotone icon mixing.** Keep stroke style consistent at 2px.
+- **No emoji.** Base UI icons stay 2px Lucide outline — keep stroke style consistent there. Filled/duotone glyphs are now allowed, but only for a distinct role: HUD status/reticle marks (e.g. a filled proximity dot, a duotone lock-on reticle), never mixed into the general outline icon set.
 - The **logo mark is not an icon** — never substitute it for a UI icon, and never recolor it outside its three approved variants.
 
 > ⚠️ **Substitution flagged:** Lucide is a CDN substitution chosen to fit the brand — the product has no proprietary icon set yet. Swap in a custom set later if desired.

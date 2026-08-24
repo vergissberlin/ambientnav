@@ -1,5 +1,6 @@
 ---
 import HeroVisual from './HeroVisual.astro';
+import CyberFrame from './CyberFrame.astro';
 
 interface Props {
   lang?: 'en' | 'de';
@@ -25,14 +26,14 @@ const t = {
 ---
 
 <div class="vv" data-vehicle-viewer>
-  <div class="vv-stage">
+  <CyberFrame as="div" class="vv-stage">
     <div class="vv-fallback" data-vv-fallback>
       <HeroVisual lang={lang} />
     </div>
     <div class="vv-canvas-wrap" data-vv-canvas-wrap aria-hidden="true">
       <canvas class="vv-canvas" data-vv-canvas></canvas>
     </div>
-  </div>
+  </CyberFrame>
   <div class="vv-footer">
     <span class="vv-hint" data-vv-hint hidden>{t.hint}</span>
     <div class="vv-legend">

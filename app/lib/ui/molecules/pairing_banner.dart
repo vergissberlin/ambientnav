@@ -1,4 +1,5 @@
 import 'package:ambientnav/core/l10n/app_localizations.dart';
+import 'package:ambientnav_ui/ambientnav_ui.dart';
 import 'package:flutter/material.dart';
 
 /// Banner shown above a controller's tabs until the link is bonded.
@@ -14,11 +15,18 @@ class PairingBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return MaterialBanner(
-      backgroundColor: Theme.of(context).colorScheme.errorContainer,
-      leading: const Icon(Icons.lock),
-      content: Text(l10n.notPaired),
-      actions: [TextButton(onPressed: onPair, child: Text(l10n.pair))],
+    return AnPanel(
+      glow: AnCardGlow.magenta,
+      accent: AnPanelAccent.pulse,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          const Icon(Icons.lock, color: AnColors.magenta),
+          const SizedBox(width: 12),
+          Expanded(child: Text(l10n.notPaired)),
+          TextButton(onPressed: onPair, child: Text(l10n.pair)),
+        ],
+      ),
     );
   }
 }

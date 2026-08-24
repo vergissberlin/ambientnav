@@ -8,6 +8,7 @@ List<WidgetbookNode> brandAtoms() => [
   _anButton,
   _anBadge,
   _anCard,
+  _anPanel,
   _anLightStrip,
 ];
 
@@ -249,6 +250,130 @@ final _anCard = WidgetbookComponent(
                   label: 'content',
                   initialValue: 'Guide Cyan leads the way.',
                 ),
+                style: TextStyle(color: brand.text2),
+              ),
+            ),
+          ),
+        );
+      },
+    ),
+  ],
+);
+
+// ── AnPanel ──────────────────────────────────────────────────────────────────
+
+final _anPanel = WidgetbookComponent(
+  name: 'AnPanel',
+  useCases: [
+    WidgetbookUseCase(
+      name: 'Glow variants',
+      builder: (context) {
+        final brand = AnBrandTheme.of(context);
+        return _stage(
+          context,
+          Wrap(
+            spacing: AnSpace.s4,
+            runSpacing: AnSpace.s4,
+            children: [
+              for (final glow in AnCardGlow.values)
+                SizedBox(
+                  width: 240,
+                  child: AnPanel(
+                    glow: glow,
+                    interactive: true,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: AnSpace.s2,
+                      children: [
+                        AnBadge(label: glow.name),
+                        Text(
+                          'Follow the light',
+                          style: TextStyle(color: brand.text2),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    ),
+    WidgetbookUseCase(
+      name: 'Accent modes',
+      builder: (context) {
+        final brand = AnBrandTheme.of(context);
+        return _stage(
+          context,
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            spacing: AnSpace.s4,
+            children: [
+              Wrap(
+                spacing: AnSpace.s4,
+                runSpacing: AnSpace.s4,
+                children: [
+                  for (final accent in AnPanelAccent.values)
+                    SizedBox(
+                      width: 200,
+                      child: AnPanel(
+                        glow: AnCardGlow.cyan,
+                        accent: accent,
+                        child: Text(
+                          accent.name,
+                          style: TextStyle(color: brand.text2),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              Text(
+                'pulse and scanline are animated and are not pinned by golden '
+                'tests — only staticAccent is.',
+                style: TextStyle(color: brand.text4),
+              ),
+            ],
+          ),
+        );
+      },
+    ),
+    WidgetbookUseCase(
+      name: 'Playground',
+      builder: (context) {
+        final brand = AnBrandTheme.of(context);
+        return _stage(
+          context,
+          SizedBox(
+            width: 320,
+            child: AnPanel(
+              glow: context.knobs.object.dropdown(
+                label: 'glow',
+                options: AnCardGlow.values,
+                labelBuilder: (g) => g.name,
+              ),
+              accent: context.knobs.object.dropdown(
+                label: 'accent',
+                options: AnPanelAccent.values,
+                labelBuilder: (a) => a.name,
+              ),
+              bracketLength: context.knobs.double.slider(
+                label: 'bracketLength',
+                initialValue: 20,
+                min: 4,
+                max: 60,
+              ),
+              bracketThickness: context.knobs.double.slider(
+                label: 'bracketThickness',
+                initialValue: 2,
+                min: 1,
+                max: 8,
+              ),
+              interactive: context.knobs.boolean(
+                label: 'interactive',
+                initialValue: true,
+              ),
+              child: Text(
+                'Guide Cyan leads the way.',
                 style: TextStyle(color: brand.text2),
               ),
             ),

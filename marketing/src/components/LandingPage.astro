@@ -2,6 +2,7 @@
 import '../styles/theme.css';
 import VehicleViewer from './VehicleViewer.astro';
 import SystemDiagram from './SystemDiagram.astro';
+import CyberFrame from './CyberFrame.astro';
 import logoLockup from '../assets/logo-lockup.svg?url';
 
 interface Props {
@@ -175,10 +176,10 @@ const year = new Date().getFullYear();
         <h2>{copy.featuresHeading}</h2>
         <div class="feature-grid">
           {copy.features.map((f) => (
-            <article class="feature-card">
+            <CyberFrame as="article" class="feature-card" scanline>
               <h3>{f.title}</h3>
               <p>{f.body}</p>
-            </article>
+            </CyberFrame>
           ))}
         </div>
       </section>

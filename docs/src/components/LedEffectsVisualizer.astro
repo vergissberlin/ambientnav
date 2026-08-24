@@ -1,5 +1,6 @@
 ---
 // LED effects visualizer — CSS-animated previews for all front and rear strip effects.
+import CyberFrame from './CyberFrame.astro';
 ---
 
 <section class="le" aria-label="LED Effects Visualizer">
@@ -10,7 +11,7 @@
   <div class="le-grid">
 
     <!-- AMBIENT -->
-    <div class="le-card">
+    <CyberFrame as="div" class="le-card">
       <div class="le-card-header">
         <span class="le-label">Ambient Glow</span>
         <span class="le-badge le-badge-violet">Violet</span>
@@ -19,10 +20,10 @@
         <div class="le-fill le-ambient"></div>
       </div>
       <p class="le-note">Calm breathing light · No active navigation</p>
-    </div>
+    </CyberFrame>
 
     <!-- NAV_LEFT -->
-    <div class="le-card">
+    <CyberFrame as="div" class="le-card">
       <div class="le-card-header">
         <span class="le-label">Turn Left</span>
         <span class="le-badge le-badge-violet">Purple · Pink</span>
@@ -31,10 +32,10 @@
         <div class="le-fill le-wave-grad le-wave-left"></div>
       </div>
       <p class="le-note">Soft bar glides left · Next left turn within 200 m</p>
-    </div>
+    </CyberFrame>
 
     <!-- NAV_RIGHT -->
-    <div class="le-card">
+    <CyberFrame as="div" class="le-card">
       <div class="le-card-header">
         <span class="le-label">Turn Right</span>
         <span class="le-badge le-badge-violet">Purple · Pink</span>
@@ -43,10 +44,10 @@
         <div class="le-fill le-wave-grad le-wave-right"></div>
       </div>
       <p class="le-note">Soft bar glides right · Next right turn within 200 m</p>
-    </div>
+    </CyberFrame>
 
     <!-- NAV_STRAIGHT -->
-    <div class="le-card">
+    <CyberFrame as="div" class="le-card">
       <div class="le-card-header">
         <span class="le-label">Go Straight</span>
         <span class="le-badge le-badge-white">White</span>
@@ -55,10 +56,10 @@
         <div class="le-fill le-straight"></div>
       </div>
       <p class="le-note">Soft center pulse · Continue straight ahead</p>
-    </div>
+    </CyberFrame>
 
     <!-- BLINKER_LEFT -->
-    <div class="le-card">
+    <CyberFrame as="div" class="le-card">
       <div class="le-card-header">
         <span class="le-label">Left Indicator</span>
         <span class="le-badge le-badge-violet">Violet</span>
@@ -67,10 +68,10 @@
         <div class="le-fill le-half-left le-blink"></div>
       </div>
       <p class="le-note">Left half blinks · Left indicator is active</p>
-    </div>
+    </CyberFrame>
 
     <!-- BLINKER_RIGHT -->
-    <div class="le-card">
+    <CyberFrame as="div" class="le-card">
       <div class="le-card-header">
         <span class="le-label">Right Indicator</span>
         <span class="le-badge le-badge-violet">Violet</span>
@@ -79,10 +80,10 @@
         <div class="le-fill le-half-right le-blink"></div>
       </div>
       <p class="le-note">Right half blinks · Right indicator is active</p>
-    </div>
+    </CyberFrame>
 
     <!-- HAZARD -->
-    <div class="le-card">
+    <CyberFrame as="div" class="le-card">
       <div class="le-card-header">
         <span class="le-label">Hazard</span>
         <span class="le-badge le-badge-magenta">Pink</span>
@@ -91,7 +92,7 @@
         <div class="le-fill le-hazard le-blink"></div>
       </div>
       <p class="le-note">Full strip blinks · Hazard lights are active</p>
-    </div>
+    </CyberFrame>
 
   </div><!-- /le-grid -->
 
@@ -125,7 +126,7 @@
       </div>
     </div>
 
-    <div class="le-legend">
+    <CyberFrame as="div" class="le-legend">
       <div class="le-legend-title">Distance</div>
       <div class="le-legend-row">
         <span class="le-swatch" style="background:#19E3FF; box-shadow: 0 0 6px rgba(25,227,255,.6)"></span>
@@ -152,7 +153,7 @@
         <span class="le-legend-range">Stop!</span>
         <span class="le-legend-detail">Blinking · very close</span>
       </div>
-    </div>
+    </CyberFrame>
 
   </div><!-- /le-rear-layout -->
 
@@ -214,6 +215,7 @@
   if (document.readyState !== 'loading') init();
 </script>
 
+<!-- CyberFrame corner chrome is decorative only — unrelated to the firmware LED-effect parity mapping below. -->
 <style>
   /* ── Layout ──────────────────────────────────────────────────────── */
   .le {

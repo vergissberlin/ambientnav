@@ -44,6 +44,27 @@
   --amb-glow-violet:  0 0 24px rgba(124, 92, 255, .55);
   --amb-glow-magenta: 0 0 24px rgba(255, 45, 156, .55);
 
+  /* Cybernetic frame — corner-bracket / scanline / glitch accents.
+     All colors alias the signal palette above, no new hues. */
+  --amb-frame-color:          var(--amb-cyan);
+  --amb-frame-color-alert:    var(--amb-magenta);
+  --amb-frame-color-brand:    var(--amb-violet);
+  --amb-frame-thickness:      2px;
+  --amb-frame-leg:            var(--space-4);
+  --amb-frame-opacity-rest:   .35;
+  --amb-frame-opacity-active: .9;
+
+  --amb-glitch-color-a: var(--amb-cyan);
+  --amb-glitch-color-b: var(--amb-magenta);
+  --amb-glitch-offset:  2px;
+
+  --amb-scanline-color: rgba(255, 255, 255, .035);
+
+  --amb-glow-frame-cyan:    0 0 8px rgba(25, 227, 255, .6);
+  --amb-glow-frame-magenta: 0 0 8px rgba(255, 45, 156, .6);
+
+  --radius-frame: 2px;
+
   /* Typography */
   --font-display: "Space Grotesk", system-ui, sans-serif;
   --font-body:    "IBM Plex Sans", system-ui, sans-serif;

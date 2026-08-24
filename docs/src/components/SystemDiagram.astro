@@ -69,6 +69,12 @@ const t = {
       </clipPath>
     </defs>
 
+    <!-- ── Cybernetic frame corner brackets ───────────────────── -->
+    <polyline class="sd-frame-corner" points="4,20 4,4 20,4" filter="url(#glow-cyan)"/>
+    <polyline class="sd-frame-corner" points="740,4 756,4 756,20" filter="url(#glow-cyan)"/>
+    <polyline class="sd-frame-corner" points="4,200 4,216 20,216" filter="url(#glow-cyan)"/>
+    <polyline class="sd-frame-corner" points="740,216 756,216 756,200" filter="url(#glow-cyan)"/>
+
     <!-- ── iPhone App ─────────────────────────────────────────── -->
     <rect class="sd-box sd-box-app" x="12" y="48" width="130" height="72" rx="10"/>
     <!-- Phone icon outline -->
@@ -156,6 +162,14 @@ const t = {
     height: auto;
     display: block;
     overflow: visible;
+  }
+
+  /* ── Cybernetic frame corner brackets ─────────────────────────── */
+  .sd-frame-corner {
+    fill: none;
+    stroke: var(--amb-frame-color, var(--amb-cyan, #19E3FF));
+    stroke-width: 2;
+    opacity: 0.7;
   }
 
   /* ── Boxes ──────────────────────────────────────────────────── */

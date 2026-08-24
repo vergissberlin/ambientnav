@@ -2,6 +2,7 @@
 library;
 
 export 'an_colors.dart';
+export 'an_frame.dart';
 export 'an_motion.dart';
 export 'an_shadows.dart';
 export 'an_spacing.dart';

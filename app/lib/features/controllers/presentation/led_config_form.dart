@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ambientnav/core/l10n/app_localizations.dart';
+import 'package:ambientnav_ui/ambientnav_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/di/providers.dart';
@@ -56,53 +57,81 @@ class _LedConfigFormState extends ConsumerState<LedConfigForm> {
       return const Center(child: CircularProgressIndicator());
     }
     final cfg = _config!;
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        Text(l10n.ledCount, style: Theme.of(context).textTheme.labelLarge),
-        TextFormField(
-          key: const Key('ledCountField'),
-          initialValue: cfg.ledCount.toString(),
-          keyboardType: TextInputType.number,
-          onChanged: (v) => setState(
-            () => _config = cfg.copyWith(
-              ledCount: int.tryParse(v) ?? cfg.ledCount,
+    return AnPanel(
+      accent: AnPanelAccent.staticAccent,
+      // The ListView below already carries its own EdgeInsets.all(16), and
+      // AnPanel's 28px default would stack on top of that — see the same
+      // padding-doubling note in controller_detail_screen.dart. Zeroing it
+      // here keeps the visible inset unchanged.
+      padding: EdgeInsets.zero,
+      child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Text(l10n.ledCount, style: Theme.of(context).textTheme.labelLarge),
+          TextFormField(
+            key: const Key('ledCountField'),
+            initialValue: cfg.ledCount.toString(),
+            keyboardType: TextInputType.number,
+            onChanged: (v) => setState(
+              () => _config = cfg.copyWith(
+                ledCount: int.tryParse(v) ?? cfg.ledCount,
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: 16),
-        Text('${l10n.brightness}: ${cfg.brightness}'),
-        Slider(
-          key: const Key('brightnessSlider'),
-          min: 0,
-          max: 255,
-          value: cfg.brightness.toDouble(),
-          onChanged: (v) =>
-              setState(() => _config = cfg.copyWith(brightness: v.round())),
-        ),
-        const SizedBox(height: 16),
-        Text('${l10n.effect}: ${cfg.effect}'),
-        Slider(
-          min: 0,
-          max: 10,
-          divisions: 10,
-          value: cfg.effect.toDouble().clamp(0, 10),
-          onChanged: (v) =>
-              setState(() => _config = cfg.copyWith(effect: v.round())),
-        ),
-        const SizedBox(height: 24),
-        FilledButton.icon(
-          key: const Key('saveLedConfig'),
-          onPressed: cfg.isValid ? _save : null,
-          icon: const Icon(Icons.save),
-          label: Text(l10n.save),
-        ),
-        if (_message != null)
-          Padding(
-            padding: const EdgeInsets.only(top: 12),
-            child: Text(_message!),
+          const SizedBox(height: 16),
+          Text('${l10n.brightness}: ${cfg.brightness}'),
+          Slider(
+            key: const Key('brightnessSlider'),
+            min: 0,
+            max: 255,
+            value: cfg.brightness.toDouble(),
+            onChanged: (v) =>
+                setState(() => _config = cfg.copyWith(brightness: v.round())),
           ),
-      ],
+          const SizedBox(height: 12),
+          // Live brightness preview only. `effect` is deliberately NOT mapped
+          // onto AnLightStripMode: there is no source-of-truth mapping between
+          // the firmware's numeric effect byte (led_effects.cpp) and this
+          // Dart-only brand specimen, and AnLightStrip's own doc comment warns
+          // that it "is not driven by real effect state" so it doesn't become
+          // a third artifact bound by the firmware<->docs parity invariant in
+          // CLAUDE.md. The raw id is surfaced as a plain badge instead.
+          Row(
+            children: [
+              Expanded(
+                child: Opacity(
+                  opacity: (cfg.brightness / 255).clamp(0.0, 1.0),
+                  child: const AnLightStrip(mode: AnLightStripMode.ambient),
+                ),
+              ),
+              const SizedBox(width: 12),
+              AnBadge(label: 'EFFECT ${cfg.effect}', tone: AnBadgeTone.neutral),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Text('${l10n.effect}: ${cfg.effect}'),
+          Slider(
+            min: 0,
+            max: 10,
+            divisions: 10,
+            value: cfg.effect.toDouble().clamp(0, 10),
+            onChanged: (v) =>
+                setState(() => _config = cfg.copyWith(effect: v.round())),
+          ),
+          const SizedBox(height: 24),
+          FilledButton.icon(
+            key: const Key('saveLedConfig'),
+            onPressed: cfg.isValid ? _save : null,
+            icon: const Icon(Icons.save),
+            label: Text(l10n.save),
+          ),
+          if (_message != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: Text(_message!),
+            ),
+        ],
+      ),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:ambientnav/core/l10n/app_localizations.dart';
+import 'package:ambientnav_ui/ambientnav_ui.dart';
 import 'package:flutter/material.dart';
 
 import '../../features/controllers/domain/entities/controller_info.dart';
@@ -35,28 +36,35 @@ class ControllerTile extends StatelessWidget {
         ? l10n.roleFront
         : l10n.roleRear;
 
-    return ListTile(
-      leading: Icon(
-        device.isConnected ? Icons.bluetooth_connected : Icons.bluetooth,
-        color: device.isConnected
-            ? Theme.of(context).colorScheme.primary
-            : null,
-      ),
-      title: Text('${device.name} · $roleLabel'),
-      subtitle: Row(
-        children: [
-          RssiIndicator(quality: device.signalQuality, rssi: device.rssi),
-          const SizedBox(width: 12),
-          BatteryGauge(voltage: device.voltage),
-          if (device.isPaired) ...[
-            const SizedBox(width: 8),
-            const Icon(Icons.lock, size: 14),
+    return AnPanel(
+      glow: device.isConnected ? AnCardGlow.cyan : AnCardGlow.none,
+      accent: AnPanelAccent.staticAccent,
+      child: ListTile(
+        leading: Icon(
+          device.isConnected ? Icons.bluetooth_connected : Icons.bluetooth,
+          color: device.isConnected
+              ? Theme.of(context).colorScheme.primary
+              : null,
+        ),
+        title: Text('${device.name} · $roleLabel'),
+        subtitle: Row(
+          children: [
+            RssiIndicator(quality: device.signalQuality, rssi: device.rssi),
+            const SizedBox(width: 12),
+            BatteryGauge(voltage: device.voltage),
+            if (device.isPaired) ...[
+              const SizedBox(width: 8),
+              const Icon(Icons.lock, size: 14),
+            ],
           ],
-        ],
+        ),
+        trailing: device.isConnected
+            ? IconButton(
+                icon: const Icon(Icons.chevron_right),
+                onPressed: onOpen,
+              )
+            : TextButton(onPressed: onConnect, child: Text(l10n.connect)),
       ),
-      trailing: device.isConnected
-          ? IconButton(icon: const Icon(Icons.chevron_right), onPressed: onOpen)
-          : TextButton(onPressed: onConnect, child: Text(l10n.connect)),
     );
   }
 }
