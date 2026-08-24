@@ -198,18 +198,18 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         LineOptions(
           geometry: geometry,
           lineColor: AnColors.cyanHex,
-          lineWidth: 22,
-          lineBlur: 10,
-          lineOpacity: 0.4,
+          lineWidth: 14,
+          lineBlur: 6,
+          lineOpacity: 0.22,
         ),
       );
       _traveledGlowMid = await controller.addLine(
         LineOptions(
           geometry: geometry,
           lineColor: AnColors.cyanHex,
-          lineWidth: 12,
-          lineBlur: 4,
-          lineOpacity: 0.75,
+          lineWidth: 8,
+          lineBlur: 3,
+          lineOpacity: 0.45,
         ),
       );
     } else {
