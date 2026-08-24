@@ -69,6 +69,13 @@ const String kMapStyleUrl = 'https://tiles.openfreemap.org/styles/liberty';
 /// updates just won't be picked up automatically anymore.
 const String kMapStyleUrlDark = 'assets/map_style/ambientnav-dark.json';
 
+/// Roads-only derivative of [kMapStyleUrlDark] with every fill/background/
+/// label layer stripped out — just the road and railway line layers, on a
+/// transparent canvas. Used behind a semi-transparent [Opacity] wrapper when
+/// the camera background setting is on, regardless of light/dark theme.
+const String kMapStyleUrlTransparent =
+    'assets/map_style/ambientnav-transparent.json';
+
 final offlineRepositoryProvider = Provider<OfflineRepository>((ref) {
   return OfflineRegionManager(styleUrl: kMapStyleUrl);
 });

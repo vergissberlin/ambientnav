@@ -23,4 +23,11 @@ class PermissionService {
     final connectOk = statuses[Permission.bluetoothConnect]?.isGranted ?? true;
     return scanOk && connectOk;
   }
+
+  /// Request the camera permission needed for the blurred navigation
+  /// background. Returns true when granted.
+  Future<bool> ensureCameraPermission() async {
+    final status = await Permission.camera.request();
+    return status.isGranted;
+  }
 }
