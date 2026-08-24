@@ -275,6 +275,13 @@ const year = new Date().getFullYear();
         font-size: clamp(2rem, 5vw, 3.2rem);
         line-height: 1.1;
         margin: 0 0 var(--space-5);
+        /* Orbitron runs wide, and German compound words (e.g.
+           "Navigationsgesteuerte") have no internal break points — without
+           this, the headline clips past the viewport edge on narrow
+           screens instead of wrapping. hyphens needs the lang attribute
+           (set on <html> above) to pick correct break points. */
+        overflow-wrap: break-word;
+        hyphens: auto;
       }
       .hero-sub {
         max-width: 640px;
