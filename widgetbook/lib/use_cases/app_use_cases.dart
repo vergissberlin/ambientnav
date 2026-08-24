@@ -234,16 +234,18 @@ final _frontLedStripPreview = WidgetbookComponent(
         final brand = AnBrandTheme.of(context);
         return _stage(
           context,
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            spacing: AnSpace.s4,
-            children: [
-              for (final effect in FrontStripEffect.values) ...[
-                Text(effect.name, style: TextStyle(color: brand.text4)),
-                FrontLedStripPreview(effect: effect),
+          SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              spacing: AnSpace.s4,
+              children: [
+                for (final effect in FrontStripEffect.values) ...[
+                  Text(effect.name, style: TextStyle(color: brand.text4)),
+                  FrontLedStripPreview(effect: effect),
+                ],
               ],
-            ],
+            ),
           ),
         );
       },
