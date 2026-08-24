@@ -77,6 +77,8 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   generate: true                # build app_localizations from lib/core/l10n/*.arb
+  assets:
+    - assets/map_style/
   fonts:
     - family: Orbitron
       fonts:
