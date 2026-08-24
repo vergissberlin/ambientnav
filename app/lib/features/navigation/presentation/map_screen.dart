@@ -11,6 +11,7 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 import '../../../core/di/providers.dart';
 import '../../../core/settings/camera_background_settings.dart';
 import '../../../ui/molecules/front_led_strip_preview.dart';
+import '../../../ui/molecules/simulated_camera_background.dart';
 import '../../../ui/molecules/turn_by_turn_panel.dart';
 import '../domain/entities/maneuver.dart';
 import '../domain/entities/route.dart';
@@ -48,6 +49,13 @@ class _MapScreenState extends ConsumerState<MapScreen>
   CameraController? _cameraController;
   bool _cameraInitializing = false;
 
+  /// True once [_initCameraBackground] has found zero cameras on this device
+  /// — the iOS Simulator and most Android emulators have no camera hardware,
+  /// which would otherwise make the feature undemonstrable outside a real
+  /// device. Drives [SimulatedCameraBackground] instead of a plain basemap
+  /// fallback.
+  bool _cameraSimulated = false;
+
   @override
   void initState() {
     super.initState();
@@ -76,15 +84,22 @@ class _MapScreenState extends ConsumerState<MapScreen>
     }
   }
 
-  /// Opens the rear camera for the blurred navigation background. Silently
-  /// falls back to the normal basemap on any failure (no hardware, revoked
-  /// permission, already in use elsewhere).
+  /// Opens the rear camera for the blurred navigation background. When the
+  /// device has no camera at all (the iOS Simulator, most Android emulators)
+  /// falls back to [SimulatedCameraBackground] instead of a plain basemap, so
+  /// the feature stays demonstrable in dev. Any other failure (revoked
+  /// permission, already in use elsewhere) falls back to the normal basemap.
   Future<void> _initCameraBackground() async {
-    if (_cameraController != null || _cameraInitializing) return;
+    if (_cameraController != null || _cameraSimulated || _cameraInitializing) {
+      return;
+    }
     _cameraInitializing = true;
     try {
       final cameras = await availableCameras();
-      if (cameras.isEmpty) return;
+      if (cameras.isEmpty) {
+        if (mounted) setState(() => _cameraSimulated = true);
+        return;
+      }
       final backCamera = cameras.firstWhere(
         (c) => c.lensDirection == CameraLensDirection.back,
         orElse: () => cameras.first,
@@ -109,16 +124,18 @@ class _MapScreenState extends ConsumerState<MapScreen>
 
   Future<void> _disposeCameraBackground() async {
     final controller = _cameraController;
-    if (controller == null) return;
     _cameraController = null;
+    final wasSimulated = _cameraSimulated;
+    _cameraSimulated = false;
+    if (controller == null && !wasSimulated) return;
     if (mounted) setState(() {});
-    await controller.dispose();
+    await controller?.dispose();
   }
 
   /// A full-bleed, aspect-correct camera preview (the plugin's own
   /// [CameraPreview] doesn't crop to fill), blurred so it reads as ambience
   /// rather than a sharp video feed behind the roads/route graphic.
-  Widget _buildBlurredCameraBackground(CameraController controller) {
+  Widget _buildBlurredCameraPreview(CameraController controller) {
     final previewSize = controller.value.previewSize;
     final preview = previewSize == null
         ? CameraPreview(controller)
@@ -130,10 +147,14 @@ class _MapScreenState extends ConsumerState<MapScreen>
               child: CameraPreview(controller),
             ),
           );
+    return _blurred(preview);
+  }
+
+  Widget _blurred(Widget child) {
     return Positioned.fill(
       child: ImageFiltered(
         imageFilter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-        child: preview,
+        child: child,
       ),
     );
   }
@@ -391,7 +412,7 @@ class _MapScreenState extends ConsumerState<MapScreen>
     final cameraBackgroundEnabled = ref.watch(cameraBackgroundEnabledProvider);
     final showCameraBackground =
         cameraBackgroundEnabled &&
-        (_cameraController?.value.isInitialized ?? false);
+        ((_cameraController?.value.isInitialized ?? false) || _cameraSimulated);
 
     ref.listen<bool>(cameraBackgroundEnabledProvider, (_, enabled) {
       if (enabled) {
@@ -513,7 +534,11 @@ class _MapScreenState extends ConsumerState<MapScreen>
       body: Stack(
         children: [
           if (showCameraBackground)
-            _buildBlurredCameraBackground(_cameraController!),
+            _cameraController != null
+                ? _buildBlurredCameraPreview(_cameraController!)
+                : _blurred(
+                    SimulatedCameraBackground(speedMps: navState.speedMps),
+                  ),
           showCameraBackground ? Opacity(opacity: 0.65, child: map) : map,
           Padding(
             padding: EdgeInsets.only(
