@@ -325,10 +325,12 @@ const year = new Date().getFullYear();
         grid-template-columns: repeat(2, 1fr);
         gap: var(--space-5);
       }
-      .feature-card {
+      /* :global — CyberFrame renders this element inside its own component
+         scope, so a plain `.feature-card` selector no longer matches it. */
+      :global(.feature-card) {
         background: var(--amb-surface-2);
         border: 1px solid var(--amb-line);
-        border-radius: var(--radius-lg);
+        border-radius: var(--radius-frame, 2px);
         padding: var(--space-5);
         box-shadow: var(--shadow-card);
       }

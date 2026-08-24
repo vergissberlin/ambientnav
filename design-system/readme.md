@@ -98,7 +98,7 @@ A second layer on top of the calm cockpit foundation: sharp corner brackets, occ
 - Geometry: `--amb-frame-thickness` (2px) line, `--amb-frame-leg` (`--space-4`, 16px) leg length snapped to the 4px grid.
 - Opacity: `--amb-frame-opacity-rest` (.35) at rest, `--amb-frame-opacity-active` (.9) on hover/active/selected state.
 - Color: `--amb-frame-color` (cyan) is the default; `--amb-frame-color-alert` (magenta) signals warning/alert; `--amb-frame-color-brand` (violet) is reserved for brand/hero contexts.
-- Radius: brackets are near-sharp (`--radius-frame`, 2px) — a deliberate contrast against the soft 12–16px card radius they sit on.
+- Radius: brackets are near-sharp (`--radius-frame`, 2px), and framed containers use that same radius instead of the softer 12–16px card default — a rounded box under a sharp bracket reads as a rendering mismatch, not a deliberate contrast.
 
 **Scanline texture** — a repeating horizontal line texture at 2–4% opacity (`--amb-scanline-color`). Use only on large, empty, dark surfaces — hero backgrounds, section dividers. Never over body text, form fields, or dense lists; it degrades legibility there.
 

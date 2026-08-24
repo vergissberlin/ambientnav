@@ -49,11 +49,13 @@ const t = {
     margin: 2rem 0 2.5rem;
   }
 
-  .vv-stage {
+  /* :global — CyberFrame renders this element inside its own component
+     scope, so a plain `.vv-stage` selector no longer matches it. */
+  :global(.vv-stage) {
     position: relative;
     width: 100%;
     aspect-ratio: 16 / 10;
-    border-radius: 16px;
+    border-radius: var(--radius-frame, 2px);
     overflow: hidden;
     background: var(--amb-cockpit, #06080e);
     border: 1px solid var(--amb-line, rgba(255, 255, 255, 0.08));
@@ -133,7 +135,7 @@ const t = {
   }
 
   @media (max-width: 640px) {
-    .vv-stage {
+    :global(.vv-stage) {
       aspect-ratio: 4 / 5;
     }
     .vv-legend {
