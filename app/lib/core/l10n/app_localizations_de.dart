@@ -55,6 +55,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get toggleHazardLights => 'Warnblinker umschalten';
 
   @override
+  String get hazardZoneWarning => 'Achtung, Gefahrenstelle';
+
+  @override
   String get developer => 'Entwickler';
 
   @override

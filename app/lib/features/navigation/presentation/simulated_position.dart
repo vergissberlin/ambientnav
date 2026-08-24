@@ -34,3 +34,10 @@ final cameraModeProvider = StateProvider<CameraMode>(
 /// has no BLE hazard command wired up (see `nav_command.dart`'s `Blinker`
 /// enum, which the app never sends anything but `Blinker.off` for today).
 final hazardPreviewProvider = StateProvider<bool>((ref) => false);
+
+/// The scripted danger-spot's geometry (see `route_simulation_runner.dart`),
+/// so the map screen can draw it — null when not simulating or once the
+/// simulation has stopped.
+final hazardZoneGeometryProvider = StateProvider<List<GeoPoint>?>(
+  (ref) => null,
+);

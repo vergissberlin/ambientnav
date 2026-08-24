@@ -8,6 +8,7 @@ import '../../../core/di/providers.dart';
 import '../../../ui/molecules/front_led_strip_preview.dart';
 import '../../../ui/molecules/turn_by_turn_panel.dart';
 import '../domain/entities/maneuver.dart';
+import '../domain/entities/route.dart';
 import 'nav_controller.dart';
 import 'nav_session.dart';
 import 'search_screen.dart';
@@ -26,6 +27,7 @@ class MapScreen extends ConsumerStatefulWidget {
 class _MapScreenState extends ConsumerState<MapScreen> {
   MapLibreMapController? _mapController;
   Line? _routeLine;
+  Line? _hazardZoneLine;
   Circle? _simCircle;
 
   /// Annotations may only be added once the style has loaded — since
@@ -42,12 +44,14 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     _mapController = controller;
     _styleLoaded = false;
     _routeLine = null;
+    _hazardZoneLine = null;
     _simCircle = null;
   }
 
   Future<void> _onStyleLoaded() async {
     _styleLoaded = true;
     await _drawRouteLine();
+    await _drawHazardZone(ref.read(hazardZoneGeometryProvider));
     await _updateSimPosition(ref.read(simulatedPositionProvider));
   }
 
@@ -83,6 +87,26 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         ],
         lineColor: AnColors.cyanHex,
         lineWidth: 5,
+      ),
+    );
+  }
+
+  /// Draw (or redraw) the scripted danger-spot segment from
+  /// [hazardZoneGeometryProvider] — null hides it (simulation stopped or not
+  /// yet started).
+  Future<void> _drawHazardZone(List<GeoPoint>? geometry) async {
+    final controller = _mapController;
+    if (controller == null || !_styleLoaded) return;
+    if (_hazardZoneLine != null) {
+      await controller.removeLine(_hazardZoneLine!);
+      _hazardZoneLine = null;
+    }
+    if (geometry == null || geometry.length < 2) return;
+    _hazardZoneLine = await controller.addLine(
+      LineOptions(
+        geometry: [for (final p in geometry) LatLng(p.latitude, p.longitude)],
+        lineColor: AnColors.magentaHex,
+        lineWidth: 7,
       ),
     );
   }
@@ -164,22 +188,28 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     }
   }
 
-  /// Distance (metres) before a maneuver at which the strip starts
-  /// signalling it. Firmware's own `orchestrator.cpp` uses 200m; the app
-  /// deliberately shows it earlier, at 500m, so the driver gets more advance
-  /// notice on the phone preview than the physical strip currently gives.
-  static const double _maneuverLeadMeters = 500;
+  /// Time (seconds) before a maneuver at which the strip starts signalling
+  /// it, converted to a distance via [NavigationState.speedMps] so it
+  /// reliably starts ~20s out regardless of driving speed. Firmware's own
+  /// `orchestrator.cpp` uses a fixed 200m; the app deliberately shows it
+  /// earlier and speed-aware, so the driver gets consistent advance notice
+  /// on the phone preview.
+  static const double _maneuverLeadSeconds = 20;
 
   /// Which effect the front strip preview shows right now: an upcoming
-  /// maneuver within [_maneuverLeadMeters] always wins over hazard, which
+  /// maneuver within [_maneuverLeadSeconds] always wins over hazard, which
   /// wins over [FrontStripEffect.off] — once a maneuver is passed (or hazard
   /// is toggled off), the strip goes dark rather than idling on
   /// [FrontStripEffect.ambient], which firmware would show but reads as
-  /// visual noise on a phone screen between turns.
+  /// visual noise on a phone screen between turns. Back-to-back maneuvers
+  /// need no special case: once the current one is passed,
+  /// [NavigationState.nextManeuver]/[NavigationState.distanceToManeuverMeters]
+  /// already point at the following one, so if that one is also within the
+  /// lead window its direction shows immediately instead of a dark gap.
   FrontStripEffect _stripEffectFor(NavigationState navState, bool hazard) {
     final maneuver = navState.nextManeuver;
-    if (maneuver != null &&
-        navState.distanceToManeuverMeters < _maneuverLeadMeters) {
+    final leadMeters = navState.speedMps * _maneuverLeadSeconds;
+    if (maneuver != null && navState.distanceToManeuverMeters < leadMeters) {
       switch (maneuver.type) {
         case ManeuverType.turnLeft:
         case ManeuverType.slightLeft:
@@ -228,6 +258,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
     ref.listen(navControllerProvider, (_, _) => _drawRouteLine());
     ref.listen(simulatedPositionProvider, (_, p) => _updateSimPosition(p));
+    ref.listen(
+      hazardZoneGeometryProvider,
+      (_, geometry) => _drawHazardZone(geometry),
+    );
 
     // Real-GPS heading-up follow is handled natively by MapLibre; the simulator
     // drives the camera manually (its position isn't the OS location).

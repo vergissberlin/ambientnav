@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/utils/geo.dart';
 import '../domain/entities/route.dart';
 import '../domain/route_simulator.dart';
 import 'nav_controller.dart';
@@ -34,6 +35,12 @@ class RouteSimulationRunner {
     if (route.geometry.isEmpty && route.maneuvers.isEmpty) return;
     _sim = RouteSimulator(route, speedMps: speedMps);
     _timer = Timer.periodic(tickInterval, (_) => _onTick());
+    _ref.read(navControllerProvider.notifier).setSpeedMps(speedMps);
+    _ref.read(hazardZoneGeometryProvider.notifier).state = Geo.sliceByDistance(
+      route.geometry,
+      _hazardZoneStartMeters,
+      _hazardZoneEndMeters,
+    );
   }
 
   void stop() {
@@ -42,6 +49,7 @@ class RouteSimulationRunner {
     _sim = null;
     _ref.read(simulatedPositionProvider.notifier).state = null;
     _ref.read(hazardPreviewProvider.notifier).state = false;
+    _ref.read(hazardZoneGeometryProvider.notifier).state = null;
   }
 
   void _onTick() {

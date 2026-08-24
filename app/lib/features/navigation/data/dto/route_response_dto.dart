@@ -16,6 +16,13 @@ class RouteResponseDto {
     final route = routes.first as Map<String, dynamic>;
     final geometry = _osrmGeometry(route['geometry']);
     final maneuvers = <Maneuver>[];
+    // OSRM's own `step.distance` is forward-looking — "distance of travel
+    // from [this step's] maneuver to the subsequent step" — but
+    // Maneuver.distanceMeters means the opposite (distance from the
+    // *previous* maneuver to this one), so each step's distance is carried
+    // over and assigned to the *next* maneuver instead of its own. The first
+    // maneuver (depart) correctly gets 0: it IS the route start.
+    var pendingDistance = 0.0;
     for (final leg in (route['legs'] as List? ?? const [])) {
       for (final step in ((leg as Map)['steps'] as List? ?? const [])) {
         final s = step as Map<String, dynamic>;
@@ -30,11 +37,12 @@ class RouteResponseDto {
             instruction: (s['name'] as String?)?.trim().isNotEmpty == true
                 ? s['name'] as String
                 : (man['type'] as String? ?? 'continue'),
-            distanceMeters: (s['distance'] as num?)?.toDouble() ?? 0,
+            distanceMeters: pendingDistance,
             latitude: loc[1].toDouble(),
             longitude: loc[0].toDouble(),
           ),
         );
+        pendingDistance = (s['distance'] as num?)?.toDouble() ?? 0;
       }
     }
     return Routes(
@@ -54,6 +62,13 @@ class RouteResponseDto {
     final legs = trip['legs'] as List? ?? const [];
     final geometry = <GeoPoint>[];
     final maneuvers = <Maneuver>[];
+    // Valhalla's own maneuver `length` is forward-looking — the distance
+    // travelled *while following* that maneuver's instruction, i.e. up to
+    // the next maneuver — but Maneuver.distanceMeters means the distance
+    // from the *previous* maneuver to this one, so each maneuver's length is
+    // carried over and assigned to the *next* maneuver instead of its own.
+    // The first maneuver (depart) correctly gets 0: it IS the route start.
+    var pendingDistance = 0.0;
     for (final leg in legs) {
       final l = leg as Map<String, dynamic>;
       final shape = decodePolyline(l['shape'] as String? ?? '', precision: 6);
@@ -68,11 +83,12 @@ class RouteResponseDto {
           Maneuver(
             type: _valhallaManeuver((m['type'] as num?)?.toInt() ?? 0),
             instruction: m['instruction'] as String? ?? '',
-            distanceMeters: ((m['length'] as num?)?.toDouble() ?? 0) * 1000,
+            distanceMeters: pendingDistance,
             latitude: point.latitude,
             longitude: point.longitude,
           ),
         );
+        pendingDistance = ((m['length'] as num?)?.toDouble() ?? 0) * 1000;
       }
     }
     final summary = trip['summary'] as Map<String, dynamic>?;

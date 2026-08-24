@@ -55,6 +55,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get toggleHazardLights => 'Toggle hazard lights';
 
   @override
+  String get hazardZoneWarning => 'Caution, hazard ahead';
+
+  @override
   String get developer => 'Developer';
 
   @override

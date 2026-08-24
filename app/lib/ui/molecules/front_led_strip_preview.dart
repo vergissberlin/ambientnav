@@ -30,11 +30,11 @@ enum FrontStripEffect {
 /// - [FrontStripEffect.navStraight] — the whole strip pulses white, one
 ///   half-sine hump every 800ms.
 /// - [FrontStripEffect.navContinue] — no firmware counterpart. Same
-///   purple-core/pink-edge bar as [navLeft]/[navRight], but held stationary
-///   at the strip's centre and hard-blinked (200ms on / 200ms off) instead
-///   of sliding to an edge. Selected for OSRM's `"new name"` maneuver
-///   ("continue straight, the road changes name") so it reads as visually
-///   related to a turn without claiming one is happening.
+///   purple-core/pink-edge bar and 1050ms cycle as [navLeft]/[navRight], but
+///   held stationary at the strip's centre and eased out to fully dark
+///   instead of sliding to an edge. Selected for OSRM's `"new name"`
+///   maneuver ("continue straight, the road changes name") so it reads as
+///   visually related to a turn without claiming one is happening.
 /// - [FrontStripEffect.hazard] — the whole strip blinks amber, 200ms on /
 ///   200ms off.
 /// - [FrontStripEffect.ambient] — a slow white breathing glow, 3000ms cycle.
@@ -164,11 +164,20 @@ class _FrontLedStripPreviewState extends State<FrontLedStripPreview>
   /// to the target edge over the first 78% of a 1050ms cycle (smoothstep
   /// ease-in-out), then fades out over the remaining 22%.
   static List<Color> _navWave(int ms, int n, {required bool toRight}) {
+    final edgeLed = toRight ? n - 1.0 : 0.0;
+    return _slideBar(ms, n, edgeLed: edgeLed);
+  }
+
+  /// Shared bar renderer behind [_navWave] and [_navContinue]: a soft
+  /// purple-core/pink-edge bar that eases from centre to [edgeLed] over the
+  /// first 78% of a 1050ms cycle, then fades out over the remaining 22%.
+  /// Passing [edgeLed] equal to the centre (as [_navContinue] does) makes the
+  /// "slide" a no-op, so the bar just sits still and fades in place.
+  static List<Color> _slideBar(int ms, int n, {required double edgeLed}) {
     const cycleMs = 1050;
     const slideEnd = 0.78;
     final t = (ms % cycleMs) / cycleMs;
     final centerLed = n / 2;
-    final edgeLed = toRight ? n - 1.0 : 0.0;
     final barHalf = n * (9 / 60);
 
     double centerPos;
@@ -205,25 +214,12 @@ class _FrontLedStripPreviewState extends State<FrontLedStripPreview>
     return List.filled(n, color);
   }
 
-  /// `renderNavContinue()` — the same purple-core/pink-edge bar shape as
-  /// [_navWave], but centred and hard-blinked (200ms on / 200ms off) rather
-  /// than sliding to an edge — "still going straight, but pay attention".
-  static List<Color> _navContinue(int ms, int n) {
-    final on = (ms % 400) < 200;
-    if (!on) return List.filled(n, Colors.transparent);
-    final centerPos = n / 2;
-    final barHalf = n * (9 / 60);
-    return List.generate(n, (i) {
-      final dist = (i - centerPos).abs();
-      if (dist > barHalf) return Colors.transparent;
-      final envelope = 0.5 * (1 + math.cos(math.pi * dist / barHalf));
-      final cosT = (dist / barHalf).clamp(0.0, 1.0);
-      final r = (120 + 135 * cosT).round();
-      final g = (80 * cosT).round();
-      final b = (220 - 35 * cosT).round();
-      return Color.fromRGBO(r, g, b, envelope);
-    });
-  }
+  /// `renderNavContinue()` — [_slideBar] pinned to the centre (`edgeLed` ==
+  /// the centre LED), so instead of sliding to an edge like [_navWave] it
+  /// holds at full brightness then eases out over the same 1050ms cycle —
+  /// "still going straight, but pay attention", without implying a turn.
+  static List<Color> _navContinue(int ms, int n) =>
+      _slideBar(ms, n, edgeLed: n / 2);
 
   /// `renderHazard()` — whole strip, hard amber blink, 200ms on / 200ms off.
   static List<Color> _hazard(int ms, int n) {

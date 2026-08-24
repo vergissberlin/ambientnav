@@ -188,6 +188,12 @@ abstract class AppLocalizations {
   /// **'Toggle hazard lights'**
   String get toggleHazardLights;
 
+  /// No description provided for @hazardZoneWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Caution, hazard ahead'**
+  String get hazardZoneWarning;
+
   /// No description provided for @developer.
   ///
   /// In en, this message translates to:

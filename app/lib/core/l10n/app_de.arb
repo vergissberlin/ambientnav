@@ -15,6 +15,7 @@
   "routeOverview": "Routenübersicht",
   "followRoute": "Route folgen",
   "toggleHazardLights": "Warnblinker umschalten",
+  "hazardZoneWarning": "Achtung, Gefahrenstelle",
   "developer": "Entwickler",
   "developerDesc": "Werkzeuge für Entwicklung und Tests",
   "routeSimulation": "Routensimulation",

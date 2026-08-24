@@ -92,6 +92,28 @@ class Geo {
     return initialBearing(points[points.length - 2], points.last);
   }
 
+  /// The sub-polyline of [points] between [startMeters] and [endMeters],
+  /// starting/ending at the exact interpolated positions (not just the
+  /// nearest vertices) so a curved road is still followed accurately.
+  /// Returns an empty list for a degenerate or empty range.
+  static List<GeoPoint> sliceByDistance(
+    List<GeoPoint> points,
+    double startMeters,
+    double endMeters,
+  ) {
+    if (points.length < 2 || endMeters <= startMeters) return const [];
+    final cum = cumulativeDistances(points);
+    final total = cum.last;
+    final start = startMeters.clamp(0.0, total);
+    final end = endMeters.clamp(0.0, total);
+    final slice = <GeoPoint>[interpolateAlong(points, start)];
+    for (var i = 0; i < points.length; i++) {
+      if (cum[i] > start && cum[i] < end) slice.add(points[i]);
+    }
+    slice.add(interpolateAlong(points, end));
+    return slice;
+  }
+
   static double _rad(double deg) => deg * math.pi / 180.0;
 
   /// Result of projecting a point onto a route polyline.
