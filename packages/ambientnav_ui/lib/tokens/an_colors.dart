@@ -48,6 +48,28 @@ abstract final class AnColors {
   static const Color ash = Color(0xFF9AA4B8);
   static const Color ink = Color(0xFF0B0F18);
 
+  // ── Cybernetic frame (corner-bracket / glitch accents) ─────────────────────
+  // These are deliberate aliases of the existing signal accents — mirroring
+  // the `var(--amb-cyan)`-style aliasing in `tokens/frame.css` — not new
+  // literal colors. See readme.md → "The Cybernetic Frame".
+  /// `--amb-frame-color: var(--amb-cyan)`.
+  static const Color frameColor = cyan;
+
+  /// `--amb-frame-color-alert: var(--amb-magenta)`.
+  static const Color frameColorAlert = magenta;
+
+  /// `--amb-frame-color-brand: var(--amb-violet)`.
+  static const Color frameColorBrand = violet;
+
+  /// `--amb-glitch-color-a: var(--amb-cyan)`.
+  static const Color glitchColorA = cyan;
+
+  /// `--amb-glitch-color-b: var(--amb-magenta)`.
+  static const Color glitchColorB = magenta;
+
+  /// `--amb-scanline-color: rgba(255,255,255,.035)`.
+  static const Color scanline = Color(0x09FFFFFF);
+
   // ── Hex strings for MapLibre style layers ──────────────────────────────────
   // MapLibre's LineOptions/CircleOptions take colour *strings*, not Colors.
   // See app/lib/features/navigation/presentation/map_screen.dart.

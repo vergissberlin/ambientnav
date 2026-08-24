@@ -1,4 +1,5 @@
 import 'package:ambientnav/core/l10n/app_localizations.dart';
+import 'package:ambientnav_ui/ambientnav_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -25,6 +26,21 @@ class ControllerDetailScreen extends ConsumerWidget {
       if (d.id == deviceId) return d;
     }
     return null;
+  }
+
+  /// Wraps a tab's content in the cybernetic frame. Each tab body already
+  /// carries its own `EdgeInsets.all(16)` via an inner [ListView], so the
+  /// panel padding is zeroed here rather than left at [AnPanel]'s default
+  /// 28px — stacking both would nearly triple the current 16px inset instead
+  /// of just doubling it. This keeps the visible spacing identical to before
+  /// this change while still drawing the corner brackets flush to the tab's
+  /// edges.
+  Widget _tabPanel(Widget child) {
+    return AnPanel(
+      accent: AnPanelAccent.staticAccent,
+      padding: EdgeInsets.zero,
+      child: child,
+    );
   }
 
   @override
@@ -63,10 +79,11 @@ class ControllerDetailScreen extends ConsumerWidget {
             Expanded(
               child: TabBarView(
                 children: [
-                  ControllerTelemetryList(device: device),
-                  LedConfigForm(deviceId: deviceId),
-                  if (isRear) SensorCalibrationForm(deviceId: deviceId),
-                  OtaScreen(deviceId: deviceId),
+                  _tabPanel(ControllerTelemetryList(device: device)),
+                  _tabPanel(LedConfigForm(deviceId: deviceId)),
+                  if (isRear)
+                    _tabPanel(SensorCalibrationForm(deviceId: deviceId)),
+                  _tabPanel(OtaScreen(deviceId: deviceId)),
                 ],
               ),
             ),

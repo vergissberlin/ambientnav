@@ -2,6 +2,7 @@
 import '../styles/theme.css';
 import VehicleViewer from './VehicleViewer.astro';
 import SystemDiagram from './SystemDiagram.astro';
+import CyberFrame from './CyberFrame.astro';
 import logoLockup from '../assets/logo-lockup.svg?url';
 
 interface Props {
@@ -175,10 +176,10 @@ const year = new Date().getFullYear();
         <h2>{copy.featuresHeading}</h2>
         <div class="feature-grid">
           {copy.features.map((f) => (
-            <article class="feature-card">
+            <CyberFrame as="article" class="feature-card" scanline>
               <h3>{f.title}</h3>
               <p>{f.body}</p>
-            </article>
+            </CyberFrame>
           ))}
         </div>
       </section>
@@ -274,6 +275,13 @@ const year = new Date().getFullYear();
         font-size: clamp(2rem, 5vw, 3.2rem);
         line-height: 1.1;
         margin: 0 0 var(--space-5);
+        /* Orbitron runs wide, and German compound words (e.g.
+           "Navigationsgesteuerte") have no internal break points — without
+           this, the headline clips past the viewport edge on narrow
+           screens instead of wrapping. hyphens needs the lang attribute
+           (set on <html> above) to pick correct break points. */
+        overflow-wrap: break-word;
+        hyphens: auto;
       }
       .hero-sub {
         max-width: 640px;
@@ -324,10 +332,12 @@ const year = new Date().getFullYear();
         grid-template-columns: repeat(2, 1fr);
         gap: var(--space-5);
       }
-      .feature-card {
+      /* :global — CyberFrame renders this element inside its own component
+         scope, so a plain `.feature-card` selector no longer matches it. */
+      :global(.feature-card) {
         background: var(--amb-surface-2);
         border: 1px solid var(--amb-line);
-        border-radius: var(--radius-lg);
+        border-radius: var(--radius-frame, 2px);
         padding: var(--space-5);
         box-shadow: var(--shadow-card);
       }

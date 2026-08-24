@@ -2,23 +2,25 @@ import 'package:flutter/painting.dart';
 
 /// Dart mirror of `design-system/tokens/typography.css`.
 ///
-/// The three brand families are only published as remote webfonts, and the only
-/// TTFs in `design-system/fonts/` are Montserrat — which is **not** one of them
-/// and must not be substituted. Until the OFL files are vendored into
-/// `app/assets/fonts/`, [kBrandFontsAvailable] stays false and the family names
-/// resolve to null, i.e. the platform default.
+/// Orbitron (`--font-display`) is vendored as an OFL variable-font asset in
+/// `app/assets/fonts/Orbitron-Variable.ttf` and declared in the app's
+/// pubspec, so [display] resolves to the real family. IBM Plex Sans/Mono
+/// are not bundled yet — [kBrandFontsAvailable] gates just those two until
+/// their OFL files are vendored the same way and the family names resolve
+/// to null, i.e. the platform default, in the meantime.
 ///
-/// That still carries most of the identity: the -0.035em display tracking, the
-/// 0.26em eyebrow tracking and the 0.98 display line-height do more work here
-/// than the glyph shapes do.
+/// The platform-default fallback still carries most of the identity: the
+/// -0.035em display tracking, the 0.26em eyebrow tracking and the 0.98
+/// display line-height do more work than the glyph shapes do.
 ///
-/// `google_fonts` is deliberately not used — it downloads at runtime, and this
-/// app exists to navigate offline in a car.
+/// `google_fonts` is deliberately not used for any of these — it downloads
+/// at runtime, and this app exists to navigate offline in a car.
 abstract final class AnTypography {
-  /// Flip once the OFL fonts are bundled and declared in the app's pubspec.
+  /// Flip once IBM Plex Sans/Mono are bundled and declared in the app's pubspec.
   static const bool kBrandFontsAvailable = false;
 
-  static const String? display = kBrandFontsAvailable ? 'Space Grotesk' : null;
+  /// `--font-display` — bundled, see the class doc comment.
+  static const String display = 'Orbitron';
   static const String? body = kBrandFontsAvailable ? 'IBM Plex Sans' : null;
   static const String? mono = kBrandFontsAvailable ? 'IBM Plex Mono' : null;
 

@@ -18,4 +18,4 @@ Key files:
 - `components/` — Button, Badge, Card, LightStrip (React).
 - `ui_kits/ios-app/` — interactive iOS app recreation.
 
-Core rules: dark cockpit base; cyan = direction/guidance, magenta = proximity/warning (never decorative); glow not grey shadow; Space Grotesk + IBM Plex Sans + IBM Plex Mono; bilingual EN/DE; no emoji.
+Core rules: dark cockpit base; cyan = direction/guidance, magenta = proximity/warning (never decorative); glow not grey shadow; corner brackets over side stripes (Cybernetic Frame); Orbitron + IBM Plex Sans + IBM Plex Mono; bilingual EN/DE; no emoji.

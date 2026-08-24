@@ -1,3 +1,4 @@
+import 'package:ambientnav_ui/ambientnav_ui.dart';
 import 'package:flutter/material.dart';
 
 import '../../features/navigation/domain/entities/maneuver.dart';
@@ -34,18 +35,33 @@ class TurnByTurnPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final m = maneuver;
     if (m == null) return const SizedBox.shrink();
-    return Card(
-      margin: const EdgeInsets.all(12),
-      child: ListTile(
-        leading: Icon(_icon(m.type), size: 36),
-        title: Text(
-          m.instruction,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-        ),
-        trailing: Text(
-          _distanceLabel(),
-          style: Theme.of(context).textTheme.titleMedium,
+    // AnPanelAccent.staticAccent deliberately — this panel rebuilds on every
+    // navigation distance tick, and pulse/scanline would stack extra motion
+    // on top of MapLibre's own rendering on a panel that must stay glanceable
+    // while driving.
+    return Padding(
+      padding: const EdgeInsets.all(12),
+      child: AnPanel(
+        glow: AnCardGlow.cyan,
+        accent: AnPanelAccent.staticAccent,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            Icon(_icon(m.type), size: 36),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                m.instruction,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              _distanceLabel(),
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+          ],
         ),
       ),
     );

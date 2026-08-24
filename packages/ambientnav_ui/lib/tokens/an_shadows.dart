@@ -43,6 +43,19 @@ abstract final class AnShadows {
     BoxShadow(color: Color(0x8CFF2D9C), blurRadius: 24),
   ];
 
+  /// `--amb-glow-frame-cyan: 0 0 8px rgba(25,227,255,.6)`.
+  ///
+  /// Tighter blur than [glowCyan] — the Cybernetic Frame's corner brackets
+  /// are thin lines, not full card surfaces.
+  static const List<BoxShadow> glowFrameCyan = [
+    BoxShadow(color: Color(0x9919E3FF), blurRadius: 8),
+  ];
+
+  /// `--amb-glow-frame-magenta: 0 0 8px rgba(255,45,156,.6)`.
+  static const List<BoxShadow> glowFrameMagenta = [
+    BoxShadow(color: Color(0x99FF2D9C), blurRadius: 8),
+  ];
+
   /// The glow matching an accent colour, or none for anything else.
   static List<BoxShadow> glowFor(Color accent) {
     if (accent == AnColors.cyan) return glowCyan;

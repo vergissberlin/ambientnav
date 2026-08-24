@@ -81,7 +81,7 @@ box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 
 | Familie | Verwendete Schriftschnitte | Rolle |
 |---|---|---|
-| **Space Grotesk** | 500 (Medium), 700 (Bold) | Display-Text, Screen-Titel, Navigationsanweisungen |
+| **Orbitron** | 500 (Medium), 700 (Bold) | Display-Text, Screen-Titel, Navigationsanweisungen |
 | **IBM Plex Sans** | 400 (Regular), 500 (Medium) | Fließtext, Labels, Listenelemente, Button-Texte |
 | **IBM Plex Mono** | 400 (Regular) | Telemetriewerte, Metriken, Code, Sensorwerte |
 
@@ -89,7 +89,7 @@ Die Typografie ist in `design-system/tokens/typography.css` definiert:
 
 ```css
 :root {
-  --font-display: 'Space Grotesk', sans-serif;
+  --font-display: 'Orbitron', sans-serif;
   --font-body:    'IBM Plex Sans', sans-serif;
   --font-mono:    'IBM Plex Mono', monospace;
 
@@ -244,7 +244,7 @@ abstract final class AppTheme {
   static const textSecondary = Color(0xFF8B8BA0);
 
   // Typography
-  static const fontDisplay = 'Space Grotesk';
+  static const fontDisplay = 'Orbitron';
   static const fontBody    = 'IBM Plex Sans';
   static const fontMono    = 'IBM Plex Mono';
 

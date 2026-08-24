@@ -1,0 +1,16 @@
+/* AmbientNav — Cybernetic frame tokens
+   Corner-bracket / scanline / glitch accents. All colors alias the existing
+   signal palette — no new hues. See readme.md → "The Cybernetic Frame". */
+:root {
+  --amb-frame-color: var(--amb-cyan);
+  --amb-frame-color-alert: var(--amb-magenta);
+  --amb-frame-color-brand: var(--amb-violet);
+  --amb-frame-thickness: 2px;
+  --amb-frame-leg: var(--space-4);
+  --amb-frame-opacity-rest: .35;
+  --amb-frame-opacity-active: .9;
+
+  --amb-glitch-color-a: var(--amb-cyan);
+  --amb-glitch-color-b: var(--amb-magenta);
+  --amb-glitch-offset: 2px;
+}

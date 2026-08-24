@@ -20,9 +20,16 @@ List<WidgetbookNode> appAtoms() => [_batteryGauge, _rssiIndicator];
 /// App-domain molecules composed from those atoms and a domain entity.
 List<WidgetbookNode> appMolecules() => [_turnByTurnPanel];
 
+// Centres a use case on the cockpit ground so the restyled BatteryGauge (and
+// TurnByTurnPanel's AnPanel frame) render against the dark surface they were
+// designed for, rather than Widgetbook's light default — same treatment as
+// brandAtoms()'s `_stage()` in atom_use_cases.dart.
 Widget _stage(BuildContext context, Widget child) {
-  return Center(
-    child: Padding(padding: const EdgeInsets.all(AnSpace.s5), child: child),
+  return ColoredBox(
+    color: AnBrandTheme.of(context).cockpit,
+    child: Center(
+      child: Padding(padding: const EdgeInsets.all(AnSpace.s5), child: child),
+    ),
   );
 }
 

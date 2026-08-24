@@ -37,7 +37,7 @@ const t = {
 <figure class="sd-wrap" aria-label="System architecture diagram">
   <svg
     class="sd-svg"
-    viewBox="0 0 760 220"
+    viewBox="0 0 800 260"
     xmlns="http://www.w3.org/2000/svg"
     role="img"
     aria-label={lang === 'de' ? 'Systemarchitektur-Diagramm' : 'System architecture diagram'}
@@ -69,6 +69,15 @@ const t = {
       </clipPath>
     </defs>
 
+    <!-- ── Cybernetic frame corner brackets ───────────────────── -->
+    <!-- Sit at the true viewBox edges; the diagram content below is shifted
+         +20,+20 via the <g> wrapper so nothing crowds the frame. -->
+    <polyline class="sd-frame-corner" points="4,20 4,4 20,4" filter="url(#glow-cyan)"/>
+    <polyline class="sd-frame-corner" points="780,4 796,4 796,20" filter="url(#glow-cyan)"/>
+    <polyline class="sd-frame-corner" points="4,240 4,256 20,256" filter="url(#glow-cyan)"/>
+    <polyline class="sd-frame-corner" points="780,256 796,256 796,240" filter="url(#glow-cyan)"/>
+
+    <g transform="translate(20,20)">
     <!-- ── iPhone App ─────────────────────────────────────────── -->
     <rect class="sd-box sd-box-app" x="12" y="48" width="130" height="72" rx="10"/>
     <!-- Phone icon outline -->
@@ -76,7 +85,7 @@ const t = {
     <circle cx="76" cy="94" r="2.5" fill="rgba(124,92,255,.7)"/>
     <rect x="71" y="60" width="10" height="2" rx="1" fill="rgba(124,92,255,.5)"/>
     <text class="sd-label" x="76" y="110">{t.app}</text>
-    <text class="sd-sub" x="76" y="122">{t.appSub}</text>
+    <text class="sd-sub" x="76" y="128">{t.appSub}</text>
 
     <!-- ── BLE connection line ───────────────────────────────── -->
     <line class="sd-line sd-ble-line" x1="143" y1="84" x2="280" y2="84"/>
@@ -97,7 +106,7 @@ const t = {
     <line x1="385" y1="76" x2="390" y2="76" stroke="rgba(25,227,255,.4)" stroke-width="1.5"/>
     <line x1="385" y1="82" x2="390" y2="82" stroke="rgba(25,227,255,.4)" stroke-width="1.5"/>
     <text class="sd-label" x="365" y="110">{t.espFront}</text>
-    <text class="sd-sub" x="365" y="122">{t.espFrontSub}</text>
+    <text class="sd-sub" x="365" y="128">{t.espFrontSub}</text>
 
     <!-- Front LED strip (below ESP32 Front box) -->
     <rect class="sd-led-bg" x="290" y="132" width="150" height="10" rx="5"/>
@@ -121,7 +130,7 @@ const t = {
     <line x1="683" y1="76" x2="688" y2="76" stroke="rgba(25,227,255,.4)" stroke-width="1.5"/>
     <line x1="683" y1="82" x2="688" y2="82" stroke="rgba(25,227,255,.4)" stroke-width="1.5"/>
     <text class="sd-label" x="663" y="110">{t.espRear}</text>
-    <text class="sd-sub" x="663" y="122">{t.espRearSub}</text>
+    <text class="sd-sub" x="663" y="128">{t.espRearSub}</text>
 
     <!-- Rear LED strip -->
     <rect class="sd-led-bg" x="588" y="132" width="150" height="10" rx="5"/>
@@ -141,6 +150,7 @@ const t = {
     <path class="sd-sensor-arc" d="M 648 14 Q 663 0 678 14" fill="none"/>
     <path class="sd-sensor-arc" d="M 688 18 Q 703 4 718 18" fill="none"/>
     <text class="sd-sensor-label" x="663" y="8">{t.sensors}</text>
+    </g>
   </svg>
 </figure>
 
@@ -156,6 +166,14 @@ const t = {
     height: auto;
     display: block;
     overflow: visible;
+  }
+
+  /* ── Cybernetic frame corner brackets ─────────────────────────── */
+  .sd-frame-corner {
+    fill: none;
+    stroke: var(--amb-frame-color, var(--amb-cyan, #19E3FF));
+    stroke-width: 2;
+    opacity: 0.7;
   }
 
   /* ── Boxes ──────────────────────────────────────────────────── */
@@ -198,7 +216,7 @@ const t = {
   /* ── Labels ─────────────────────────────────────────────────── */
   .sd-label {
     fill: var(--amb-text, #EEF2FA);
-    font-family: var(--font-display, "Space Grotesk", sans-serif);
+    font-family: var(--font-display, "Orbitron", sans-serif);
     font-size: 10px;
     font-weight: 600;
     text-anchor: middle;

@@ -216,7 +216,7 @@ final _typography = WidgetbookUseCase(
             borderRadius: BorderRadius.circular(AnRadius.sm),
           ),
           child: Text(
-            'Brand fonts are not bundled yet — Space Grotesk, IBM Plex Sans and '
+            'Brand fonts are not bundled yet — Orbitron, IBM Plex Sans and '
             'IBM Plex Mono fall back to the platform default. Sizes, weights, '
             'tracking and line heights below are still the real tokens.',
             style: TextStyle(color: brand.text2, fontSize: 13),

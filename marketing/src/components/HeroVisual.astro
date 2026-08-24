@@ -1,4 +1,6 @@
 ---
+import CyberFrame from './CyberFrame.astro';
+
 interface Props {
   lang?: 'en' | 'de';
 }
@@ -32,7 +34,7 @@ const t = {
 }[lang];
 ---
 
-<section class="hv" aria-label={t.eyebrow}>
+<CyberFrame as="section" class="hv" aria-label={t.eyebrow}>
   <div class="hv-header">
     <span class="hv-eyebrow">{t.eyebrow}</span>
     <div class="hv-mode-labels" aria-live="polite" aria-atomic="true">
@@ -85,16 +87,18 @@ const t = {
       <span class="hv-ml hv-pl-danger">{t.parkDanger}</span>
     </div>
   </div>
-</section>
+</CyberFrame>
 
 <style>
   /* ── Container ─────────────────────────────────────────────── */
-  .hv {
+  /* :global — CyberFrame renders this element inside its own component
+     scope, so a plain `.hv` selector no longer matches it. */
+  :global(.hv) {
     margin: 2rem 0 2.5rem;
     padding: 1.5rem 1.75rem 1.75rem;
     background: var(--amb-cockpit, #06080E);
     border: 1px solid var(--amb-line, rgba(255,255,255,.08));
-    border-radius: 16px;
+    border-radius: var(--radius-frame, 2px);
     box-shadow: 0 8px 40px rgba(0,0,0,.5);
     overflow: hidden;
   }
@@ -350,7 +354,7 @@ const t = {
   }
 
   /* ── Light-mode adjustments ─────────────────────────────────── */
-  :global([data-theme='light']) .hv {
+  :global([data-theme='light'] .hv) {
     background: #F4F6FB;
     border-color: rgba(0,0,0,.08);
     box-shadow: 0 4px 20px rgba(0,0,0,.08);

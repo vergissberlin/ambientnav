@@ -48,6 +48,7 @@ class NavigationLocationRunner {
     }
 
     nav.updateDistance(progress.distanceToManeuverMeters);
+    nav.updateProgress(progress.distanceAlongMeters);
   }
 
   void stop() {

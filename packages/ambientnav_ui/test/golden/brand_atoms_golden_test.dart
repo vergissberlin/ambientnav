@@ -31,6 +31,18 @@ void main() {
     testGolden('resting', const _CardResting());
   });
 
+  group('AnPanel', () {
+    // Only accent: staticAccent is pinned. pulse/scanline are non-deterministic
+    // animation loops — a pixel diff would flake on timing alone, so they are
+    // deliberately left out of golden coverage (see Widgetbook's "Accent
+    // modes" use case for a manual look at those instead).
+    testGolden(
+      'glow-variants',
+      const _PanelGlowVariants(),
+      size: const Size(480, 500),
+    );
+  });
+
   group('AnLightStrip', () {
     testGolden('modes', const _LightStripModes(), size: const Size(560, 260));
   });
@@ -144,6 +156,34 @@ class _CardResting extends StatelessWidget {
         ],
       ),
     ),
+  );
+}
+
+class _PanelGlowVariants extends StatelessWidget {
+  const _PanelGlowVariants();
+
+  @override
+  Widget build(BuildContext context) => Wrap(
+    spacing: AnSpace.s4,
+    runSpacing: AnSpace.s4,
+    children: [
+      for (final glow in AnCardGlow.values)
+        SizedBox(
+          width: 200,
+          child: AnPanel(
+            glow: glow,
+            padding: const EdgeInsets.all(AnSpace.s5),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: AnSpace.s2,
+              children: [
+                AnBadge(label: glow.name),
+                const Text('Follow the light'),
+              ],
+            ),
+          ),
+        ),
+    ],
   );
 }
 
