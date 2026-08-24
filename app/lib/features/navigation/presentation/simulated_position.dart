@@ -28,3 +28,9 @@ enum CameraMode {
 final cameraModeProvider = StateProvider<CameraMode>(
   (ref) => CameraMode.follow,
 );
+
+/// Whether the simulated front-strip preview's hazard lights are toggled on.
+/// UI-only — this drives [FrontLedStripPreview], not real hardware; the app
+/// has no BLE hazard command wired up (see `nav_command.dart`'s `Blinker`
+/// enum, which the app never sends anything but `Blinker.off` for today).
+final hazardPreviewProvider = StateProvider<bool>((ref) => false);

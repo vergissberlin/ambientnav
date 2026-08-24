@@ -182,6 +182,12 @@ abstract class AppLocalizations {
   /// **'Follow route'**
   String get followRoute;
 
+  /// No description provided for @toggleHazardLights.
+  ///
+  /// In en, this message translates to:
+  /// **'Toggle hazard lights'**
+  String get toggleHazardLights;
+
   /// No description provided for @developer.
   ///
   /// In en, this message translates to:

@@ -52,6 +52,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get followRoute => 'Route folgen';
 
   @override
+  String get toggleHazardLights => 'Warnblinker umschalten';
+
+  @override
   String get developer => 'Entwickler';
 
   @override

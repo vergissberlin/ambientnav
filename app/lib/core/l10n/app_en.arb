@@ -14,6 +14,7 @@
   "locationPermissionDenied": "Location permission is required for navigation",
   "routeOverview": "Route overview",
   "followRoute": "Follow route",
+  "toggleHazardLights": "Toggle hazard lights",
   "developer": "Developer",
   "developerDesc": "Tools for development and testing",
   "routeSimulation": "Route simulation",

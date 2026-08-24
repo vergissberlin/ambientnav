@@ -52,6 +52,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get followRoute => 'Follow route';
 
   @override
+  String get toggleHazardLights => 'Toggle hazard lights';
+
+  @override
   String get developer => 'Developer';
 
   @override

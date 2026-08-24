@@ -14,6 +14,7 @@
   "locationPermissionDenied": "Standortberechtigung ist für die Navigation erforderlich",
   "routeOverview": "Routenübersicht",
   "followRoute": "Route folgen",
+  "toggleHazardLights": "Warnblinker umschalten",
   "developer": "Entwickler",
   "developerDesc": "Werkzeuge für Entwicklung und Tests",
   "routeSimulation": "Routensimulation",

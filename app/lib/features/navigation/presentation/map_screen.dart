@@ -5,11 +5,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 import '../../../core/di/providers.dart';
+import '../../../ui/molecules/front_led_strip_preview.dart';
+import '../../../ui/molecules/turn_by_turn_panel.dart';
+import '../domain/entities/maneuver.dart';
 import 'nav_controller.dart';
 import 'nav_session.dart';
 import 'search_screen.dart';
 import 'simulated_position.dart';
-import '../../../ui/molecules/turn_by_turn_panel.dart';
 
 /// The main navigation screen: a MapLibre street map with the next-maneuver
 /// banner and the planned route overlaid. While navigating the camera follows
@@ -162,6 +164,32 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     }
   }
 
+  /// Which effect the real front strip would show right now — mirrors
+  /// `orchestrator.cpp`'s `chooseEffect()` priority: an active maneuver
+  /// within 200m always wins over hazard, which in turn wins over the idle
+  /// ambient glow.
+  FrontStripEffect _stripEffectFor(NavigationState navState, bool hazard) {
+    final maneuver = navState.nextManeuver;
+    if (maneuver != null && navState.distanceToManeuverMeters < 200) {
+      switch (maneuver.type) {
+        case ManeuverType.turnLeft:
+        case ManeuverType.slightLeft:
+          return FrontStripEffect.navLeft;
+        case ManeuverType.turnRight:
+        case ManeuverType.slightRight:
+          return FrontStripEffect.navRight;
+        case ManeuverType.straight:
+        case ManeuverType.depart:
+          return FrontStripEffect.navStraight;
+        case ManeuverType.uturn:
+        case ManeuverType.roundabout:
+        case ManeuverType.arrive:
+          break; // no direction — fall through to hazard/ambient
+      }
+    }
+    return hazard ? FrontStripEffect.hazard : FrontStripEffect.ambient;
+  }
+
   void _toggleOverview() {
     final notifier = ref.read(cameraModeProvider.notifier);
     if (ref.read(cameraModeProvider) == CameraMode.overview) {
@@ -184,6 +212,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final simulating = ref.watch(simulatedPositionProvider) != null;
     final cameraMode = ref.watch(cameraModeProvider);
     final following = cameraMode == CameraMode.follow;
+    final hazardActive = ref.watch(hazardPreviewProvider);
+    final stripEffect = _stripEffectFor(navState, hazardActive);
 
     ref.listen(navControllerProvider, (_, _) => _drawRouteLine());
     ref.listen(simulatedPositionProvider, (_, p) => _updateSimPosition(p));
@@ -223,6 +253,14 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               icon: const Icon(Icons.download_for_offline),
               onPressed: () => ref.read(navSessionProvider).downloadOffline(),
             ),
+          if (isNavigating)
+            IconButton(
+              tooltip: l10n.toggleHazardLights,
+              isSelected: hazardActive,
+              icon: const Icon(Icons.warning_amber_rounded),
+              onPressed: () => ref.read(hazardPreviewProvider.notifier).state =
+                  !hazardActive,
+            ),
         ],
       ),
       floatingActionButton: isNavigating
@@ -255,9 +293,19 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           ),
           Align(
             alignment: Alignment.topCenter,
-            child: TurnByTurnPanel(
-              maneuver: navState.nextManeuver,
-              distanceMeters: navState.distanceToManeuverMeters,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TurnByTurnPanel(
+                  maneuver: navState.nextManeuver,
+                  distanceMeters: navState.distanceToManeuverMeters,
+                ),
+                if (isNavigating)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                    child: FrontLedStripPreview(effect: stripEffect),
+                  ),
+              ],
             ),
           ),
         ],
