@@ -507,6 +507,7 @@ class _MapScreenState extends ConsumerState<MapScreen>
     );
 
     final appBar = AnAppBar(
+      centerTitle: false,
       title: NavigationAppBarTitle(
         label: l10n.navTab,
         phase: navState.phase,

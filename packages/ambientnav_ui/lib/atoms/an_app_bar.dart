@@ -15,6 +15,7 @@ class AnAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.actions,
     this.leading,
     this.automaticallyImplyLeading = true,
+    this.centerTitle,
     this.bottom,
   });
 
@@ -22,6 +23,7 @@ class AnAppBar extends StatelessWidget implements PreferredSizeWidget {
   final List<Widget>? actions;
   final Widget? leading;
   final bool automaticallyImplyLeading;
+  final bool? centerTitle;
   final PreferredSizeWidget? bottom;
 
   @override
@@ -35,6 +37,7 @@ class AnAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: actions,
       leading: leading,
       automaticallyImplyLeading: automaticallyImplyLeading,
+      centerTitle: centerTitle,
       bottom: bottom,
       backgroundColor: Colors.transparent,
       elevation: 0,

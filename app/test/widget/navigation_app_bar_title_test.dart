@@ -1,3 +1,4 @@
+import 'package:ambientnav_ui/ambientnav_ui.dart';
 import 'package:ambientnav/features/navigation/presentation/navigation_app_bar_title.dart';
 import 'package:ambientnav/features/navigation/presentation/nav_controller.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +28,9 @@ void main() {
     await tester.pump();
 
     final logo = tester.getRect(find.byKey(const Key('navigationHeaderLogo')));
-    final label = tester.getRect(find.byKey(const Key('navigationHeaderLabel')));
+    final label = tester.getRect(
+      find.byKey(const Key('navigationHeaderLabel')),
+    );
 
     expect(logo.right, lessThan(label.left));
   });
@@ -53,10 +56,52 @@ void main() {
     await tester.pump();
 
     final logo = tester.getRect(find.byKey(const Key('navigationHeaderLogo')));
-    final label = tester.getRect(find.byKey(const Key('navigationHeaderLabel')));
+    final label = tester.getRect(
+      find.byKey(const Key('navigationHeaderLabel')),
+    );
 
     expect(logo.bottom, lessThan(label.top));
   });
+
+  testWidgets(
+    'keeps the navigation title clear of app bar actions in portrait',
+    (tester) async {
+      await pumpApp(
+        tester,
+        const MediaQuery(
+          data: MediaQueryData(size: Size(390, 844), devicePixelRatio: 1),
+          child: Scaffold(
+            appBar: AnAppBar(
+              centerTitle: false,
+              title: NavigationAppBarTitle(
+                label: 'Navigate',
+                phase: NavPhase.navigating,
+                speedMps: 13.9,
+              ),
+              actions: [
+                IconButton(onPressed: null, icon: Icon(Icons.navigation)),
+                IconButton(
+                  onPressed: null,
+                  icon: Icon(Icons.download_for_offline),
+                ),
+                IconButton(
+                  onPressed: null,
+                  icon: Icon(Icons.warning_amber_rounded),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      await tester.pump();
+
+      final title = tester.getRect(find.byType(NavigationAppBarTitle));
+      final firstAction = tester.getRect(find.byIcon(Icons.navigation));
+
+      expect(title.right, lessThan(firstAction.left));
+    },
+  );
 
   test('returns a shorter cycle duration as speed increases', () {
     final idle = navigationLogoCycleDurationFor(
