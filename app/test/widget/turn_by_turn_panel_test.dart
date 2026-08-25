@@ -54,6 +54,6 @@ void main() {
     );
 
     expect(landscapeHeight, lessThan(portraitHeight));
-    expect(landscapeHeight, lessThan(80));
+    expect(landscapeHeight, lessThan(72));
   });
 }

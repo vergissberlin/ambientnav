@@ -40,20 +40,23 @@ class TurnByTurnPanel extends StatelessWidget {
     final compact = MediaQuery.orientationOf(context) == Orientation.landscape;
     final outerPadding = EdgeInsets.fromLTRB(
       12,
-      compact ? 8 : 12,
+      compact ? 4 : 12,
       12,
-      compact ? 8 : 12,
+      compact ? 4 : 12,
     );
     final innerPadding = EdgeInsets.symmetric(
-      horizontal: compact ? 12 : 16,
-      vertical: compact ? 8 : 12,
+      horizontal: compact ? 10 : 16,
+      vertical: compact ? 6 : 12,
     );
-    final iconSize = compact ? 28.0 : 36.0;
+    final iconSize = compact ? 24.0 : 36.0;
     final instructionStyle = compact
-        ? theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)
+        ? theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w600,
+            height: 1.0,
+          )
         : theme.textTheme.titleMedium;
     final distanceStyle = compact
-        ? theme.textTheme.titleSmall
+        ? theme.textTheme.labelLarge?.copyWith(height: 1.0)
         : theme.textTheme.titleMedium;
     // AnPanelAccent.staticAccent deliberately — this panel rebuilds on every
     // navigation distance tick, and pulse/scanline would stack extra motion
@@ -68,7 +71,7 @@ class TurnByTurnPanel extends StatelessWidget {
         child: Row(
           children: [
             Icon(_icon(m.type), size: iconSize),
-            SizedBox(width: compact ? 10 : 16),
+            SizedBox(width: compact ? 8 : 16),
             Expanded(
               child: Text(
                 m.instruction,
@@ -77,7 +80,7 @@ class TurnByTurnPanel extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            SizedBox(width: compact ? 10 : 12),
+            SizedBox(width: compact ? 8 : 12),
             Text(_distanceLabel(), style: distanceStyle),
           ],
         ),
