@@ -73,7 +73,9 @@ class _SimulatedCameraBackgroundState extends State<SimulatedCameraBackground>
     final speed = widget.speedMps > _idleSpeedMps
         ? widget.speedMps
         : _idleSpeedMps;
-    setState(() => _phase = (_phase + dtSeconds * speed / _metersPerCycle) % 1);
+    // Advance the road pattern toward the viewer so it reads like forward
+    // motion instead of reversing away from the horizon.
+    setState(() => _phase = (_phase - dtSeconds * speed / _metersPerCycle) % 1);
   }
 
   @override

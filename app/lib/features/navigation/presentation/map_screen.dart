@@ -247,8 +247,8 @@ class _MapScreenState extends ConsumerState<MapScreen>
         geometry: [
           for (final p in route.geometry) LatLng(p.latitude, p.longitude),
         ],
-        lineColor: AnColors.cyanHex,
-        lineWidth: 5,
+        lineColor: '#FFD166',
+        lineWidth: 6,
       ),
     );
   }
