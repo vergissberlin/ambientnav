@@ -14,6 +14,7 @@ import '../../../ui/molecules/front_led_strip_preview.dart';
 import '../../../ui/molecules/simulated_camera_background.dart';
 import '../../../ui/molecules/turn_by_turn_panel.dart';
 import 'navigation_info_overlay.dart';
+import 'navigation_info_strip_frame.dart';
 import '../domain/entities/maneuver.dart';
 import '../domain/entities/route.dart';
 import 'nav_controller.dart';
@@ -33,9 +34,9 @@ class MapScreen extends ConsumerStatefulWidget {
 
 class _MapScreenState extends ConsumerState<MapScreen>
     with WidgetsBindingObserver {
-  /// When the simulator video is visible, keep the map as a very light
-  /// overlay so the moving background remains obvious.
-  static const double _cameraBackgroundMapOpacity = 0.42;
+  /// When the simulator video is visible, keep the map as a faint overlay so
+  /// the moving background remains obvious.
+  static const double _cameraBackgroundMapOpacity = 0.28;
 
   MapLibreMapController? _mapController;
   Line? _routeLine;
@@ -591,9 +592,11 @@ class _MapScreenState extends ConsumerState<MapScreen>
                   if (isNavigating || _celebrateArrival)
                     Padding(
                       padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                      child: FrontLedStripPreview(
-                        effect: stripEffect,
-                        progress: stripProgress,
+                      child: NavigationInfoStripFrame(
+                        child: FrontLedStripPreview(
+                          effect: stripEffect,
+                          progress: stripProgress,
+                        ),
                       ),
                     ),
                 ],
