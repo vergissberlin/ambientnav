@@ -25,7 +25,7 @@
         android:required="true" />
 
     <application
-        android:label="ambientnav"
+        android:label="AmbientNav"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

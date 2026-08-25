@@ -293,8 +293,27 @@ class _MapScreenState extends ConsumerState<MapScreen>
     );
   }
 
-  /// Move (or create) the virtual-vehicle marker and, in follow mode, keep the
-  /// camera centred + oriented in the travel direction.
+  Future<void> _animateCameraTo({
+    required LatLng latLng,
+    required double bearingDeg,
+    required double distanceToManeuverMeters,
+  }) async {
+    final controller = _mapController;
+    if (controller == null || !_styleLoaded) return;
+    if (ref.read(cameraModeProvider) != CameraMode.follow) return;
+    await controller.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+          target: latLng,
+          bearing: bearingDeg,
+          tilt: 50,
+          zoom: _followZoom(distanceToManeuverMeters),
+        ),
+      ),
+    );
+  }
+
+  /// Move (or create) the virtual-vehicle marker and keep the camera synced.
   Future<void> _updateSimPosition(SimPose? pose) async {
     final controller = _mapController;
     if (controller == null || !_styleLoaded) return;
@@ -322,19 +341,22 @@ class _MapScreenState extends ConsumerState<MapScreen>
         CircleOptions(geometry: latLng),
       );
     }
-    if (ref.read(cameraModeProvider) == CameraMode.follow) {
-      final dist = ref.read(navControllerProvider).distanceToManeuverMeters;
-      await controller.animateCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(
-            target: latLng,
-            bearing: pose.bearingDeg,
-            tilt: 50,
-            zoom: _followZoom(dist),
-          ),
-        ),
-      );
-    }
+    await _animateCameraTo(
+      latLng: latLng,
+      bearingDeg: pose.bearingDeg,
+      distanceToManeuverMeters:
+          ref.read(navControllerProvider).distanceToManeuverMeters,
+    );
+  }
+
+  Future<void> _updateNavigationPose(NavigationPose? pose) async {
+    if (pose == null) return;
+    await _animateCameraTo(
+      latLng: LatLng(pose.position.latitude, pose.position.longitude),
+      bearingDeg: pose.bearingDeg,
+      distanceToManeuverMeters:
+          ref.read(navControllerProvider).distanceToManeuverMeters,
+    );
   }
 
   Future<void> _openSearch() async {
@@ -457,6 +479,7 @@ class _MapScreenState extends ConsumerState<MapScreen>
     });
     ref.listen(navControllerProvider, (_, _) => _drawRouteLine());
     ref.listen(simulatedPositionProvider, (_, p) => _updateSimPosition(p));
+    ref.listen(navigationPoseProvider, (_, p) => _updateNavigationPose(p));
     ref.listen(
       hazardZoneGeometryProvider,
       (_, geometry) => _drawHazardZone(geometry),
@@ -479,31 +502,33 @@ class _MapScreenState extends ConsumerState<MapScreen>
       }
     });
 
-    // Real-GPS heading-up follow is handled natively by MapLibre; the simulator
-    // drives the camera manually (its position isn't the OS location).
-    final trackingMode = (isNavigating && following && !simulating)
-        ? MyLocationTrackingMode.trackingGps
-        : MyLocationTrackingMode.none;
-
     // Roads/route only, transparent basemap when the camera background is
     // showing, so the blur can show through without dimming the overlay.
     final effectiveStyleUrl = showCameraBackground
         ? kMapStyleUrlTransparent
         : styleUrl;
+    final initialCameraPosition =
+        isNavigating && navState.route?.geometry.isNotEmpty == true
+        ? CameraPosition(
+            target: LatLng(
+              navState.route!.geometry.first.latitude,
+              navState.route!.geometry.first.longitude,
+            ),
+            zoom: _followZoom(navState.distanceToManeuverMeters),
+          )
+        : const CameraPosition(
+            target: LatLng(52.52, 13.405), // Berlin
+            zoom: 12,
+          );
     final map = MapLibreMap(
       key: ValueKey(effectiveStyleUrl),
       styleString: effectiveStyleUrl,
-      initialCameraPosition: const CameraPosition(
-        target: LatLng(52.52, 13.405), // Berlin
-        zoom: 12,
-      ),
+      initialCameraPosition: initialCameraPosition,
       onMapCreated: _onMapCreated,
       onStyleLoadedCallback: _onStyleLoaded,
       myLocationEnabled: true,
-      myLocationTrackingMode: trackingMode,
-      myLocationRenderMode: trackingMode == MyLocationTrackingMode.none
-          ? MyLocationRenderMode.normal
-          : MyLocationRenderMode.compass,
+      myLocationTrackingMode: MyLocationTrackingMode.none,
+      myLocationRenderMode: MyLocationRenderMode.normal,
     );
 
     final appBar = AnAppBar(

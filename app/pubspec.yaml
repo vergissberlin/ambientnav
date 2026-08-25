@@ -87,6 +87,7 @@ flutter:
   assets:
     - assets/map_style/
     - assets/videos/
+    - assets/branding/
   fonts:
     - family: Orbitron
       fonts:

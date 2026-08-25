@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="launchGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#19E3FF"></stop>
+      <stop offset="50%" stop-color="#7C5CFF"></stop>
+      <stop offset="100%" stop-color="#FF2D9C"></stop>
+    </linearGradient>
+    <radialGradient id="launchGlowLeft" cx="30%" cy="28%" r="45%">
+      <stop offset="0%" stop-color="#19E3FF" stop-opacity="0.55"></stop>
+      <stop offset="60%" stop-color="#19E3FF" stop-opacity="0.12"></stop>
+      <stop offset="100%" stop-color="#19E3FF" stop-opacity="0"></stop>
+    </radialGradient>
+    <radialGradient id="launchGlowRight" cx="72%" cy="72%" r="45%">
+      <stop offset="0%" stop-color="#FF2D9C" stop-opacity="0.42"></stop>
+      <stop offset="60%" stop-color="#FF2D9C" stop-opacity="0.12"></stop>
+      <stop offset="100%" stop-color="#FF2D9C" stop-opacity="0"></stop>
+    </radialGradient>
+  </defs>
+  <circle cx="330" cy="270" r="250" fill="url(#launchGlowLeft)"></circle>
+  <circle cx="734" cy="742" r="260" fill="url(#launchGlowRight)"></circle>
+  <g fill="none" stroke="url(#launchGrad)" stroke-width="30" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M300 780 L512 206 L724 780"></path>
+    <path d="M392 570 L632 570"></path>
+  </g>
+  <g fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M300 780 L512 206 L724 780"></path>
+    <path d="M392 570 L632 570"></path>
+  </g>
+</svg>

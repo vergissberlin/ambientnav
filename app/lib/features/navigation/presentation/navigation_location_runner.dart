@@ -4,6 +4,7 @@ import '../../../core/di/providers.dart';
 import '../domain/entities/route.dart';
 import '../domain/route_progress_tracker.dart';
 import 'nav_controller.dart';
+import 'simulated_position.dart';
 
 /// Drives real GPS progress along a planned route while navigation is active.
 class NavigationLocationRunner {
@@ -48,10 +49,15 @@ class NavigationLocationRunner {
     }
 
     nav.updateDistance(progress.distanceToManeuverMeters);
+    _ref.read(navigationPoseProvider.notifier).state = NavigationPose(
+      position: progress.snappedPosition,
+      bearingDeg: progress.bearingDeg,
+    );
   }
 
   void stop() {
     _tracker = null;
+    _ref.read(navigationPoseProvider.notifier).state = null;
     _ref.read(locationServiceProvider).stopNavigationSession();
   }
 }

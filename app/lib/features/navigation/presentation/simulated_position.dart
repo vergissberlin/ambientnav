@@ -15,6 +15,17 @@ class SimPose {
 /// Live simulated pose; the map follows it and shows a "SIM" badge.
 final simulatedPositionProvider = StateProvider<SimPose?>((ref) => null);
 
+/// Live real-world pose for heading-up recentering while turn-by-turn
+/// navigation is active.
+class NavigationPose {
+  const NavigationPose({required this.position, required this.bearingDeg});
+
+  final GeoPoint position;
+  final double bearingDeg;
+}
+
+final navigationPoseProvider = StateProvider<NavigationPose?>((ref) => null);
+
 /// How the navigation camera behaves.
 enum CameraMode {
   /// Heading-up, zoomed-in follow of the current position.

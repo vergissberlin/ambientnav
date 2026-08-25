@@ -163,8 +163,8 @@ class _DrivingLogoMarkState extends State<_DrivingLogoMark>
     return AnimatedBuilder(
       animation: _controller,
       child: ExcludeSemantics(
-        child: SvgPicture.string(
-          _logoSvg,
+        child: SvgPicture.asset(
+          'assets/branding/ambientnav-mark.svg',
           width: widget.size,
           height: widget.size,
           fit: BoxFit.contain,
@@ -189,26 +189,3 @@ class _DrivingLogoMarkState extends State<_DrivingLogoMark>
     );
   }
 }
-
-const String _logoSvg = '''
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <defs>
-    <linearGradient id="ambGrad" x1="0%" y1="100%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#19E3FF"></stop>
-      <stop offset="50%" stop-color="#7C5CFF"></stop>
-      <stop offset="100%" stop-color="#FF2D9C"></stop>
-    </linearGradient>
-  </defs>
-  <g fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8.5"
-     stroke-linecap="round" stroke-dasharray="0.1 11.5">
-    <path d="M23 83 L50 17 L77 83"></path>
-    <path d="M35 59 L65 59"></path>
-  </g>
-  <g fill="none" stroke="url(#ambGrad)" stroke-width="8.5"
-     stroke-linecap="round" stroke-dasharray="0.1 11.5"
-     style="filter:drop-shadow(0 0 6px rgba(124,92,255,.6))">
-    <path d="M23 83 L50 17 L77 83"></path>
-    <path d="M35 59 L65 59"></path>
-  </g>
-</svg>
-''';

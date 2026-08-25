@@ -25,6 +25,7 @@ class NavSession {
   Future<void> planTo(GeoResult destination, {GeoPoint? originOverride}) async {
     final nav = _ref.read(navControllerProvider.notifier);
     nav.startPlanning();
+    _ref.read(navigationPoseProvider.notifier).state = null;
     try {
       final origin =
           originOverride ??
@@ -68,6 +69,7 @@ class NavSession {
   void stop() {
     _ref.read(routeSimulationRunnerProvider).stop();
     _ref.read(navigationLocationRunnerProvider).stop();
+    _ref.read(navigationPoseProvider.notifier).state = null;
     _ref.read(cameraModeProvider.notifier).state = CameraMode.follow;
     _ref.read(navControllerProvider.notifier).stop();
   }

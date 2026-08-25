@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="LaunchTheme" parent="@android:style/Theme.Light.NoTitleBar">
+        <item name="android:windowSplashScreenBackground">@color/ambientnav_cockpit</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ambientnav_launch_mark</item>
+        <item name="android:postSplashScreenTheme">@style/NormalTheme</item>
+    </style>
+
+    <style name="NormalTheme" parent="@android:style/Theme.Light.NoTitleBar">
+        <item name="android:windowBackground">@color/ambientnav_cockpit</item>
+    </style>
+</resources>
