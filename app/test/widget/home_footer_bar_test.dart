@@ -75,9 +75,7 @@ void main() {
     expect(restoredHeight, closeTo(portraitHeight, 1));
   });
 
-  testWidgets('footer does not inherit bottom safe-area padding', (
-    tester,
-  ) async {
+  testWidgets('footer respects bottom safe-area padding', (tester) async {
     await pumpApp(
       tester,
       const _FooterHarness(bottomPadding: EdgeInsets.only(bottom: 34)),
@@ -87,6 +85,6 @@ void main() {
     final footerHeight = tester
         .getSize(find.byType(ResponsiveHomeFooterBar))
         .height;
-    expect(footerHeight, closeTo(80, 1));
+    expect(footerHeight, closeTo(114, 1));
   });
 }

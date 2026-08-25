@@ -66,7 +66,35 @@ class _ResponsiveHomeFooterBarState extends State<ResponsiveHomeFooterBar>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final borderColor = AnBrandTheme.of(context).line;
+    final brand = AnBrandTheme.of(context);
+    final footerLabelStyle = Theme.of(context).textTheme.labelSmall?.copyWith(
+      fontWeight: FontWeight.w600,
+      letterSpacing: 0.08,
+    );
+    final navBarTheme = NavigationBarThemeData(
+      backgroundColor: Colors.transparent,
+      surfaceTintColor: Colors.transparent,
+      shadowColor: Colors.transparent,
+      indicatorColor: AnColors.cyan.withValues(alpha: 0.14),
+      indicatorShape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AnRadius.md),
+        side: BorderSide(color: AnColors.cyan.withValues(alpha: 0.45)),
+      ),
+      height: 80,
+      iconTheme: MaterialStateProperty.resolveWith((states) {
+        final selected = states.contains(MaterialState.selected);
+        return IconThemeData(
+          color: selected ? AnColors.cyan : brand.text3,
+          size: 24,
+        );
+      }),
+      labelTextStyle: MaterialStateProperty.resolveWith((states) {
+        final selected = states.contains(MaterialState.selected);
+        return footerLabelStyle?.copyWith(
+          color: selected ? AnColors.cyan : brand.text3,
+        );
+      }),
+    );
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
@@ -82,32 +110,37 @@ class _ResponsiveHomeFooterBarState extends State<ResponsiveHomeFooterBar>
           ),
         );
       },
-      child: MediaQuery.removePadding(
-        context: context,
-        removeBottom: true,
-        child: AnGlassBar(
-          border: Border(top: BorderSide(color: borderColor)),
-          child: NavigationBar(
-            backgroundColor: Colors.transparent,
-            selectedIndex: widget.selectedIndex,
-            onDestinationSelected: widget.onDestinationSelected,
-            destinations: [
-              NavigationDestination(
-                icon: const Icon(Icons.navigation_outlined),
-                selectedIcon: const Icon(Icons.navigation),
-                label: l10n.navTab,
-              ),
-              NavigationDestination(
-                icon: const Icon(Icons.memory_outlined),
-                selectedIcon: const Icon(Icons.memory),
-                label: l10n.controllersTab,
-              ),
-              NavigationDestination(
-                icon: const Icon(Icons.settings_outlined),
-                selectedIcon: const Icon(Icons.settings),
-                label: l10n.settingsTab,
-              ),
-            ],
+      child: AnGlassBar(
+        border: Border(top: BorderSide(color: brand.line)),
+        child: SafeArea(
+          top: false,
+          child: NavigationBarTheme(
+            data: navBarTheme,
+            child: NavigationBar(
+              backgroundColor: Colors.transparent,
+              surfaceTintColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              selectedIndex: widget.selectedIndex,
+              onDestinationSelected: widget.onDestinationSelected,
+              labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+              destinations: [
+                NavigationDestination(
+                  icon: const Icon(Icons.navigation_outlined),
+                  selectedIcon: const Icon(Icons.navigation),
+                  label: l10n.navTab,
+                ),
+                NavigationDestination(
+                  icon: const Icon(Icons.memory_outlined),
+                  selectedIcon: const Icon(Icons.memory),
+                  label: l10n.controllersTab,
+                ),
+                NavigationDestination(
+                  icon: const Icon(Icons.settings_outlined),
+                  selectedIcon: const Icon(Icons.settings),
+                  label: l10n.settingsTab,
+                ),
+              ],
+            ),
           ),
         ),
       ),
