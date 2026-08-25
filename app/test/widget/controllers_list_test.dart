@@ -24,4 +24,36 @@ void main() {
     expect(find.byType(RssiIndicator), findsNWidgets(2));
     expect(find.byType(BatteryGauge), findsNWidgets(2));
   });
+
+  testWidgets('controllers list fits on a narrow phone viewport', (
+    tester,
+  ) async {
+    final errors = <FlutterErrorDetails>[];
+    final previousOnError = FlutterError.onError;
+    FlutterError.onError = (details) {
+      errors.add(details);
+      previousOnError?.call(details);
+    };
+    addTearDown(() => FlutterError.onError = previousOnError);
+
+    await tester.binding.setSurfaceSize(const Size(393, 852));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await pumpApp(tester, const ControllersListScreen());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(FloatingActionButton));
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(find.textContaining('AmbientNav-Front'), findsOneWidget);
+    expect(find.textContaining('AmbientNav-Rear'), findsOneWidget);
+    expect(find.byType(RssiIndicator), findsNWidgets(2));
+    expect(find.byType(BatteryGauge), findsNWidgets(2));
+
+    final overflowErrors = errors
+        .where((details) => details.exceptionAsString().contains('overflowed'))
+        .toList();
+    expect(overflowErrors, isEmpty);
+  });
 }

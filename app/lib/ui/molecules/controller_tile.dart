@@ -39,31 +39,55 @@ class ControllerTile extends StatelessWidget {
     return AnPanel(
       glow: device.isConnected ? AnCardGlow.cyan : AnCardGlow.none,
       accent: AnPanelAccent.staticAccent,
-      child: ListTile(
-        leading: Icon(
-          device.isConnected ? Icons.bluetooth_connected : Icons.bluetooth,
-          color: device.isConnected
-              ? Theme.of(context).colorScheme.primary
-              : null,
-        ),
-        title: Text('${device.name} · $roleLabel'),
-        subtitle: Row(
-          children: [
-            RssiIndicator(quality: device.signalQuality, rssi: device.rssi),
-            const SizedBox(width: 12),
-            BatteryGauge(voltage: device.voltage),
-            if (device.isPaired) ...[
-              const SizedBox(width: 8),
-              const Icon(Icons.lock, size: 14),
-            ],
-          ],
-        ),
-        trailing: device.isConnected
-            ? IconButton(
-                icon: const Icon(Icons.chevron_right),
-                onPressed: onOpen,
-              )
-            : TextButton(onPressed: onConnect, child: Text(l10n.connect)),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            device.isConnected ? Icons.bluetooth_connected : Icons.bluetooth,
+            color: device.isConnected
+                ? Theme.of(context).colorScheme.primary
+                : null,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${device.name} · $roleLabel',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 6,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    RssiIndicator(
+                      quality: device.signalQuality,
+                      rssi: device.rssi,
+                    ),
+                    BatteryGauge(voltage: device.voltage),
+                    if (device.isPaired) const Icon(Icons.lock, size: 14),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: device.isConnected
+                ? IconButton(
+                    icon: const Icon(Icons.chevron_right),
+                    onPressed: onOpen,
+                  )
+                : TextButton(onPressed: onConnect, child: Text(l10n.connect)),
+          ),
+        ],
       ),
     );
   }
