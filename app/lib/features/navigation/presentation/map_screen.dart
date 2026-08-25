@@ -34,6 +34,24 @@ class MapScreen extends ConsumerStatefulWidget {
 
 class _MapScreenState extends ConsumerState<MapScreen>
     with WidgetsBindingObserver {
+  static const List<String> _cameraBackgroundLayerIds = [
+    'road_pier',
+    'highway_path',
+    'highway_minor',
+    'highway_major_casing',
+    'highway_major_inner',
+    'highway_major_subtle',
+    'highway_motorway_casing',
+    'highway_motorway_inner',
+    'highway_motorway_subtle',
+    'railway_transit',
+    'railway_transit_dashline',
+    'railway_minor',
+    'railway_minor_dashline',
+    'railway',
+    'railway_dashline',
+  ];
+
   MapLibreMapController? _mapController;
   Line? _routeLine;
   Line? _hazardZoneLine;
@@ -211,6 +229,21 @@ class _MapScreenState extends ConsumerState<MapScreen>
     await _drawRouteLine();
     await _drawHazardZone(ref.read(hazardZoneGeometryProvider));
     await _updateSimPosition(ref.read(simulatedPositionProvider));
+    await _applyCameraBackgroundTransparency(
+      ref.read(cameraBackgroundTransparencyProvider),
+    );
+  }
+
+  Future<void> _applyCameraBackgroundTransparency(double transparency) async {
+    final controller = _mapController;
+    if (controller == null || !_styleLoaded) return;
+    final opacity = (1 - transparency).clamp(0.0, 1.0);
+    for (final layerId in _cameraBackgroundLayerIds) {
+      await controller.setLayerProperties(
+        layerId,
+        LineLayerProperties(lineOpacity: opacity),
+      );
+    }
   }
 
   String _navErrorMessage(AppLocalizations l10n, String? error) {
@@ -442,7 +475,6 @@ class _MapScreenState extends ConsumerState<MapScreen>
     final cameraBackgroundTransparency = ref.watch(
       cameraBackgroundTransparencyProvider,
     );
-    final cameraBackgroundMapOpacity = 1 - cameraBackgroundTransparency;
     final showCameraBackground =
         cameraBackgroundEnabled &&
         ((_cameraController?.value.isInitialized ?? false) || _cameraSimulated);
@@ -452,6 +484,11 @@ class _MapScreenState extends ConsumerState<MapScreen>
         _initCameraBackground();
       } else {
         _disposeCameraBackground();
+      }
+    });
+    ref.listen<double>(cameraBackgroundTransparencyProvider, (_, next) {
+      if (showCameraBackground) {
+        unawaited(_applyCameraBackgroundTransparency(next));
       }
     });
     ref.listen(navControllerProvider, (_, _) => _drawRouteLine());
@@ -572,10 +609,7 @@ class _MapScreenState extends ConsumerState<MapScreen>
                 : _blurred(
                     SimulatedCameraBackground(speedMps: navState.speedMps),
                   ),
-          if (showCameraBackground)
-            Opacity(opacity: cameraBackgroundMapOpacity, child: map)
-          else
-            map,
+          map,
           Positioned(
             top:
                 MediaQuery.paddingOf(context).top + appBar.preferredSize.height,
