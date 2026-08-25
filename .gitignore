@@ -1,3 +1,5 @@
+.DS_Store
+
 docs/dist/
 docs/.astro/
 docs/.pnpm-store/
