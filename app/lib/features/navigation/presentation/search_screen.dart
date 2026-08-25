@@ -52,7 +52,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       _error = null;
     });
     try {
-      final results = await ref.read(geocodingServiceProvider).search(query);
+      final origin = await ref.read(locationServiceProvider).currentPosition();
+      final results = await ref.read(
+        geocodingServiceProvider,
+      ).search(query, origin: origin);
       if (!mounted) return;
       setState(() => _results = results);
     } catch (_) {

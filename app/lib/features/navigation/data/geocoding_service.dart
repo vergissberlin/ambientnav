@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import '../../../core/utils/geo.dart';
 import '../domain/entities/route.dart';
 
 /// A geocoded place: a human-readable [label] and its coordinate.
@@ -31,14 +32,27 @@ class GeocodingService {
   final Dio _dio;
   final String baseUrl;
 
-  Future<List<GeoResult>> search(String query, {int limit = 5}) async {
+  Future<List<GeoResult>> search(
+    String query, {
+    int limit = 5,
+    GeoPoint? origin,
+  }) async {
     if (query.trim().isEmpty) return const [];
     final res = await _dio.get<List<dynamic>>(
       '$baseUrl/search',
       queryParameters: {'q': query, 'format': 'jsonv2', 'limit': limit},
       options: Options(headers: {'User-Agent': 'AmbientNav/0.4 (flutter app)'}),
     );
-    return parse(res.data ?? const []);
+    final results = parse(res.data ?? const []);
+    if (origin == null) return results;
+    final indexed = results.asMap().entries.toList();
+    indexed.sort((a, b) {
+      final da = Geo.haversineMeters(origin, a.value.point);
+      final db = Geo.haversineMeters(origin, b.value.point);
+      final byDistance = da.compareTo(db);
+      return byDistance != 0 ? byDistance : a.key.compareTo(b.key);
+    });
+    return [for (final entry in indexed) entry.value];
   }
 
   /// Pure parser for a Nominatim `jsonv2` response — unit-tested.
