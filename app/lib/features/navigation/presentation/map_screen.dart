@@ -13,6 +13,7 @@ import '../../../core/settings/camera_background_settings.dart';
 import '../../../ui/molecules/front_led_strip_preview.dart';
 import '../../../ui/molecules/simulated_camera_background.dart';
 import '../../../ui/molecules/turn_by_turn_panel.dart';
+import 'navigation_info_overlay.dart';
 import '../domain/entities/maneuver.dart';
 import '../domain/entities/route.dart';
 import 'nav_controller.dart';
@@ -32,6 +33,10 @@ class MapScreen extends ConsumerStatefulWidget {
 
 class _MapScreenState extends ConsumerState<MapScreen>
     with WidgetsBindingObserver {
+  /// When the simulator video is visible, keep the map as a very light
+  /// overlay so the moving background remains obvious.
+  static const double _cameraBackgroundMapOpacity = 0.42;
+
   MapLibreMapController? _mapController;
   Line? _routeLine;
   Line? _hazardZoneLine;
@@ -566,17 +571,18 @@ class _MapScreenState extends ConsumerState<MapScreen>
                 : _blurred(
                     SimulatedCameraBackground(speedMps: navState.speedMps),
                   ),
-          showCameraBackground ? Opacity(opacity: 0.65, child: map) : map,
-          Padding(
-            padding: EdgeInsets.only(
-              top:
-                  MediaQuery.paddingOf(context).top +
-                  appBar.preferredSize.height,
-            ),
-            child: Align(
-              alignment: Alignment.topCenter,
+          showCameraBackground
+              ? Opacity(opacity: _cameraBackgroundMapOpacity, child: map)
+              : map,
+          Positioned(
+            top:
+                MediaQuery.paddingOf(context).top + appBar.preferredSize.height,
+            left: 0,
+            right: 0,
+            child: NavigationInfoOverlay(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TurnByTurnPanel(
                     maneuver: navState.nextManeuver,

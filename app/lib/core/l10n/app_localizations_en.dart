@@ -86,7 +86,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cameraNavBackgroundNoCamera =>
-      'No camera is available in this simulator. The app is showing a simulated background instead.';
+      'No camera is available in this simulator. The app is showing a simulated video background instead.';
 
   @override
   String get theme => 'Theme';

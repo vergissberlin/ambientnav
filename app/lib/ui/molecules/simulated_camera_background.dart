@@ -1,16 +1,12 @@
 import 'package:ambientnav_ui/ambientnav_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:video_player/video_player.dart';
 
 /// A synthetic "driving" visual shown in place of a live camera feed when no
-/// real camera is available — the iOS Simulator has no camera hardware, and
-/// most Android emulators don't either, which would otherwise make the
-/// camera-background navigation feature undemonstrable outside a physical
-/// device. Draws a perspective road with a centre dash line animating toward
-/// the viewer; [speedMps] scales how fast the dashes travel, driven by the
-/// same live/simulated speed the rest of the nav UI reads
-/// (`NavigationState.speedMps`), so a route simulation visibly "moves" the
-/// background too. Parked/idle still drifts slowly rather than freezing.
+/// real camera is available. The simulator now prefers a looping MP4 so the
+/// background clearly reads as video; the older animated road stays as a
+/// fallback while the clip initializes or if playback fails.
 class SimulatedCameraBackground extends StatefulWidget {
   const SimulatedCameraBackground({super.key, this.speedMps = 0});
 
@@ -27,7 +23,11 @@ class _SimulatedCameraBackgroundState extends State<SimulatedCameraBackground>
   Duration _lastElapsed = Duration.zero;
   double _phase = 0;
 
-  /// Slow ambient drift so the background never looks frozen while parked.
+  VideoPlayerController? _videoController;
+  bool _videoInitializing = false;
+
+  /// Slow ambient drift so the fallback animation never looks frozen while
+  /// parked.
   static const double _idleSpeedMps = 4;
 
   /// Metres of "travel" per full dash-repeat cycle.
@@ -37,6 +37,32 @@ class _SimulatedCameraBackgroundState extends State<SimulatedCameraBackground>
   void initState() {
     super.initState();
     _ticker = createTicker(_onTick)..start();
+    _initVideoBackground();
+  }
+
+  Future<void> _initVideoBackground() async {
+    if (_videoController != null || _videoInitializing) {
+      return;
+    }
+    _videoInitializing = true;
+    try {
+      final controller = VideoPlayerController.asset(
+        'assets/videos/simulated_camera_background.mp4',
+      );
+      await controller.initialize();
+      if (!mounted) {
+        await controller.dispose();
+        return;
+      }
+      await controller.setLooping(true);
+      await controller.setVolume(0);
+      await controller.play();
+      setState(() => _videoController = controller);
+    } catch (_) {
+      // Leave the animated fallback in place.
+    } finally {
+      _videoInitializing = false;
+    }
   }
 
   void _onTick(Duration elapsed) {
@@ -53,14 +79,58 @@ class _SimulatedCameraBackgroundState extends State<SimulatedCameraBackground>
   @override
   void dispose() {
     _ticker.dispose();
+    _videoController?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final controller = _videoController;
+    if (controller != null && controller.value.isInitialized) {
+      return Stack(
+        fit: StackFit.expand,
+        children: [_buildVideoPreview(controller), const _VideoWash()],
+      );
+    }
+
     return CustomPaint(
       painter: _RoadPainter(phase: _phase),
       child: const SizedBox.expand(),
+    );
+  }
+
+  Widget _buildVideoPreview(VideoPlayerController controller) {
+    final size = controller.value.size;
+    final player = size.width > 0 && size.height > 0
+        ? FittedBox(
+            fit: BoxFit.cover,
+            child: SizedBox(
+              width: size.width,
+              height: size.height,
+              child: VideoPlayer(controller),
+            ),
+          )
+        : VideoPlayer(controller);
+
+    return Positioned.fill(child: player);
+  }
+}
+
+class _VideoWash extends StatelessWidget {
+  const _VideoWash();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Positioned.fill(
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0x1A000000), Color(0x0D000000), Color(0x1F000000)],
+          ),
+        ),
+      ),
     );
   }
 }

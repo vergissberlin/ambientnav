@@ -24,7 +24,7 @@
   "cameraNavBackground": "Camera background",
   "cameraNavBackgroundDesc": "Show a blurred live camera view behind the navigation map",
   "cameraNavBackgroundPermissionDenied": "Camera permission is required. If you deny it, the camera background stays off until you allow access.",
-  "cameraNavBackgroundNoCamera": "No camera is available in this simulator. The app is showing a simulated background instead.",
+  "cameraNavBackgroundNoCamera": "No camera is available in this simulator. The app is showing a simulated video background instead.",
   "theme": "Theme",
   "themeSystem": "System",
   "themeLight": "Light",

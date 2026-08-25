@@ -245,7 +245,7 @@ abstract class AppLocalizations {
   /// No description provided for @cameraNavBackgroundNoCamera.
   ///
   /// In en, this message translates to:
-  /// **'No camera is available in this simulator. The app is showing a simulated background instead.'**
+  /// **'No camera is available in this simulator. The app is showing a simulated video background instead.'**
   String get cameraNavBackgroundNoCamera;
 
   /// No description provided for @theme.
