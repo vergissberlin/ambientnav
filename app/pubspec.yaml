@@ -31,6 +31,7 @@ dependencies:
   maplibre_gl: ^0.27.0          # OSS map rendering + offline regions (OSM tiles)
   geolocator: ^14.0.3           # device GPS position
   flutter_tts: ^4.2.5           # multi-language voice guidance
+  flutter_svg: ^2.1.0           # render the AmbientNav brand mark in the nav header
 
   # BLE — central role, RSSI exposed natively, bonding/pairing, MTU.
   #

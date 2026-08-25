@@ -82,29 +82,33 @@ class _ResponsiveHomeFooterBarState extends State<ResponsiveHomeFooterBar>
           ),
         );
       },
-      child: AnGlassBar(
-        border: Border(top: BorderSide(color: borderColor)),
-        child: NavigationBar(
-          backgroundColor: Colors.transparent,
-          selectedIndex: widget.selectedIndex,
-          onDestinationSelected: widget.onDestinationSelected,
-          destinations: [
-            NavigationDestination(
-              icon: const Icon(Icons.navigation_outlined),
-              selectedIcon: const Icon(Icons.navigation),
-              label: l10n.navTab,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.memory_outlined),
-              selectedIcon: const Icon(Icons.memory),
-              label: l10n.controllersTab,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.settings_outlined),
-              selectedIcon: const Icon(Icons.settings),
-              label: l10n.settingsTab,
-            ),
-          ],
+      child: MediaQuery.removePadding(
+        context: context,
+        removeBottom: true,
+        child: AnGlassBar(
+          border: Border(top: BorderSide(color: borderColor)),
+          child: NavigationBar(
+            backgroundColor: Colors.transparent,
+            selectedIndex: widget.selectedIndex,
+            onDestinationSelected: widget.onDestinationSelected,
+            destinations: [
+              NavigationDestination(
+                icon: const Icon(Icons.navigation_outlined),
+                selectedIcon: const Icon(Icons.navigation),
+                label: l10n.navTab,
+              ),
+              NavigationDestination(
+                icon: const Icon(Icons.memory_outlined),
+                selectedIcon: const Icon(Icons.memory),
+                label: l10n.controllersTab,
+              ),
+              NavigationDestination(
+                icon: const Icon(Icons.settings_outlined),
+                selectedIcon: const Icon(Icons.settings),
+                label: l10n.settingsTab,
+              ),
+            ],
+          ),
         ),
       ),
     );

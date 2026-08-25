@@ -13,6 +13,7 @@ import '../../../core/settings/camera_background_settings.dart';
 import '../../../ui/molecules/front_led_strip_preview.dart';
 import '../../../ui/molecules/simulated_camera_background.dart';
 import '../../../ui/molecules/turn_by_turn_panel.dart';
+import 'navigation_app_bar_title.dart';
 import 'navigation_info_overlay.dart';
 import 'navigation_info_strip_frame.dart';
 import '../domain/entities/maneuver.dart';
@@ -506,7 +507,11 @@ class _MapScreenState extends ConsumerState<MapScreen>
     );
 
     final appBar = AnAppBar(
-      title: Text(l10n.navTab),
+      title: NavigationAppBarTitle(
+        label: l10n.navTab,
+        phase: navState.phase,
+        speedMps: navState.speedMps,
+      ),
       actions: [
         if (simulating)
           const Padding(
