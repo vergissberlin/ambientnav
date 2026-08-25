@@ -95,11 +95,38 @@ class _MapScreenState extends ConsumerState<MapScreen>
     }
     _cameraInitializing = true;
     try {
-      final cameras = await availableCameras();
+      List<CameraDescription> cameras;
+      try {
+        cameras = await ref.read(cameraServiceProvider).availableCameras();
+      } catch (_) {
+        cameras = const [];
+      }
       if (cameras.isEmpty) {
+        ref.read(cameraBackgroundPermissionDeniedProvider.notifier).state =
+            false;
+        ref.read(cameraBackgroundNoCameraAvailableProvider.notifier).state =
+            true;
         if (mounted) setState(() => _cameraSimulated = true);
         return;
       }
+      final granted = await ref
+          .read(permissionServiceProvider)
+          .ensureCameraPermission();
+      if (!granted) {
+        ref.read(cameraBackgroundNoCameraAvailableProvider.notifier).state =
+            false;
+        ref.read(cameraBackgroundPermissionDeniedProvider.notifier).state =
+            true;
+        if (ref.read(cameraBackgroundEnabledProvider)) {
+          await ref
+              .read(cameraBackgroundEnabledProvider.notifier)
+              .setEnabled(false);
+        }
+        return;
+      }
+      ref.read(cameraBackgroundNoCameraAvailableProvider.notifier).state =
+          false;
+      ref.read(cameraBackgroundPermissionDeniedProvider.notifier).state = false;
       final backCamera = cameras.firstWhere(
         (c) => c.lensDirection == CameraLensDirection.back,
         orElse: () => cameras.first,

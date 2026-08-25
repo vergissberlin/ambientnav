@@ -11,6 +11,8 @@ import '../../features/navigation/domain/repositories/routing_repository.dart';
 import '../../features/navigation/presentation/voice/voice_guidance_service.dart';
 import '../../features/offline/data/offline_region_manager.dart';
 import '../../features/offline/domain/offline_repository.dart';
+import '../camera/camera_service.dart';
+import '../permissions/permission_service.dart';
 import '../location/location_service.dart';
 import '../security/pairing_service.dart';
 import '../theme/theme_controller.dart';
@@ -32,6 +34,14 @@ final controllerRepositoryProvider = Provider<ControllerRepository>((ref) {
 
 final pairingServiceProvider = Provider<PairingService>((ref) {
   return PairingService(ref.watch(controllerRepositoryProvider));
+});
+
+final permissionServiceProvider = Provider<PermissionService>((ref) {
+  return const PermissionService();
+});
+
+final cameraServiceProvider = Provider<CameraService>((ref) {
+  return const CameraService();
 });
 
 // ── Navigation / routing ──────────────────────────────────────────────────────

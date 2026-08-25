@@ -239,8 +239,14 @@ abstract class AppLocalizations {
   /// No description provided for @cameraNavBackgroundPermissionDenied.
   ///
   /// In en, this message translates to:
-  /// **'Camera permission is required for this feature'**
+  /// **'Camera permission is required. If you deny it, the camera background stays off until you allow access.'**
   String get cameraNavBackgroundPermissionDenied;
+
+  /// No description provided for @cameraNavBackgroundNoCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'No camera is available in this simulator. The app is showing a simulated background instead.'**
+  String get cameraNavBackgroundNoCamera;
 
   /// No description provided for @theme.
   ///

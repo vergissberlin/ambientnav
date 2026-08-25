@@ -36,32 +36,49 @@ class TurnByTurnPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final m = maneuver;
     if (m == null) return const SizedBox.shrink();
+    final theme = Theme.of(context);
+    final compact = MediaQuery.orientationOf(context) == Orientation.landscape;
+    final outerPadding = EdgeInsets.fromLTRB(
+      12,
+      compact ? 8 : 12,
+      12,
+      compact ? 8 : 12,
+    );
+    final innerPadding = EdgeInsets.symmetric(
+      horizontal: compact ? 12 : 16,
+      vertical: compact ? 8 : 12,
+    );
+    final iconSize = compact ? 28.0 : 36.0;
+    final instructionStyle = compact
+        ? theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)
+        : theme.textTheme.titleMedium;
+    final distanceStyle = compact
+        ? theme.textTheme.titleSmall
+        : theme.textTheme.titleMedium;
     // AnPanelAccent.staticAccent deliberately — this panel rebuilds on every
     // navigation distance tick, and pulse/scanline would stack extra motion
     // on top of MapLibre's own rendering on a panel that must stay glanceable
     // while driving.
     return Padding(
-      padding: const EdgeInsets.all(12),
+      padding: outerPadding,
       child: AnPanel(
         glow: AnCardGlow.cyan,
         accent: AnPanelAccent.staticAccent,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: innerPadding,
         child: Row(
           children: [
-            Icon(_icon(m.type), size: 36),
-            const SizedBox(width: 16),
+            Icon(_icon(m.type), size: iconSize),
+            SizedBox(width: compact ? 10 : 16),
             Expanded(
               child: Text(
                 m.instruction,
-                maxLines: 2,
+                style: instructionStyle,
+                maxLines: compact ? 1 : 2,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            const SizedBox(width: 12),
-            Text(
-              _distanceLabel(),
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+            SizedBox(width: compact ? 10 : 12),
+            Text(_distanceLabel(), style: distanceStyle),
           ],
         ),
       ),

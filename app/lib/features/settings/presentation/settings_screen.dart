@@ -1,11 +1,12 @@
 import 'package:ambientnav_ui/ambientnav_ui.dart';
+import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:ambientnav/core/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/dev/dev_settings.dart';
-import '../../../core/permissions/permission_service.dart';
+import '../../../core/di/providers.dart';
 import '../../../core/settings/camera_background_settings.dart';
 import '../../../core/theme/theme_controller.dart';
 
@@ -22,6 +23,9 @@ class SettingsScreen extends ConsumerWidget {
     final cameraBackgroundEnabled = ref.watch(cameraBackgroundEnabledProvider);
     final cameraPermissionDenied = ref.watch(
       cameraBackgroundPermissionDeniedProvider,
+    );
+    final cameraNoAvailable = ref.watch(
+      cameraBackgroundNoCameraAvailableProvider,
     );
 
     final appBar = AnAppBar(title: Text(l10n.settingsTab));
@@ -72,23 +76,48 @@ class SettingsScreen extends ConsumerWidget {
             secondary: const Icon(Icons.camera_alt_outlined),
             title: Text(l10n.cameraNavBackground),
             subtitle: Text(
-              cameraPermissionDenied
+              cameraNoAvailable
+                  ? l10n.cameraNavBackgroundNoCamera
+                  : cameraPermissionDenied
                   ? l10n.cameraNavBackgroundPermissionDenied
                   : l10n.cameraNavBackgroundDesc,
             ),
             value: cameraBackgroundEnabled,
             onChanged: (v) async {
+              final deniedNotifier = ref.read(
+                cameraBackgroundPermissionDeniedProvider.notifier,
+              );
+              final noCameraNotifier = ref.read(
+                cameraBackgroundNoCameraAvailableProvider.notifier,
+              );
               if (!v) {
+                deniedNotifier.state = false;
+                noCameraNotifier.state = false;
                 ref
                     .read(cameraBackgroundEnabledProvider.notifier)
                     .setEnabled(false);
                 return;
               }
-              final granted = await const PermissionService()
+              List<CameraDescription> cameras;
+              try {
+                cameras = await ref
+                    .read(cameraServiceProvider)
+                    .availableCameras();
+              } catch (_) {
+                cameras = const [];
+              }
+              if (cameras.isEmpty) {
+                deniedNotifier.state = false;
+                noCameraNotifier.state = true;
+                await ref
+                    .read(cameraBackgroundEnabledProvider.notifier)
+                    .setEnabled(true);
+                return;
+              }
+              final granted = await ref
+                  .read(permissionServiceProvider)
                   .ensureCameraPermission();
-              final deniedNotifier = ref.read(
-                cameraBackgroundPermissionDeniedProvider.notifier,
-              );
+              noCameraNotifier.state = false;
               deniedNotifier.state = !granted;
               if (granted) {
                 ref

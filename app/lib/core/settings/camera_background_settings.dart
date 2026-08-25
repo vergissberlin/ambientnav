@@ -33,3 +33,10 @@ final cameraBackgroundEnabledProvider =
 final cameraBackgroundPermissionDeniedProvider = StateProvider<bool>(
   (ref) => false,
 );
+
+/// True when the app tried to enable the background but the current device or
+/// simulator reports no available cameras. Used to show a simulator-specific
+/// hint instead of a permission error.
+final cameraBackgroundNoCameraAvailableProvider = StateProvider<bool>(
+  (ref) => false,
+);

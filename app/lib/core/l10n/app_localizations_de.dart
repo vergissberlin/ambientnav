@@ -82,7 +82,11 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get cameraNavBackgroundPermissionDenied =>
-      'Für diese Funktion ist die Kamera-Berechtigung erforderlich';
+      'Für diese Funktion ist die Kamera-Berechtigung erforderlich. Wenn du sie ablehnst, bleibt der Kamera-Hintergrund aus, bis du den Zugriff erlaubst.';
+
+  @override
+  String get cameraNavBackgroundNoCamera =>
+      'In diesem Simulator ist keine Kamera verfügbar. Stattdessen wird ein simulierter Hintergrund angezeigt.';
 
   @override
   String get theme => 'Design';
