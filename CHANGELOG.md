@@ -1,5 +1,58 @@
 # Changelog
 
+## [0.7.0](https://github.com/vergissberlin/ambientnav/compare/ambientnav-v0.6.0...ambientnav-v0.7.0) (2026-08-25)
+
+
+### Features
+
+* add adjustable camera background transparency ([abc1c00](https://github.com/vergissberlin/ambientnav/commit/abc1c00349c5ade2272456109e70769ad809976e))
+* **app:** add camera background toggle to navigation map ([b16abb4](https://github.com/vergissberlin/ambientnav/commit/b16abb4b65d4da310773f59ee58afc5de6a201b0))
+* **app:** bundle Orbitron so the header font actually renders ([e960947](https://github.com/vergissberlin/ambientnav/commit/e96094780814bda0e82dbeeb7de939f51eeea909))
+* **app:** camera background toggle for navigation map ([230bfb1](https://github.com/vergissberlin/ambientnav/commit/230bfb1d3595cf6aff2ccd35e08f44e5a8d674e3))
+* **app:** glow the already-driven portion of the route line ([5a624cd](https://github.com/vergissberlin/ambientnav/commit/5a624cd3bbce8b998a6348819e4ada2c6fe8f96e))
+* **app:** handle camera availability and landscape navigation ([f343afb](https://github.com/vergissberlin/ambientnav/commit/f343afb20513ad6d1e856a9376868fd41ae47a56))
+* **app:** improve navigation camera and app branding ([1d9ad59](https://github.com/vergissberlin/ambientnav/commit/1d9ad59f613caccbbbbde5957c5e557cec3912f0))
+* **app:** show a growing green fill as the destination approaches ([0e7a98b](https://github.com/vergissberlin/ambientnav/commit/0e7a98b11c8c3d01c580f0f183c5a480f2baeed2))
+* **app:** simulate the camera background when no camera is available ([31e5716](https://github.com/vergissberlin/ambientnav/commit/31e5716854aff29ecb9e235c444a6d5637385789))
+* **app:** simulate the camera background when no camera is available ([30cfe8c](https://github.com/vergissberlin/ambientnav/commit/30cfe8cb1023011a3eb8ee6e1fcbe5a8b17c9bee))
+* **app:** simulate the front LED strip during navigation ([13082c6](https://github.com/vergissberlin/ambientnav/commit/13082c64654f6e369439d50f6cb1421ecb2860eb))
+* **design,app:** frosted-glass header and bottom nav bar ([9ea53bc](https://github.com/vergissberlin/ambientnav/commit/9ea53bc6d4cae56ce1ac42796fd4535732dd18c1))
+* **design:** introduce the Cybernetic Frame cyberpunk-neon direction ([7b4eb34](https://github.com/vergissberlin/ambientnav/commit/7b4eb3469d5b2c60fb225f8f0e61afb67617df97))
+* **design:** switch heading font to Orbitron for the cyberpunk direction ([781bd0b](https://github.com/vergissberlin/ambientnav/commit/781bd0b77bdce77a3842030ad26902361b232ac5))
+* make straight navigation effect breathe across the strip ([b6cd918](https://github.com/vergissberlin/ambientnav/commit/b6cd918dd247d151183326d09084e0fbb0c3fc02))
+* **map:** update route and map styling ([c046158](https://github.com/vergissberlin/ambientnav/commit/c04615875131022f8efd9979c6a5e6246011b624))
+* **marketing:** 3D viewer focus buttons + front/rear sensor animation ([fe8d558](https://github.com/vergissberlin/ambientnav/commit/fe8d55892b1014a8f102892c3877b2bf56befbc1))
+* **marketing:** add feature-focus navigation buttons to the 3D viewer ([a3a43f8](https://github.com/vergissberlin/ambientnav/commit/a3a43f811262eb43558e8a8f3697211768d3c048))
+* **marketing:** add vehicle model assets ([013fc46](https://github.com/vergissberlin/ambientnav/commit/013fc46b42bd57a7505354669276dc2bd84970e7))
+* **marketing:** animate front and rear distance sensors ([8066a4c](https://github.com/vergissberlin/ambientnav/commit/8066a4ca0c2658fc1d5cf29d4585c87b12f7b375))
+* **marketing:** interactive 3D vehicle preview in the hero section ([1825820](https://github.com/vergissberlin/ambientnav/commit/18258208ee51fc2d026ba2b500667e18c61a68b6))
+* **marketing:** replace hero visual with an interactive 3D vehicle preview ([bd9326a](https://github.com/vergissberlin/ambientnav/commit/bd9326aeef96b9a95792c3f79a10321e86d6217a))
+* **navigation:** add looping simulator video background ([d17690d](https://github.com/vergissberlin/ambientnav/commit/d17690d6945c581c4086cc243449e8da33ca4d37))
+* **navigation:** add support for "new name" maneuver type ([867d8cd](https://github.com/vergissberlin/ambientnav/commit/867d8cd86808c2b38ee646719cd2414d927a28e2))
+* **navigation:** frame LED strip preview and soften map overlay ([ebc9cc4](https://github.com/vergissberlin/ambientnav/commit/ebc9cc48bbf705c70ffa22899f6be8e0daaba239))
+* **navigation:** refine map colors and forward motion ([d52f814](https://github.com/vergissberlin/ambientnav/commit/d52f8141fc4c8528572c386d231699c2d847d3e4))
+* **navigation:** sort geocoding results by proximity ([fbdde3a](https://github.com/vergissberlin/ambientnav/commit/fbdde3a8ec2009b27cb464370c26fccdfe2c04e5))
+* polish responsive home footer navigation ([57d71e9](https://github.com/vergissberlin/ambientnav/commit/57d71e9193c99017400fdca30ec1ed1337a1d5c5))
+* **pubspec.lock:** add camera package and its dependencies to enable camera functionality in the app ([8c5f996](https://github.com/vergissberlin/ambientnav/commit/8c5f99644679f787e321134f4f6bc2b7b2645799))
+* replace camera background transparency with blur control ([8373d59](https://github.com/vergissberlin/ambientnav/commit/8373d591d4a39c52ddacff5362fd0d3fe791332d))
+* **ui:** support left-aligned navigation app bar titles ([62634f0](https://github.com/vergissberlin/ambientnav/commit/62634f0872d265aac95d9029b5538ff8b01786c0))
+
+
+### Bug Fixes
+
+* align release defaults and firmware queues ([37e62df](https://github.com/vergissberlin/ambientnav/commit/37e62df2429447a8545850f9c1edb06a4c1387c2))
+* **app:** correct front-strip maneuver timing and add hazard-zone cues ([034eef2](https://github.com/vergissberlin/ambientnav/commit/034eef23f7b399709d4bd2650e140229bd1e7e3f))
+* **app:** stop the route-glow update from racing itself ([2e10f6e](https://github.com/vergissberlin/ambientnav/commit/2e10f6e579fa2d396800261fea58ddd917e13226))
+* **marketing,docs:** give the SystemDiagram frame breathing room ([25181e2](https://github.com/vergissberlin/ambientnav/commit/25181e282471f199a92f32058cdd1fdf20118349))
+* **marketing,docs:** restore scoped-CSS-broken CyberFrame containers ([7a0dca6](https://github.com/vergissberlin/ambientnav/commit/7a0dca6f8a7ac2b3023a1e34dc622364455d0626))
+* **marketing,docs:** stop the box subtitle text overlapping the box edge ([6263f76](https://github.com/vergissberlin/ambientnav/commit/6263f7652b3b4b93be8d6561249465efa6a46af9))
+* **navigation:** apply camera transparency to map layers ([d6e686c](https://github.com/vergissberlin/ambientnav/commit/d6e686c10c6ed5c3a75b6a7db1e04a0dc864af5e))
+* **ui,widgetbook:** regenerate stale glow golden and fix LED-preview overflow ([5cbc132](https://github.com/vergissberlin/ambientnav/commit/5cbc132b76309fb584361b3eb33d5d6c2b80c315))
+* **ui:** compact turn-by-turn panel layout ([bcaab3c](https://github.com/vergissberlin/ambientnav/commit/bcaab3ce0aeb42a4c4fd26befa735650cdaaeab7))
+* **ui:** prevent controller tile overflow on narrow screens ([7d04cab](https://github.com/vergissberlin/ambientnav/commit/7d04cab498571dced663ae62cd0372db61a16fed))
+* **ui:** prevent footer safe-area padding and show nav status ([2325b94](https://github.com/vergissberlin/ambientnav/commit/2325b94a3ae6ba8a02c70db583557ac260db1a3a))
+* **widgetbook:** register SimulatedCameraBackground use case ([053b0de](https://github.com/vergissberlin/ambientnav/commit/053b0de82b45d7c3550c6f88348fb3d752140e8f))
+
 ## [0.6.0](https://github.com/vergissberlin/ambientnav/compare/ambientnav-v0.5.0...ambientnav-v0.6.0) (2026-08-21)
 
 
