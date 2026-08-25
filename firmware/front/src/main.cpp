@@ -29,9 +29,9 @@ void setup() {
     Serial.begin(115200);
     Serial.printf("\n[AmbientNav Front] firmware %s\n", FIRMWARE_VERSION);
 
-    navQueue    = xQueueCreate(4, sizeof(NavState));
-    proxQueue   = xQueueCreate(4, sizeof(SensorData));
-    effectQueue = xQueueCreate(2, sizeof(EffectCommand));
+    navQueue    = xQueueCreate(1, sizeof(NavState));
+    proxQueue   = xQueueCreate(1, sizeof(SensorData));
+    effectQueue = xQueueCreate(1, sizeof(EffectCommand));
     sppMutex    = xSemaphoreCreateMutex();
     configMutex = xSemaphoreCreateMutex();
 

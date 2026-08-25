@@ -114,7 +114,7 @@ See [`app/README.md`](app/README.md) for the app architecture and features (dark
 
 ---
 
-## Repository Structure (planned)
+## Repository Structure
 
 ```plaintext
 ambientnav/
@@ -128,6 +128,9 @@ ambientnav/
 │   │       ├── car/        # CarPlay / Android Auto scaffolds
 │   │       └── settings/   # theme & preferences
 │   └── test/               # unit + widget tests (run against a mock BLE layer)
+├── packages/
+│   └── ambientnav_ui/      # shared Flutter design tokens and UI atoms
+├── widgetbook/             # component catalogue for the Flutter UI package
 ├── firmware/
 │   ├── front/              # ESP32 Master (Arduino / ESP-IDF)
 │   │   ├── src/
@@ -143,10 +146,11 @@ ambientnav/
 │       │   ├── bt_classic.cpp      # SPP server (front ESP32 side)
 │       │   └── led_effects.cpp     # FastLED parking-aid effects
 │       └── platformio.ini
-└── docs/
-    ├── wiring.md           # Pin assignments and wiring diagrams
-    ├── ble-protocol.md     # GATT service / characteristic spec
-    └── bt-protocol.md      # SPP message format spec
+├── docs/                   # Starlight documentation site
+├── marketing/              # Astro marketing site deployed by Netlify
+├── design-system/          # brand assets, tokens, UI kits, guidelines
+├── wokwi/                  # firmware simulation projects
+└── output/                 # source assets for generated media and 3D work
 ```
 
 ---
@@ -227,15 +231,25 @@ cd ../../firmware/rear
 pio run --target upload
 ```
 
+Run native firmware unit tests for pure logic without an ESP32:
+
+```bash
+cd firmware/rear
+pio test -e native
+```
+
 ### App
 
 ```bash
 cd app
 flutter pub get
 flutter gen-l10n
-flutter run --dart-define=USE_MOCK=true   # run against the in-memory mock (no hardware)
-# Drop USE_MOCK to use real BLE on a physical device
+flutter run --dart-define=USE_MOCK=true    # in-memory mock, no hardware
+flutter run --dart-define=USE_MOCK=false   # real BLE on a physical device
 ```
+
+If `USE_MOCK` is omitted, debug builds default to the mock and product builds
+default to real BLE.
 
 See [`app/README.md`](app/README.md) for full app docs.
 

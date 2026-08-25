@@ -85,6 +85,9 @@ jobs:
       - name: Build rear firmware
         run: cd firmware/rear && pio run
 
+      - name: Test rear firmware pure logic
+        run: cd firmware/rear && pio test -e native
+
       - name: Build merged rear firmware
         run: cd firmware/rear && pio run --target mergebin
 

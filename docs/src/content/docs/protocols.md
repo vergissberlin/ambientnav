@@ -59,8 +59,8 @@ over additional GATT services on the same peripheral. All UUIDs extend the base
 `12345678-1234-5678-1234-56789ABCDExx`; **all multi-byte values are little-endian**.
 
 > **Status:** The app implements and unit-tests these codecs against this
-> specification with a mock layer. Firmware implementation of the new services
-> is a follow-up; the navigation service above is already implemented.
+> specification with a mock layer. The front firmware exposes the extended GATT
+> services for telemetry, LED configuration, sensor configuration, and OTA.
 
 | Service / Characteristic | UUID suffix | Properties | Payload |
 |---|---|---|---|
@@ -94,8 +94,10 @@ firmware, the front controller uses **LE Secure Connections with a 6-digit
 passkey and bonding** (encrypted + authenticated link, MITM protection — works
 on the display-less ESP32).
 
-- The controller stores a fixed per-device passkey (flash/NVS, printed on a
-  sticker) and advertises with bonding + MITM + SC flags (NimBLE
+- The controller uses a fixed 6-digit passkey from firmware configuration
+  (`BLE_PASSKEY`, default `123456` for development). Production units should
+  override this build flag per device and print the value on the device sticker.
+  The controller advertises with bonding + MITM + SC flags (NimBLE
   `setSecurityAuth` / `setSecurityPasskey`).
 - **All write/OTA/config characteristics require an encrypted, authenticated
   link** (`READ_ENC | WRITE_ENC | WRITE_AUTHEN`); telemetry/device-info reads may

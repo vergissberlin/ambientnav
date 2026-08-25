@@ -14,7 +14,7 @@ AmbientNav verwendet intern zwei drahtlose Protokolle:
 
 ## BLE — GATT (iPhone ↔ ESP32 Vorne)
 
-Die iOS App fungiert als **BLE Central**. Der vordere ESP32 exponiert ein **GATT Peripheral** mit einem einzigen Custom-Service und einer Characteristic.
+Die App fungiert als **BLE Central**. Der vordere ESP32 exponiert ein **GATT Peripheral**. Der ursprüngliche Navigations-Service bleibt unverändert; zusätzlich nutzt die App das unten beschriebene erweiterte Protokoll für Telemetrie, Konfiguration und OTA.
 
 ### Service & Characteristic
 
@@ -49,6 +49,57 @@ Leerlauf / keine Navigation: 00 00 00
 - Die iOS App scannt beim Start nach der Service-UUID und verbindet sich automatisch.
 - Die App veröffentlicht nur bei **Zustandsänderungen** — nicht in festen Intervallen.
 - Bei BLE-Verbindungsunterbrechung blendet der vordere ESP32 den LED-Streifen nach 5 Sekunden auf `AMBIENT` ab.
+
+---
+
+## BLE — Erweitertes Protokoll (App ↔ Controller)
+
+Neben der Navigation verwaltet die App Controller-Telemetrie, Konfiguration und
+OTA über zusätzliche GATT-Services auf demselben Peripheral. Alle UUIDs erweitern
+die Basis `12345678-1234-5678-1234-56789ABCDExx`; **alle Multi-Byte-Werte sind
+Little-Endian**.
+
+> **Status:** Die App implementiert und testet diese Codecs gegen diese
+> Spezifikation mit einer Mock-Schicht. Die Front-Firmware exponiert die
+> erweiterten GATT-Services für Telemetrie, LED-Konfiguration,
+> Sensor-Konfiguration und OTA.
+
+| Service / Characteristic | UUID-Suffix | Properties | Nutzlast |
+|---|---|---|---|
+| **Navigation** | Service `…F0`, Char `…F1` | Write Without Response | `[direction, distance_m, blinker]` (3 Bytes) |
+| **Telemetry** Service | `…F2` | | |
+| — Batteriespannung | Char `…F3` | Read, Notify | `uint16` Millivolt (~1 Hz) |
+| — Device info | Char `…F4` | Read | `[role(u8: 0=front,1=rear)] + UTF-8 Firmware-Version` |
+| **LED Config** Service | `…F5` | | |
+| — LED config | Char `…F6` | Read, Write¹ | `[ledCount(u16), brightness(u8), effect(u8), p0,p1,p2,p3(u8)]` (8 Bytes) |
+| **Sensor Config** Service | `…F7` | | |
+| — Sensor config | Char `…F8` | Read, Write¹ | `[activeSensor(u8), calibrationOffset(i16, cm), maxRange(u16, cm)]` (5 Bytes) |
+| **OTA** Service | `…F9` | | |
+| — OTA control | Char `…FA` | Write¹, Notify | begin: `[op(0), totalLen(u32), crc32(u32)]` · abort `[1]` · commit `[2]`; notify = Status/Ack |
+| — OTA data | Char `…FB` | Write Without Response¹ | `[seq(u16), chunk(≤ MTU-3)]` |
+
+¹ Erfordert eine verschlüsselte, authentifizierte Verbindung per Bonding.
+
+- **RSSI** wird vom Smartphone nativ gelesen; es gibt keine RSSI-Characteristic.
+- **LED config** Read-back befüllt den Editor der App mit der aktuellen
+  Controller-Konfiguration.
+- **OTA** trägt Länge und CRC-32 im Begin-Frame; die Firmware verifiziert vor
+  dem Commit und Reboot.
+
+### Sicherheit — Passkey Pairing + Bonding
+
+Der Front-Controller nutzt **LE Secure Connections mit 6-stelligem Passkey und
+Bonding** für schreibende Konfigurations- und OTA-Zugriffe.
+
+- Der Controller nutzt einen festen 6-stelligen Passkey aus der
+  Firmware-Konfiguration (`BLE_PASSKEY`, Entwicklungs-Default `123456`).
+  Produktive Geräte sollten diesen Build-Flag pro Gerät überschreiben und den
+  Wert auf den Geräteaufkleber drucken.
+- Schreibende Config- und OTA-Characteristics erfordern eine verschlüsselte,
+  authentifizierte Verbindung. Telemetrie- und Device-Info-Reads können offen
+  bleiben.
+- Die App validiert das Passkey-Format, triggert den OS-Pairing-Flow und sperrt
+  mutierende Aktionen, bis das Gerät gekoppelt ist.
 
 ---
 

@@ -21,9 +21,12 @@
 #define BLE_CHR_OTA_CTRL   "12345678-1234-5678-1234-56789ABCDEFA" // Write/Notify
 #define BLE_CHR_OTA_DATA   "12345678-1234-5678-1234-56789ABCDEFB" // Write Without Response
 
-// Per-device 6-digit passkey for LE Secure Connections + bonding. Config/OTA
-// characteristics require an encrypted, authenticated link. Override per unit.
+// 6-digit passkey for LE Secure Connections + bonding. Config/OTA
+// characteristics require an encrypted, authenticated link. Override per unit
+// with a build flag, e.g. -DBLE_PASSKEY=482916.
+#ifndef BLE_PASSKEY
 #define BLE_PASSKEY      123456
+#endif
 
 // Role reported via the device-info characteristic: 0 = front, 1 = rear.
 #define DEVICE_ROLE      0
@@ -115,9 +118,9 @@ struct SensorRuntimeConfig {
 };
 
 // ── FreeRTOS handles (defined in main.cpp) ────────────────────────────────────
-extern QueueHandle_t   navQueue;    // NavState,      depth 4
-extern QueueHandle_t   proxQueue;   // SensorData,    depth 4
-extern QueueHandle_t   effectQueue; // EffectCommand, depth 2
+extern QueueHandle_t   navQueue;    // NavState mailbox, depth 1
+extern QueueHandle_t   proxQueue;   // SensorData mailbox, depth 1
+extern QueueHandle_t   effectQueue; // EffectCommand mailbox, depth 1
 extern SemaphoreHandle_t sppMutex;
 
 // Shared runtime config (guarded by configMutex; defined in main.cpp)

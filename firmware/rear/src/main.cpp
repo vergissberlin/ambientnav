@@ -15,8 +15,8 @@ void setup() {
     Serial.begin(115200);
     Serial.printf("\n[AmbientNav Rear] firmware %s\n", FIRMWARE_VERSION);
 
-    cmdQueue    = xQueueCreate(4, sizeof(bool));
-    sensorQueue = xQueueCreate(4, sizeof(SensorData));
+    cmdQueue    = xQueueCreate(1, sizeof(bool));
+    sensorQueue = xQueueCreate(1, sizeof(SensorData));
     sppMutex    = xSemaphoreCreateMutex();
     configMutex = xSemaphoreCreateMutex();
 

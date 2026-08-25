@@ -55,7 +55,11 @@ Or manually:
 flutter pub get
 flutter gen-l10n
 flutter run --dart-define=USE_MOCK=true   # run against the in-memory mock
+flutter run --dart-define=USE_MOCK=false  # run against real BLE hardware
 ```
+
+When `USE_MOCK` is omitted, debug builds default to mock BLE and product builds
+default to the real `universal_ble` implementation.
 
 ### iOS device (physical iPhone)
 

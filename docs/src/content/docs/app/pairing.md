@@ -15,7 +15,10 @@ Pairing establishes an encrypted, authenticated channel between the app and the 
 - Rogue OTA firmware uploads that could damage the controller
 - Replay attacks on BLE configuration characteristics
 
-The passkey printed on the device sticker is generated once during manufacturing and stored in the ESP32's non-volatile storage (NVS). It never changes unless the firmware is reflashed.
+Development firmware uses the default passkey `123456`. For a real installation,
+override `BLE_PASSKEY` when building the front-controller firmware and print that
+6-digit value on the device sticker. The passkey does not change until the
+firmware is rebuilt or reflashed with another value.
 
 ---
 
@@ -59,7 +62,7 @@ If the device does not appear after 15 seconds, see [Troubleshooting](#troublesh
 ### Step 4 — Enter the 6-Digit Passkey
 
 1. A passkey entry dialog appears on screen.
-2. Enter the **6-digit numeric passkey** printed on the white sticker on the ESP32 controller housing (e.g., `482 916`).
+2. Enter the **6-digit numeric passkey** printed on the white sticker on the ESP32 controller housing. Development builds use `123456` unless the firmware was built with another `BLE_PASSKEY`.
 3. Tap **Confirm**.
 
 :::caution

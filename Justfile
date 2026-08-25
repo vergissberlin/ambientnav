@@ -63,6 +63,10 @@ analyze:
 test:
     cd {{app_dir}} && flutter test
 
+# Native firmware unit tests for pure logic (no ESP32 required)
+firmware-test:
+    cd firmware/rear && pio test -e native
+
 # --- Design system & component catalogue ---
 
 # Install dependencies for the UI package and the catalogue too

@@ -15,9 +15,14 @@ import '../location/location_service.dart';
 import '../security/pairing_service.dart';
 import '../theme/theme_controller.dart';
 
-/// Compile-time switch: `--dart-define=USE_MOCK=true` (default true so the app
-/// runs end-to-end without hardware; CI/tests always use the mock).
-const bool kUseMock = bool.fromEnvironment('USE_MOCK', defaultValue: true);
+/// Compile-time switch: `--dart-define=USE_MOCK=true|false`.
+///
+/// Debug builds default to the mock so local development and tests run without
+/// hardware. Product builds default to the real BLE implementation unless the
+/// value is explicitly overridden.
+const bool kUseMock = bool.hasEnvironment('USE_MOCK')
+    ? bool.fromEnvironment('USE_MOCK')
+    : !bool.fromEnvironment('dart.vm.product');
 
 /// The controller repository. Overridden in tests with the mock; in production
 /// the real `universal_ble` implementation is used when [kUseMock] is false.

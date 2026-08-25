@@ -51,8 +51,8 @@ struct SensorRuntimeConfig {
 };
 
 // ── FreeRTOS handles (defined in main.cpp) ────────────────────────────────────
-extern QueueHandle_t   cmdQueue;    // bool reverseActive, depth 4
-extern QueueHandle_t   sensorQueue; // SensorData, depth 4
+extern QueueHandle_t   cmdQueue;    // bool reverseActive mailbox, depth 1
+extern QueueHandle_t   sensorQueue; // SensorData mailbox, depth 1
 extern SemaphoreHandle_t sppMutex;
 
 // Shared sensor config (guarded by configMutex; defined in main.cpp)

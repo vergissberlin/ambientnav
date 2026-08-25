@@ -189,7 +189,11 @@ flutter run --dart-define=USE_MOCK=true
 flutter run --dart-define=USE_MOCK=false
 ```
 
-The `controllerRepositoryProvider` in `providers.dart` reads `bool.fromEnvironment('USE_MOCK')` and returns the appropriate implementation. Because this is a compile-time constant, tree shaking removes the unused implementation from the release build.
+The `controllerRepositoryProvider` in `providers.dart` reads `USE_MOCK` at
+compile time and returns the appropriate implementation. If `USE_MOCK` is
+omitted, debug builds default to the mock and product builds default to real BLE.
+Because this is a compile-time constant, tree shaking removes the unused
+implementation from the release build.
 
 ## Navigation
 

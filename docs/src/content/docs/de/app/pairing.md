@@ -15,7 +15,11 @@ Die Kopplung stellt einen verschlüsselten, authentifizierten Kanal zwischen der
 - Unerwünschte OTA-Firmware-Uploads, die den Controller beschädigen könnten
 - Replay-Angriffe auf BLE-Konfigurations-Characteristics
 
-Der auf dem Geräteaufkleber aufgedruckte Passkey wird einmalig während der Fertigung generiert und im Non-Volatile Storage (NVS) des ESP32 gespeichert. Er ändert sich nicht, solange die Firmware nicht neu geflasht wird.
+Die Entwicklungs-Firmware verwendet standardmäßig den Passkey `123456`. Für eine
+echte Installation sollte `BLE_PASSKEY` beim Build der Front-Controller-Firmware
+überschrieben und dieser 6-stellige Wert auf den Geräteaufkleber gedruckt werden.
+Der Passkey ändert sich erst, wenn die Firmware mit einem anderen Wert neu gebaut
+oder geflasht wird.
 
 ---
 
@@ -59,7 +63,7 @@ Erscheint das Gerät nach 15 Sekunden nicht, lies den Abschnitt [Fehlerbehebung]
 ### Schritt 4 — 6-stelligen Passkey eingeben
 
 1. Ein Passkey-Eingabedialog erscheint auf dem Bildschirm.
-2. Gib den **6-stelligen numerischen Passkey** ein, der auf dem weißen Aufkleber am Gehäuse des ESP32 Controllers aufgedruckt ist (z. B. `482 916`).
+2. Gib den **6-stelligen numerischen Passkey** ein, der auf dem weißen Aufkleber am Gehäuse des ESP32 Controllers aufgedruckt ist. Entwicklungs-Builds verwenden `123456`, sofern die Firmware nicht mit einem anderen `BLE_PASSKEY` gebaut wurde.
 3. Tippe auf **Bestätigen**.
 
 :::caution

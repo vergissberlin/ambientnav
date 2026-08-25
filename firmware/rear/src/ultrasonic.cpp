@@ -1,6 +1,7 @@
 #include "ultrasonic.h"
 #include "config.h"
 #include "bt_classic.h"
+#include "sensor_math.h"
 
 static uint16_t measureOne(uint8_t trigPin, uint8_t echoPin) {
     digitalWrite(trigPin, LOW);
@@ -16,21 +17,10 @@ static uint16_t measureOne(uint8_t trigPin, uint8_t echoPin) {
     return (cm > 400) ? 999 : cm;
 }
 
-static uint16_t median3(uint16_t a, uint16_t b, uint16_t c) {
-    if (a > b) { uint16_t t = a; a = b; b = t; }
-    if (b > c) { uint16_t t = b; b = c; c = t; }
-    if (a > b) { uint16_t t = a; a = b; b = t; }
-    return b;
-}
-
 // Apply calibration offset and the configured max range to a reading (cm).
 // 999 means "no obstacle" and is left untouched.
 static void applyConfig(uint16_t& cm, const SensorRuntimeConfig& cfg) {
-    if (cm == 999) return;
-    int32_t v = (int32_t)cm + cfg.calib_offset_cm;
-    if (v < 0) v = 0;
-    if (v > cfg.max_range_cm) { cm = 999; return; }
-    cm = (uint16_t)v;
+    cm = sensorApplyCalibration(cm, cfg.calib_offset_cm, cfg.max_range_cm);
 }
 
 void ultrasonicInit() {
@@ -70,9 +60,9 @@ void taskUltrasonic(void* param) {
         }
 
         SensorData data;
-        data.left_cm   = median3(rawL[0], rawL[1], rawL[2]);
-        data.center_cm = median3(rawC[0], rawC[1], rawC[2]);
-        data.right_cm  = median3(rawR[0], rawR[1], rawR[2]);
+        data.left_cm   = sensorMedian3(rawL[0], rawL[1], rawL[2]);
+        data.center_cm = sensorMedian3(rawC[0], rawC[1], rawC[2]);
+        data.right_cm  = sensorMedian3(rawR[0], rawR[1], rawR[2]);
 
         // Apply runtime calibration / range / active-sensor selection.
         SensorRuntimeConfig cfg;
@@ -86,9 +76,9 @@ void taskUltrasonic(void* param) {
         applyConfig(data.center_cm, cfg);
         applyConfig(data.right_cm, cfg);
         if (cfg.active_sensor != SENSOR_FUSED) {
-            if (cfg.active_sensor != SENSOR_LEFT)   data.left_cm   = 999;
-            if (cfg.active_sensor != SENSOR_CENTER) data.center_cm = 999;
-            if (cfg.active_sensor != SENSOR_RIGHT)  data.right_cm  = 999;
+            if (!sensorIsEnabled(cfg.active_sensor, SENSOR_LEFT))   data.left_cm   = SENSOR_NO_OBSTACLE_CM;
+            if (!sensorIsEnabled(cfg.active_sensor, SENSOR_CENTER)) data.center_cm = SENSOR_NO_OBSTACLE_CM;
+            if (!sensorIsEnabled(cfg.active_sensor, SENSOR_RIGHT))  data.right_cm  = SENSOR_NO_OBSTACLE_CM;
         }
 
         xQueueOverwrite(sensorQueue, &data);

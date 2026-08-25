@@ -3,8 +3,8 @@
 /// The base `12345678-1234-5678-1234-56789ABCDExx` family extends the existing
 /// firmware navigation service. The navigation service/characteristic
 /// (`…DEF0` / `…DEF1`) are already implemented in firmware; the remaining
-/// services are the documented extension implemented by the app's codecs and
-/// awaiting firmware support.
+/// services are implemented by the app's codecs and the front firmware's
+/// extended GATT server.
 class BleUuids {
   const BleUuids._();
 

@@ -33,30 +33,40 @@ jobs:
       - name: Collect all EN docs
         id: changed
         run: |
-          files=$(find docs/src/content/docs -maxdepth 1 \( -name "*.md" -o -name "*.mdx" \) | sort | tr '\n' '\n')
-          echo "all_changed_files=$files" >> $GITHUB_OUTPUT
+          files=$(find docs/src/content/docs -maxdepth 1 \( -name "*.md" -o -name "*.mdx" \) | sort)
+          {
+            echo "all_changed_files<<EOF"
+            echo "$files"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+          echo "any_changed=$([ -n "$files" ] && echo true || echo false)" >> $GITHUB_OUTPUT
 
       - uses: pnpm/action-setup@v4
+        if: steps.changed.outputs.any_changed == 'true'
         with:
           package_json_file: docs/package.json
 
       - uses: actions/setup-node@v4
+        if: steps.changed.outputs.any_changed == 'true'
         with:
           node-version: 20
           cache: pnpm
           cache-dependency-path: docs/pnpm-lock.yaml
 
       - name: Install dependencies
+        if: steps.changed.outputs.any_changed == 'true'
         run: pnpm install --frozen-lockfile
         working-directory: docs
 
       - name: Run translation script
+        if: steps.changed.outputs.any_changed == 'true'
         run: node docs/scripts/translate.mjs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CHANGED_FILES: ${{ steps.changed.outputs.all_changed_files }}
 
       - name: Commit and push translations
+        if: steps.changed.outputs.any_changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
