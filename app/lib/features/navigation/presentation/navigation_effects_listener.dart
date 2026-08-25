@@ -1,3 +1,4 @@
+import 'package:ambientnav/core/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -6,6 +7,7 @@ import '../../controllers/domain/entities/controller_role.dart';
 import '../../controllers/presentation/controllers_controller.dart';
 import '../domain/usecases/maneuver_to_ble_command.dart';
 import 'nav_controller.dart';
+import 'simulated_position.dart';
 
 /// App-level listener for navigation side effects (voice + BLE) that must keep
 /// running when the user leaves the map tab or backgrounds the app.
@@ -36,6 +38,19 @@ class NavigationEffectsListener extends ConsumerWidget {
         if (c.isConnected && c.role == ControllerRole.front) {
           ref.read(controllerRepositoryProvider).sendNavCommand(c.id, command);
         }
+      }
+    });
+
+    // Announce entering the scripted danger spot the same way an upcoming
+    // maneuver is announced above — only on the false->true edge, not on
+    // every tick while inside the zone.
+    ref.listen<bool>(hazardPreviewProvider, (prev, next) {
+      if (next && prev != true) {
+        try {
+          ref
+              .read(voiceGuidanceServiceProvider)
+              .speak(AppLocalizations.of(context).hazardZoneWarning);
+        } catch (_) {}
       }
     });
 

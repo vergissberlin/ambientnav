@@ -16,6 +16,7 @@ class NavigationState {
     this.route,
     this.nextManeuverIndex = 0,
     this.distanceToManeuverMeters = 0,
+    this.speedMps = 13.9,
     this.offlineReady = false,
     this.error,
   });
@@ -24,6 +25,14 @@ class NavigationState {
   final Routes? route;
   final int nextManeuverIndex;
   final double distanceToManeuverMeters;
+
+  /// Current travel speed, used to convert the front-strip preview's
+  /// maneuver-lead time window into a distance threshold (see
+  /// `map_screen.dart`'s `_stripEffectFor`). Defaults to the dev route
+  /// simulator's own default (~50 km/h) and is kept in sync with it via
+  /// [NavController.setSpeedMps]; real GPS navigation doesn't track live
+  /// speed yet, so it stays at this default there.
+  final double speedMps;
   final bool offlineReady;
   final String? error;
 
@@ -38,6 +47,7 @@ class NavigationState {
     Routes? route,
     int? nextManeuverIndex,
     double? distanceToManeuverMeters,
+    double? speedMps,
     bool? offlineReady,
     String? error,
   }) {
@@ -47,6 +57,7 @@ class NavigationState {
       nextManeuverIndex: nextManeuverIndex ?? this.nextManeuverIndex,
       distanceToManeuverMeters:
           distanceToManeuverMeters ?? this.distanceToManeuverMeters,
+      speedMps: speedMps ?? this.speedMps,
       offlineReady: offlineReady ?? this.offlineReady,
       error: error,
     );
@@ -63,13 +74,24 @@ class NavController extends StateNotifier<NavigationState> {
       state = state.copyWith(phase: NavPhase.planning, error: null);
 
   void setRoute(Routes route) {
+    // The first maneuver is always "depart" with distanceMeters == 0 (it IS
+    // the route start, so there's no predecessor leg) — skip straight past
+    // it so the strip/panel show the first *actionable* maneuver immediately
+    // instead of one render frame of "depart" at distance 0, which would
+    // otherwise flash before the location/simulation runner's first tick
+    // corrects it a moment later.
+    var index = 0;
+    var cumulative = 0.0;
+    for (; index < route.maneuvers.length; index++) {
+      cumulative += route.maneuvers[index].distanceMeters;
+      if (cumulative > 0) break;
+    }
+    final pastEnd = index >= route.maneuvers.length;
     state = NavigationState(
       phase: NavPhase.navigating,
       route: route,
-      nextManeuverIndex: 0,
-      distanceToManeuverMeters: route.maneuvers.isNotEmpty
-          ? route.maneuvers.first.distanceMeters
-          : 0,
+      nextManeuverIndex: pastEnd ? route.maneuvers.length - 1 : index,
+      distanceToManeuverMeters: pastEnd ? 0 : cumulative,
     );
   }
 
@@ -89,6 +111,8 @@ class NavController extends StateNotifier<NavigationState> {
 
   void updateDistance(double meters) =>
       state = state.copyWith(distanceToManeuverMeters: meters);
+
+  void setSpeedMps(double mps) => state = state.copyWith(speedMps: mps);
 
   void markOfflineReady() => state = state.copyWith(offlineReady: true);
 

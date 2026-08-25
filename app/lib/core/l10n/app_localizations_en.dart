@@ -52,6 +52,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get followRoute => 'Follow route';
 
   @override
+  String get toggleHazardLights => 'Toggle hazard lights';
+
+  @override
+  String get hazardZoneWarning => 'Caution, hazard ahead';
+
+  @override
   String get developer => 'Developer';
 
   @override
@@ -66,6 +72,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get voiceGuidance => 'Voice guidance';
+
+  @override
+  String get cameraNavBackground => 'Camera background';
+
+  @override
+  String get cameraNavBackgroundDesc =>
+      'Show a blurred live camera view behind the navigation map';
+
+  @override
+  String get cameraNavBackgroundPermissionDenied =>
+      'Camera permission is required for this feature';
 
   @override
   String get theme => 'Theme';

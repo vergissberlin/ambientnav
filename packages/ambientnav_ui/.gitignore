@@ -3,6 +3,10 @@
 *.log
 *.pyc
 *.swp
+
+# Golden-test failure diffs (regenerated locally by flutter_test on a
+# mismatch — never intentional test output).
+test/golden/failures/
 .DS_Store
 .atom/
 .build/

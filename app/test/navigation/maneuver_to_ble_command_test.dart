@@ -24,6 +24,10 @@ void main() {
       usecase(_m(ManeuverType.straight), 50).direction,
       NavDirection.straight,
     );
+    expect(
+      usecase(_m(ManeuverType.newName), 50).direction,
+      NavDirection.straight,
+    );
     expect(usecase(_m(ManeuverType.arrive), 50).direction, NavDirection.none);
   });
 

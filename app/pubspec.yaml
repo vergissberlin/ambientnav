@@ -49,11 +49,14 @@ dependencies:
   hive_ce: ^2.19.3
   hive_ce_flutter: ^2.3.4
 
-  # Runtime permissions for BLE scan/connect + location.
+  # Runtime permissions for BLE scan/connect + location + camera.
   # Track with `fvm flutter pub upgrade --major-versions` when bumping Android SDK.
-  permission_handler: ^13.0.1   # BLE scan/connect + location runtime permissions
+  permission_handler: ^13.0.1   # BLE scan/connect + location + camera runtime permissions
   file_picker: ^11.0.3           # select firmware .bin for OTA
   intl: any                     # localization formatting (pinned by flutter_localizations)
+
+  # Live device camera feed, used as an optional blurred navigation background.
+  camera: ^0.11.0+2
 
 # geolocator 14 pulls geolocator_linux 0.2.6 -> package_info_plus ^10 -> win32 ^6,
 # while every file_picker from 8.3.3 to 11.x pins win32 ^5.9.0. The two cannot
@@ -77,3 +80,16 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   generate: true                # build app_localizations from lib/core/l10n/*.arb
+  assets:
+    - assets/map_style/
+  fonts:
+    - family: Orbitron
+      fonts:
+        - asset: assets/fonts/Orbitron-Variable.ttf
+          weight: 400
+        - asset: assets/fonts/Orbitron-Variable.ttf
+          weight: 500
+        - asset: assets/fonts/Orbitron-Variable.ttf
+          weight: 600
+        - asset: assets/fonts/Orbitron-Variable.ttf
+          weight: 700

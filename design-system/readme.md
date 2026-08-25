@@ -116,7 +116,7 @@ A second layer on top of the calm cockpit foundation: sharp corner brackets, occ
 
 **Motion / the light system** — the signature motif. Cyan *flows* toward the turn direction, brightening as the maneuver nears. Magenta *fills inward* as proximity closes; solid + rapid pulse = stop. Animations are light-like: opacity + position, never bouncy. Documented as `Elements` cards.
 
-**Transparency & blur** — used for the sticky app/nav bars (`backdrop-filter: blur(14px)` over `rgba(6,8,14,.78)`). Sparingly elsewhere.
+**Transparency & blur** — used for the sticky app/nav bars (`backdrop-filter: blur(14px)` over `rgba(6,8,14,.78)`). Sparingly elsewhere. The iOS app carries the same treatment: `AnGlassBar` (a `BackdropFilter` at the same 14px blur, tinted `--amb-cockpit` at 78% opacity) sits behind `AnAppBar`'s header and the bottom tab bar, so the map or a scrolling list shows through, blurred, rather than being hidden by a flat surface fill.
 
 **Layout** — 1080px content container (1280 wide variant). Generous vertical rhythm (`92–120px` section padding). 4px spacing grid.
 

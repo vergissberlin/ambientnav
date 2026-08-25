@@ -30,6 +30,8 @@
 	<string>AmbientNav uses Bluetooth to connect to and configure your LED controllers.</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>AmbientNav uses Bluetooth to connect to and configure your LED controllers.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>AmbientNav can use the rear camera to show a blurred live view behind the navigation map.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>AmbientNav continues turn-by-turn navigation when you switch to another app, including voice guidance and LED strip updates.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>

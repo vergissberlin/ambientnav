@@ -10,6 +10,8 @@ List<WidgetbookNode> brandAtoms() => [
   _anCard,
   _anPanel,
   _anLightStrip,
+  _anGlassBar,
+  _anAppBar,
 ];
 
 /// Centres a use case on the cockpit ground so glows read correctly — brand
@@ -452,6 +454,130 @@ final _anLightStrip = WidgetbookComponent(
             min: 6,
             max: 40,
           ),
+        ),
+      ),
+    ),
+  ],
+);
+
+// ── Demo backdrop for the glass atoms ───────────────────────────────────────
+//
+// Blurring a flat color is invisible, so these use cases need something with
+// real detail behind the glass to prove the effect — a stand-in for the map
+// or scrolling list a real screen would show through it.
+
+Widget _glassDemoBackdrop(BuildContext context) {
+  final brand = AnBrandTheme.of(context);
+  return DecoratedBox(
+    decoration: BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [AnColors.cyanDeep, AnColors.violet, AnColors.magentaDeep],
+      ),
+    ),
+    child: GridView.builder(
+      padding: const EdgeInsets.all(AnSpace.s4),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        mainAxisSpacing: AnSpace.s3,
+        crossAxisSpacing: AnSpace.s3,
+        childAspectRatio: 1.6,
+      ),
+      itemCount: 18,
+      itemBuilder: (context, i) => DecoratedBox(
+        decoration: BoxDecoration(
+          color: brand.text.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(AnRadius.sm),
+        ),
+      ),
+    ),
+  );
+}
+
+// ── AnGlassBar ───────────────────────────────────────────────────────────────
+
+final _anGlassBar = WidgetbookComponent(
+  name: 'AnGlassBar',
+  useCases: [
+    WidgetbookUseCase(
+      name: 'Over content',
+      builder: (context) => SizedBox(
+        height: 320,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            _glassDemoBackdrop(context),
+            const Align(
+              alignment: Alignment.topCenter,
+              child: SizedBox(height: 64, child: AnGlassBar()),
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: SizedBox(
+                height: 64,
+                child: AnGlassBar(
+                  border: Border(
+                    top: BorderSide(color: AnBrandTheme.of(context).line),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+    WidgetbookUseCase(
+      name: 'Playground',
+      builder: (context) => SizedBox(
+        height: 320,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            _glassDemoBackdrop(context),
+            Align(
+              alignment: Alignment.topCenter,
+              child: SizedBox(
+                height: 64,
+                child: AnGlassBar(
+                  blurSigma: context.knobs.double.slider(
+                    label: 'blurSigma',
+                    initialValue: 14,
+                    max: 40,
+                  ),
+                  tintOpacity: context.knobs.double.slider(
+                    label: 'tintOpacity',
+                    initialValue: 0.78,
+                    max: 1,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  ],
+);
+
+// ── AnAppBar ─────────────────────────────────────────────────────────────────
+
+final _anAppBar = WidgetbookComponent(
+  name: 'AnAppBar',
+  useCases: [
+    WidgetbookUseCase(
+      name: 'Over content',
+      builder: (context) => SizedBox(
+        height: 400,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            _glassDemoBackdrop(context),
+            Align(
+              alignment: Alignment.topCenter,
+              child: AnAppBar(title: const Text('Navigate')),
+            ),
+          ],
         ),
       ),
     ),

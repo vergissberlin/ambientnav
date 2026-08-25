@@ -61,7 +61,20 @@ final locationServiceProvider = Provider<LocationService>((ref) {
 
 /// MapLibre style URLs — OpenFreeMap (free, no API key).
 const String kMapStyleUrl = 'https://tiles.openfreemap.org/styles/liberty';
-const String kMapStyleUrlDark = 'https://tiles.openfreemap.org/styles/dark';
+
+/// A locally bundled fork of OpenFreeMap's "dark" style, retinted with the
+/// brand's cyan/violet/magenta signal palette (see design-system/readme.md).
+/// Same `sources`/tiles as the upstream style — only layer `paint` colors
+/// were edited, so tile requests are unaffected and OpenFreeMap style
+/// updates just won't be picked up automatically anymore.
+const String kMapStyleUrlDark = 'assets/map_style/ambientnav-dark.json';
+
+/// Roads-only derivative of [kMapStyleUrlDark] with every fill/background/
+/// label layer stripped out — just the road and railway line layers, on a
+/// transparent canvas. Used behind a semi-transparent [Opacity] wrapper when
+/// the camera background setting is on, regardless of light/dark theme.
+const String kMapStyleUrlTransparent =
+    'assets/map_style/ambientnav-transparent.json';
 
 final offlineRepositoryProvider = Provider<OfflineRepository>((ref) {
   return OfflineRegionManager(styleUrl: kMapStyleUrl);

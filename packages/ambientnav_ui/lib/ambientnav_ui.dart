@@ -5,9 +5,11 @@
 /// and domain widgets live in `app/lib/ui` instead.
 library;
 
+export 'atoms/an_app_bar.dart';
 export 'atoms/an_badge.dart';
 export 'atoms/an_button.dart';
 export 'atoms/an_card.dart';
+export 'atoms/an_glass_bar.dart';
 export 'atoms/an_light_strip.dart';
 export 'atoms/an_panel.dart';
 export 'theme/an_app_theme.dart';

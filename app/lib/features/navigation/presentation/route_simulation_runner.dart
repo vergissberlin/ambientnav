@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/utils/geo.dart';
 import '../domain/entities/route.dart';
 import '../domain/route_simulator.dart';
 import 'nav_controller.dart';
@@ -20,6 +21,13 @@ class RouteSimulationRunner {
   static const Duration tickInterval = Duration(milliseconds: 200);
   static const double _dt = 0.2;
 
+  /// A scripted "danger spot" early in the drive — purely to demonstrate the
+  /// hazard animation on [hazardPreviewProvider] without the user needing to
+  /// toggle it by hand. Firmware has no equivalent; this is dev-simulation
+  /// only, mirroring how [RouteSimulator] itself only exists for this mode.
+  static const double _hazardZoneStartMeters = 400;
+  static const double _hazardZoneEndMeters = 700;
+
   bool get isRunning => _timer != null;
 
   void start(Routes route, {double speedMps = 13.9}) {
@@ -27,6 +35,12 @@ class RouteSimulationRunner {
     if (route.geometry.isEmpty && route.maneuvers.isEmpty) return;
     _sim = RouteSimulator(route, speedMps: speedMps);
     _timer = Timer.periodic(tickInterval, (_) => _onTick());
+    _ref.read(navControllerProvider.notifier).setSpeedMps(speedMps);
+    _ref.read(hazardZoneGeometryProvider.notifier).state = Geo.sliceByDistance(
+      route.geometry,
+      _hazardZoneStartMeters,
+      _hazardZoneEndMeters,
+    );
   }
 
   void stop() {
@@ -34,6 +48,8 @@ class RouteSimulationRunner {
     _timer = null;
     _sim = null;
     _ref.read(simulatedPositionProvider.notifier).state = null;
+    _ref.read(hazardPreviewProvider.notifier).state = false;
+    _ref.read(hazardZoneGeometryProvider.notifier).state = null;
   }
 
   void _onTick() {
@@ -44,6 +60,12 @@ class RouteSimulationRunner {
       position: step.position,
       bearingDeg: step.bearingDeg,
     );
+
+    final inHazardZone =
+        sim.traveledMeters >= _hazardZoneStartMeters &&
+        sim.traveledMeters < _hazardZoneEndMeters;
+    final hazard = _ref.read(hazardPreviewProvider.notifier);
+    if (hazard.state != inHazardZone) hazard.state = inHazardZone;
 
     final nav = _ref.read(navControllerProvider.notifier);
 

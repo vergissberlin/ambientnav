@@ -182,6 +182,18 @@ abstract class AppLocalizations {
   /// **'Follow route'**
   String get followRoute;
 
+  /// No description provided for @toggleHazardLights.
+  ///
+  /// In en, this message translates to:
+  /// **'Toggle hazard lights'**
+  String get toggleHazardLights;
+
+  /// No description provided for @hazardZoneWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Caution, hazard ahead'**
+  String get hazardZoneWarning;
+
   /// No description provided for @developer.
   ///
   /// In en, this message translates to:
@@ -211,6 +223,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Voice guidance'**
   String get voiceGuidance;
+
+  /// No description provided for @cameraNavBackground.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera background'**
+  String get cameraNavBackground;
+
+  /// No description provided for @cameraNavBackgroundDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Show a blurred live camera view behind the navigation map'**
+  String get cameraNavBackgroundDesc;
+
+  /// No description provided for @cameraNavBackgroundPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera permission is required for this feature'**
+  String get cameraNavBackgroundPermissionDenied;
 
   /// No description provided for @theme.
   ///

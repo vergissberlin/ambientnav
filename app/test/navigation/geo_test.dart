@@ -51,4 +51,32 @@ void main() {
       expect(mid.longitude, closeTo(0.001, 1e-4));
     });
   });
+
+  group('Geo.sliceByDistance', () {
+    final line = const [
+      GeoPoint(0, 0),
+      GeoPoint(0, 0.001),
+      GeoPoint(0, 0.002),
+      GeoPoint(0, 0.003),
+    ];
+
+    test('starts and ends at the exact interpolated positions', () {
+      final total = Geo.polylineLength(line);
+      final slice = Geo.sliceByDistance(line, total * 0.25, total * 0.75);
+      expect(slice.first, Geo.interpolateAlong(line, total * 0.25));
+      expect(slice.last, Geo.interpolateAlong(line, total * 0.75));
+    });
+
+    test('includes interior vertices strictly within the range', () {
+      final total = Geo.polylineLength(line);
+      final slice = Geo.sliceByDistance(line, total * 0.1, total * 0.9);
+      expect(slice, contains(const GeoPoint(0, 0.001)));
+      expect(slice, contains(const GeoPoint(0, 0.002)));
+    });
+
+    test('returns empty for a degenerate or reversed range', () {
+      expect(Geo.sliceByDistance(line, 100, 100), isEmpty);
+      expect(Geo.sliceByDistance(line, 200, 100), isEmpty);
+    });
+  });
 }

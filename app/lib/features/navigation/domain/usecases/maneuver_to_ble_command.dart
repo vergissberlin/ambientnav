@@ -32,6 +32,7 @@ class ManeuverToBleCommand {
         return NavDirection.right;
       case ManeuverType.straight:
       case ManeuverType.depart:
+      case ManeuverType.newName:
         return NavDirection.straight;
       case ManeuverType.uturn:
       case ManeuverType.roundabout:
