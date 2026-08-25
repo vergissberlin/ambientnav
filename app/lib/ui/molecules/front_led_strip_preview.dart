@@ -28,8 +28,9 @@ enum FrontStripEffect {
 ///   that slides from the strip's centre to the corresponding edge over
 ///   819ms (ease-in-out), then fades over the remaining 231ms of a 1050ms
 ///   loop.
-/// - [FrontStripEffect.navStraight] — the whole strip pulses white, one
-///   half-sine hump every 800ms.
+/// - [FrontStripEffect.navStraight] — a soft white breathing glow that grows
+///   wider and brighter toward the middle of a 2400ms cycle, then narrows and
+///   dims again.
 /// - [FrontStripEffect.navContinue] — no firmware counterpart. Same
 ///   purple-core/pink-edge bar and 1050ms cycle as [navLeft]/[navRight], but
 ///   held stationary at the strip's centre and eased out to fully dark
@@ -231,12 +232,30 @@ class _FrontLedStripPreviewState extends State<FrontLedStripPreview>
     });
   }
 
-  /// `renderNavStraight()` — whole strip, one half-sine pulse every 800ms.
+  /// `renderNavStraight()` — a soft white breathing glow that widens and
+  /// brightens toward the middle of a 2400ms cycle, then narrows and dims
+  /// again.
   static List<Color> _navStraight(int ms, int n) {
-    final phase = (ms % 800) / 800;
-    final value = math.sin(math.pi * phase).clamp(0.0, 1.0);
-    final color = Colors.white.withValues(alpha: value);
-    return List.filled(n, color);
+    const cycleMs = 2400;
+    const minSigma = 0.08;
+    const maxSigma = 0.36;
+    const minPeak = 0.12;
+    const maxPeak = 0.48;
+
+    final phase = (ms % cycleMs) / cycleMs;
+    final breath = 0.5 - 0.5 * math.cos(2 * math.pi * phase); // 0 -> 1 -> 0
+    final sigma = minSigma + (maxSigma - minSigma) * breath;
+    final peak = minPeak + (maxPeak - minPeak) * breath;
+    final center = (n - 1) / 2;
+    final maxDist = center > 0 ? center : 1.0;
+
+    return List.generate(n, (i) {
+      final dist = ((i - center).abs()) / maxDist;
+      final x = dist / sigma;
+      final envelope = math.exp(-0.5 * x * x);
+      final alpha = (peak * envelope).clamp(0.0, 1.0);
+      return Colors.white.withValues(alpha: alpha);
+    });
   }
 
   /// `renderNavContinue()` — [_slideBar] pinned to the centre (`edgeLed` ==

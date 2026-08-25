@@ -353,6 +353,7 @@ Do **not** extract when the markup is a one-off, fewer than ~15 lines, or splitt
 This project uses **trunk-based development** on `main`.
 
 - Work directly on `main`. Do not create feature, fix, or chore branches.
+- For every task and for every sub-agent, create a fresh git worktree. Never reuse an existing worktree for a new task.
 - Do not suggest branch-based workflows (`git checkout -b …`, PRs from feature branches).
 - Keep changes small and commit often on `main`.
 - Pull or rebase onto the latest `main` before pushing.

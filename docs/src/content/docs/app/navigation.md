@@ -79,7 +79,7 @@ The front strip reflects every maneuver instruction directly in your peripheral 
 |---|---|
 | Turn left within 200 m | Amber dot sweeps from center toward the left edge |
 | Turn right within 200 m | Amber dot sweeps from center toward the right edge |
-| Continue straight within 200 m | White pulse grows and fades at the strip center |
+| Continue straight within 200 m | White breath that grows wider and then narrows again |
 | Left indicator active | Left half of the strip blinks amber |
 | Right indicator active | Right half of the strip blinks amber |
 | Hazard lights active | Full strip blinks amber |

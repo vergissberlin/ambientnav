@@ -59,9 +59,27 @@ static void renderNavWave(EffectType dir, uint32_t elapsed) {
 }
 
 static void renderNavStraight(uint32_t elapsed) {
-    float   phase = fmodf((float)elapsed, 800.0f) / 800.0f;
-    uint8_t val   = (uint8_t)(255.0f * sinf(M_PI * phase));
-    fill_solid(leds, FRONT_LED_COUNT, CRGB(val, val, val));
+    const float CYCLE_MS   = 2400.0f;
+    const float MIN_SIGMA  = 0.08f;   // narrow core at the trough
+    const float MAX_SIGMA  = 0.36f;   // broad glow at the peak
+    const float MIN_PEAK   = 0.12f;   // keep a faint signal even when "small"
+    const float MAX_PEAK   = 0.48f;   // still soft; brightness cap handles the rest
+
+    float phase  = fmodf((float)elapsed, CYCLE_MS) / CYCLE_MS;
+    float breath = 0.5f - 0.5f * cosf(2.0f * M_PI * phase);  // 0 -> 1 -> 0
+    float sigma  = MIN_SIGMA + (MAX_SIGMA - MIN_SIGMA) * breath;
+    float peak   = MIN_PEAK + (MAX_PEAK - MIN_PEAK) * breath;
+
+    float center = ((float)FRONT_LED_COUNT - 1.0f) * 0.5f;
+    float maxDist = center > 0.0f ? center : 1.0f;
+
+    for (int i = 0; i < FRONT_LED_COUNT; i++) {
+        float dist = fabsf(((float)i - center) / maxDist);
+        float x = dist / sigma;
+        float envelope = expf(-0.5f * x * x);
+        uint8_t val = (uint8_t)(255.0f * peak * envelope);
+        leds[i] = CRGB(val, val, val);
+    }
 }
 
 static void renderBlinker(EffectType side, uint32_t elapsed) {

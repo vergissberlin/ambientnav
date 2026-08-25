@@ -28,7 +28,7 @@ The strip runs the full width of the instrument panel or A-pillar trim. Because 
 |---|---|---|---|
 | `NAV_LEFT` | Turn left within 200 m | Amber `#FFA500` | Dot sweeps center → left, 600 ms cycle |
 | `NAV_RIGHT` | Turn right within 200 m | Amber `#FFA500` | Dot sweeps center → right, 600 ms cycle |
-| `NAV_STRAIGHT` | Continue straight | White `#FFFFFF` | Single pulse toward center, 800 ms |
+| `NAV_STRAIGHT` | Continue straight | White `#FFFFFF` | Soft breathing glow that widens and narrows, 2400 ms cycle |
 | `INDICATOR_LEFT` | Left blinker active | Amber `#FFA500` | Left half blinks, 400 ms on/off |
 | `INDICATOR_RIGHT` | Right blinker active | Amber `#FFA500` | Right half blinks, 400 ms on/off |
 | `HAZARD` | Hazard lights | Amber `#FFA500` | Full strip blinks, 400 ms on/off |
@@ -51,13 +51,13 @@ NAV_LEFT — dot travels from center to left edge:
 
 NAV_RIGHT — mirror image, center to right edge.
 
-NAV_STRAIGHT — pulse grows and fades at strip center:
+NAV_STRAIGHT — soft breath that grows wider and dimmer at the trough:
 
-  t = 0 ms   ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-  t = 200 ms ░░░░░░░░░░░░░░░█░░░░░░░░░░░░░░░░░
-  t = 400 ms ░░░░░░░░░░░░███████░░░░░░░░░░░░░░
-  t = 600 ms ░░░░░░░░░░░█████████░░░░░░░░░░░░░
-  t = 800 ms ░░░░░░░░░░░░░░░█░░░░░░░░░░░░░░░░░
+  t = 0 ms    ░░░░░░░░░░░░█░░░░░░░░░░░░░░░░░░░
+  t = 600 ms  ░░░░░░░░░█████████░░░░░░░░░░░░░░
+  t = 1200 ms ░░░░███████████████████░░░░░░░░░░
+  t = 1800 ms ░░░░░░░░░█████████░░░░░░░░░░░░░░
+  t = 2400 ms ░░░░░░░░░░░░█░░░░░░░░░░░░░░░░░░░
 ```
 
 ---
