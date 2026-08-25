@@ -94,7 +94,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "hsl(218, 12%, 28%)",
+        "line-color": "hsl(220, 7%, 30%)",
         "line-dasharray": [
           1.5,
           1.5
@@ -156,7 +156,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "hsl(218, 10%, 32%)",
+        "line-color": "hsl(220, 6%, 36%)",
         "line-opacity": 1,
         "line-width": [
           "interpolate",
@@ -215,7 +215,7 @@
         "line-join": "miter"
       },
       "paint": {
-        "line-color": "rgba(128,142,160,0.40)",
+        "line-color": "rgba(255,79,171,0.46)",
         "line-dasharray": [
           12,
           0
@@ -277,7 +277,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "hsl(218, 18%, 42%)",
+        "line-color": "hsl(220, 7%, 44%)",
         "line-width": [
           "interpolate",
           [
@@ -336,7 +336,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "hsl(218, 12%, 36%)",
+        "line-color": "hsl(220, 6%, 34%)",
         "line-width": [
           "interpolate",
           [
@@ -386,7 +386,7 @@
         "line-join": "miter"
       },
       "paint": {
-        "line-color": "rgba(128,142,160,0.58)",
+        "line-color": "rgba(255,79,171,0.60)",
         "line-dasharray": [
           2,
           0
@@ -444,19 +444,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          5.8,
-          "hsla(210,16%,90%,0.82)",
-          6,
-          "#000"
-        ],
+        "line-color": "hsl(220, 12%, 82%)",
         "line-width": [
           "interpolate",
           [
@@ -509,7 +497,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "hsl(218, 10%, 26%)",
+        "line-color": "hsl(220, 6%, 28%)",
         "line-width": [
           "interpolate",
           [
@@ -574,7 +562,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "hsl(218, 10%, 30%)",
+        "line-color": "hsl(220, 6%, 30%)",
         "line-width": 3
       }
     },
@@ -626,7 +614,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#11141C",
+        "line-color": "hsl(220, 7%, 22%)",
         "line-dasharray": [
           3,
           3
@@ -674,7 +662,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "hsl(218, 10%, 30%)",
+        "line-color": "hsl(220, 6%, 30%)",
         "line-width": 3
       }
     },
@@ -718,7 +706,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#11141C",
+        "line-color": "hsl(220, 7%, 22%)",
         "line-dasharray": [
           3,
           3
@@ -766,7 +754,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "hsl(218, 10%, 30%)",
+        "line-color": "hsl(220, 6%, 28%)",
         "line-width": [
           "interpolate",
           [
@@ -823,7 +811,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#11141C",
+        "line-color": "hsl(220, 7%, 22%)",
         "line-dasharray": [
           3,
           3

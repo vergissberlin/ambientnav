@@ -660,7 +660,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "hsl(255, 10%, 14%)",
+        "line-color": "hsl(220, 7%, 28%)",
         "line-dasharray": [
           1.5,
           1.5
@@ -722,7 +722,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "hsl(255, 8%, 12%)",
+        "line-color": "hsl(220, 6%, 34%)",
         "line-opacity": 0.9,
         "line-width": [
           "interpolate",
@@ -781,7 +781,7 @@
         "line-join": "miter"
       },
       "paint": {
-        "line-color": "rgba(25,227,255,0.35)",
+        "line-color": "rgba(255,79,171,0.42)",
         "line-dasharray": [
           12,
           0
@@ -843,7 +843,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "hsl(196, 20%, 10%)",
+        "line-color": "hsl(220, 6%, 38%)",
         "line-width": [
           "interpolate",
           [
@@ -902,7 +902,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "hsl(196, 15%, 18%)",
+        "line-color": "hsl(220, 6%, 30%)",
         "line-width": [
           "interpolate",
           [
@@ -952,7 +952,7 @@
         "line-join": "miter"
       },
       "paint": {
-        "line-color": "rgba(25,227,255,0.5)",
+        "line-color": "rgba(255,79,171,0.56)",
         "line-dasharray": [
           2,
           0
@@ -1010,19 +1010,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          5.8,
-          "hsla(195,90%,88%,0.55)",
-          6,
-          "#000"
-        ],
+        "line-color": "hsl(220, 12%, 78%)",
         "line-width": [
           "interpolate",
           [
@@ -1153,7 +1141,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "hsl(196, 15%, 14%)",
+        "line-color": "hsl(220, 6%, 26%)",
         "line-width": [
           "interpolate",
           [
