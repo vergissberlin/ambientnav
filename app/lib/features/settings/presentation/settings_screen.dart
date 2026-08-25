@@ -21,6 +21,9 @@ class SettingsScreen extends ConsumerWidget {
     final mode = ref.watch(themeControllerProvider);
     final controller = ref.read(themeControllerProvider.notifier);
     final cameraBackgroundEnabled = ref.watch(cameraBackgroundEnabledProvider);
+    final cameraBackgroundTransparency = ref.watch(
+      cameraBackgroundTransparencyProvider,
+    );
     final cameraPermissionDenied = ref.watch(
       cameraBackgroundPermissionDeniedProvider,
     );
@@ -126,6 +129,33 @@ class SettingsScreen extends ConsumerWidget {
               }
             },
           ),
+          if (cameraBackgroundEnabled)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(56, 0, AnSpace.s4, 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(l10n.cameraNavBackgroundTransparency),
+                    subtitle: Text(l10n.cameraNavBackgroundTransparencyDesc),
+                  ),
+                  Slider(
+                    key: const Key('cameraNavBackgroundTransparencySlider'),
+                    value: cameraBackgroundTransparency,
+                    min: 0.15,
+                    max: 0.9,
+                    divisions: 15,
+                    label: l10n.cameraNavBackgroundTransparencyValue(
+                      (cameraBackgroundTransparency * 100).round().toString(),
+                    ),
+                    onChanged: (value) => ref
+                        .read(cameraBackgroundTransparencyProvider.notifier)
+                        .setTransparency(value),
+                  ),
+                ],
+              ),
+            ),
           if (kDebugMode) ...[
             const Divider(),
             ListTile(

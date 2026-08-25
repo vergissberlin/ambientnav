@@ -8,6 +8,13 @@
   },
   "layers": [
     {
+      "id": "background",
+      "type": "background",
+      "paint": {
+        "background-color": "rgba(0,0,0,0)"
+      }
+    },
+    {
       "id": "road_pier",
       "type": "line",
       "source": "openmaptiles",

@@ -34,10 +34,6 @@ class MapScreen extends ConsumerStatefulWidget {
 
 class _MapScreenState extends ConsumerState<MapScreen>
     with WidgetsBindingObserver {
-  /// When the simulator video is visible, keep the map as a faint overlay so
-  /// the moving background remains obvious.
-  static const double _cameraBackgroundMapOpacity = 0.28;
-
   MapLibreMapController? _mapController;
   Line? _routeLine;
   Line? _hazardZoneLine;
@@ -443,6 +439,10 @@ class _MapScreenState extends ConsumerState<MapScreen>
     final stripEffect = _celebrateArrival ? FrontStripEffect.arriving : effect;
     final stripProgress = _celebrateArrival ? 1.0 : progress;
     final cameraBackgroundEnabled = ref.watch(cameraBackgroundEnabledProvider);
+    final cameraBackgroundTransparency = ref.watch(
+      cameraBackgroundTransparencyProvider,
+    );
+    final cameraBackgroundMapOpacity = 1 - cameraBackgroundTransparency;
     final showCameraBackground =
         cameraBackgroundEnabled &&
         ((_cameraController?.value.isInitialized ?? false) || _cameraSimulated);
@@ -485,7 +485,7 @@ class _MapScreenState extends ConsumerState<MapScreen>
         : MyLocationTrackingMode.none;
 
     // Roads/route only, transparent basemap when the camera background is
-    // showing, so it — half-transparent below — lets the blur through.
+    // showing, so the blur can show through without dimming the overlay.
     final effectiveStyleUrl = showCameraBackground
         ? kMapStyleUrlTransparent
         : styleUrl;
@@ -572,9 +572,10 @@ class _MapScreenState extends ConsumerState<MapScreen>
                 : _blurred(
                     SimulatedCameraBackground(speedMps: navState.speedMps),
                   ),
-          showCameraBackground
-              ? Opacity(opacity: _cameraBackgroundMapOpacity, child: map)
-              : map,
+          if (showCameraBackground)
+            Opacity(opacity: cameraBackgroundMapOpacity, child: map)
+          else
+            map,
           Positioned(
             top:
                 MediaQuery.paddingOf(context).top + appBar.preferredSize.height,

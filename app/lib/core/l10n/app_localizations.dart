@@ -248,6 +248,24 @@ abstract class AppLocalizations {
   /// **'No camera is available in this simulator. The app is showing a simulated video background instead.'**
   String get cameraNavBackgroundNoCamera;
 
+  /// No description provided for @cameraNavBackgroundTransparency.
+  ///
+  /// In en, this message translates to:
+  /// **'Map background transparency'**
+  String get cameraNavBackgroundTransparency;
+
+  /// No description provided for @cameraNavBackgroundTransparencyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust how strongly the roads-only map fades behind the camera view.'**
+  String get cameraNavBackgroundTransparencyDesc;
+
+  /// No description provided for @cameraNavBackgroundTransparencyValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% transparent'**
+  String cameraNavBackgroundTransparencyValue(String percent);
+
   /// No description provided for @theme.
   ///
   /// In en, this message translates to:

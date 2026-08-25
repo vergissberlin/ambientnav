@@ -89,6 +89,19 @@ class AppLocalizationsDe extends AppLocalizations {
       'In diesem Simulator ist keine Kamera verfügbar. Stattdessen wird ein simuliertes Video angezeigt.';
 
   @override
+  String get cameraNavBackgroundTransparency =>
+      'Transparenz des Kartenhintergrunds';
+
+  @override
+  String get cameraNavBackgroundTransparencyDesc =>
+      'Bestimmt, wie stark die Straßenkarte hinter der Kamera ausgeblendet wird.';
+
+  @override
+  String cameraNavBackgroundTransparencyValue(String percent) {
+    return '$percent% transparent';
+  }
+
+  @override
   String get theme => 'Design';
 
   @override
