@@ -25,12 +25,12 @@
   "cameraNavBackgroundDesc": "Show a blurred live camera view behind the navigation map",
   "cameraNavBackgroundPermissionDenied": "Camera permission is required. If you deny it, the camera background stays off until you allow access.",
   "cameraNavBackgroundNoCamera": "No camera is available in this simulator. The app is showing a simulated video background instead.",
-  "cameraNavBackgroundTransparency": "Map background transparency",
-  "cameraNavBackgroundTransparencyDesc": "Adjust how strongly the roads-only map fades behind the camera view.",
-  "cameraNavBackgroundTransparencyValue": "{percent}% transparent",
-  "@cameraNavBackgroundTransparencyValue": {
+  "cameraNavBackgroundBlur": "Camera background blur",
+  "cameraNavBackgroundBlurDesc": "Adjust how soft the camera view appears behind the navigation map.",
+  "cameraNavBackgroundBlurValue": "{sigma} blur",
+  "@cameraNavBackgroundBlurValue": {
     "placeholders": {
-      "percent": {
+      "sigma": {
         "type": "String"
       }
     }

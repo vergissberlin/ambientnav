@@ -25,12 +25,12 @@
   "cameraNavBackgroundDesc": "Unscharfes Live-Kamerabild hinter der Navigationskarte anzeigen",
   "cameraNavBackgroundPermissionDenied": "Für diese Funktion ist die Kamera-Berechtigung erforderlich. Wenn du sie ablehnst, bleibt der Kamera-Hintergrund aus, bis du den Zugriff erlaubst.",
   "cameraNavBackgroundNoCamera": "In diesem Simulator ist keine Kamera verfügbar. Stattdessen wird ein simuliertes Video angezeigt.",
-  "cameraNavBackgroundTransparency": "Transparenz des Kartenhintergrunds",
-  "cameraNavBackgroundTransparencyDesc": "Bestimmt, wie stark die Straßenkarte hinter der Kamera ausgeblendet wird.",
-  "cameraNavBackgroundTransparencyValue": "{percent}% transparent",
-  "@cameraNavBackgroundTransparencyValue": {
+  "cameraNavBackgroundBlur": "Blur des Kamerahintergrunds",
+  "cameraNavBackgroundBlurDesc": "Bestimmt, wie weich das Kamerabild hinter der Navigationskarte wirkt.",
+  "cameraNavBackgroundBlurValue": "{sigma} Blur",
+  "@cameraNavBackgroundBlurValue": {
     "placeholders": {
-      "percent": {
+      "sigma": {
         "type": "String"
       }
     }

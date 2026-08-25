@@ -89,15 +89,15 @@ class AppLocalizationsEn extends AppLocalizations {
       'No camera is available in this simulator. The app is showing a simulated video background instead.';
 
   @override
-  String get cameraNavBackgroundTransparency => 'Map background transparency';
+  String get cameraNavBackgroundBlur => 'Camera background blur';
 
   @override
-  String get cameraNavBackgroundTransparencyDesc =>
-      'Adjust how strongly the roads-only map fades behind the camera view.';
+  String get cameraNavBackgroundBlurDesc =>
+      'Adjust how soft the camera view appears behind the navigation map.';
 
   @override
-  String cameraNavBackgroundTransparencyValue(String percent) {
-    return '$percent% transparent';
+  String cameraNavBackgroundBlurValue(String sigma) {
+    return '$sigma blur';
   }
 
   @override

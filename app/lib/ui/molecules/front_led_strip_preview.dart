@@ -120,10 +120,11 @@ class _FrontLedStripPreviewState extends State<FrontLedStripPreview>
       widget.progress,
     );
     return Container(
+      key: const Key('frontLedStripPreviewFrame'),
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: brand.surface2,
-        borderRadius: BorderRadius.circular(AnRadius.strip),
+        borderRadius: BorderRadius.zero,
         border: Border.all(color: brand.line),
       ),
       child: SizedBox(

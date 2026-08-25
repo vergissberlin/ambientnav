@@ -21,9 +21,7 @@ class SettingsScreen extends ConsumerWidget {
     final mode = ref.watch(themeControllerProvider);
     final controller = ref.read(themeControllerProvider.notifier);
     final cameraBackgroundEnabled = ref.watch(cameraBackgroundEnabledProvider);
-    final cameraBackgroundTransparency = ref.watch(
-      cameraBackgroundTransparencyProvider,
-    );
+    final cameraBackgroundBlur = ref.watch(cameraBackgroundBlurProvider);
     final cameraPermissionDenied = ref.watch(
       cameraBackgroundPermissionDeniedProvider,
     );
@@ -137,21 +135,21 @@ class SettingsScreen extends ConsumerWidget {
                 children: [
                   ListTile(
                     contentPadding: EdgeInsets.zero,
-                    title: Text(l10n.cameraNavBackgroundTransparency),
-                    subtitle: Text(l10n.cameraNavBackgroundTransparencyDesc),
+                    title: Text(l10n.cameraNavBackgroundBlur),
+                    subtitle: Text(l10n.cameraNavBackgroundBlurDesc),
                   ),
                   Slider(
-                    key: const Key('cameraNavBackgroundTransparencySlider'),
-                    value: cameraBackgroundTransparency,
-                    min: 0.15,
-                    max: 0.9,
-                    divisions: 15,
-                    label: l10n.cameraNavBackgroundTransparencyValue(
-                      (cameraBackgroundTransparency * 100).round().toString(),
+                    key: const Key('cameraNavBackgroundBlurSlider'),
+                    value: cameraBackgroundBlur,
+                    min: 0,
+                    max: 30,
+                    divisions: 30,
+                    label: l10n.cameraNavBackgroundBlurValue(
+                      cameraBackgroundBlur.round().toString(),
                     ),
                     onChanged: (value) => ref
-                        .read(cameraBackgroundTransparencyProvider.notifier)
-                        .setTransparency(value),
+                        .read(cameraBackgroundBlurProvider.notifier)
+                        .setBlur(value),
                   ),
                 ],
               ),

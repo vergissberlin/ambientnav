@@ -27,36 +27,32 @@ final cameraBackgroundEnabledProvider =
       return CameraBackgroundController(ref.watch(localStoreProvider));
     });
 
-/// Persists the camera-background map transparency. Higher values make the
-/// roads-only map fade more strongly behind the camera view.
-class CameraBackgroundTransparencyController extends StateNotifier<double> {
-  CameraBackgroundTransparencyController(this._store) : super(_read(_store));
+/// Persists the camera-background blur strength. Higher values make the
+/// camera preview more blurred behind the roads-only map.
+class CameraBackgroundBlurController extends StateNotifier<double> {
+  CameraBackgroundBlurController(this._store) : super(_read(_store));
 
   final LocalStore _store;
-  static const String _key = 'camera_nav_background_transparency';
-  static const double _defaultValue = 0.72;
+  static const String _key = 'camera_nav_background_blur';
+  static const double _defaultValue = 18.0;
 
   static double _read(LocalStore store) {
     final raw = store.getString(_key);
     final parsed = raw == null ? null : double.tryParse(raw);
     if (parsed == null) return _defaultValue;
-    return parsed.clamp(0.0, 1.0);
+    return parsed.clamp(0.0, 30.0);
   }
 
-  Future<void> setTransparency(double value) async {
-    final clamped = value.clamp(0.0, 1.0);
+  Future<void> setBlur(double value) async {
+    final clamped = value.clamp(0.0, 30.0);
     state = clamped;
     await _store.setString(_key, clamped.toString());
   }
 }
 
-final cameraBackgroundTransparencyProvider =
-    StateNotifierProvider<CameraBackgroundTransparencyController, double>((
-      ref,
-    ) {
-      return CameraBackgroundTransparencyController(
-        ref.watch(localStoreProvider),
-      );
+final cameraBackgroundBlurProvider =
+    StateNotifierProvider<CameraBackgroundBlurController, double>((ref) {
+      return CameraBackgroundBlurController(ref.watch(localStoreProvider));
     });
 
 /// True right after a camera permission request for the background feature
